@@ -38,6 +38,7 @@ import de.grobox.transportr.AppComponent
 import de.grobox.transportr.R
 import de.grobox.transportr.TransportrApplication
 import de.grobox.transportr.data.locations.FavoriteLocation.FavLocationType
+import de.grobox.transportr.databinding.FragmentSpecialLocationBinding
 import de.grobox.transportr.favorites.trips.FavoriteTripListener
 import de.grobox.transportr.locations.LocationView
 import de.grobox.transportr.locations.LocationsViewModel
@@ -58,6 +59,9 @@ abstract class SpecialLocationFragment : DialogFragment(), LocationView.Location
     protected lateinit var viewModel: LocationsViewModel
     var listener: FavoriteTripListener? = null
 
+    private var _binding: FragmentSpecialLocationBinding? = null;
+    private val binding get() = _binding!!
+
     private lateinit var loc: LocationView
 
     @get:StringRes
@@ -72,12 +76,13 @@ abstract class SpecialLocationFragment : DialogFragment(), LocationView.Location
     protected abstract fun viewModel(): LocationsViewModel  // a method to init when activity has been created
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val v = inflater.inflate(R.layout.fragment_special_location, container)
+        _binding = FragmentSpecialLocationBinding.inflate(inflater, container, false)
+        val v = binding.root
 
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
         // Initialize LocationView
-        loc = v.findViewById(R.id.location_input)
+        loc = binding.locationInput
         loc.setHint(hint)
         loc.setLocationViewListener(this)
 
@@ -124,4 +129,8 @@ abstract class SpecialLocationFragment : DialogFragment(), LocationView.Location
 
     override fun onLocationCleared(type: FavLocationType) {}
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 }
