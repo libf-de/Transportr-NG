@@ -29,11 +29,14 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import de.grobox.transportr.R
 import de.grobox.transportr.TransportrFragment
 import de.grobox.transportr.databinding.FragmentTripDetailBinding
@@ -77,6 +80,7 @@ class TripDetailFragment : TransportrFragment(), Toolbar.OnMenuItemClickListener
     private lateinit var topBar: View
     private lateinit var bottomBar: View
     private lateinit var list: RecyclerView
+    private lateinit var closeButton: ImageView
 
     private val timeUpdater: CountDownTimer = object : CountDownTimer(Long.MAX_VALUE, 1000 * 30) {
         override fun onTick(millisUntilFinished: Long) {
@@ -109,6 +113,7 @@ class TripDetailFragment : TransportrFragment(), Toolbar.OnMenuItemClickListener
         topBar = binding.topBar
         bottomBar = binding.bottomBar
         list = binding.list
+        closeButton = binding.closeButton
 
         return binding.root
     }

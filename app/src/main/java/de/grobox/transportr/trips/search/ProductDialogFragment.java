@@ -71,7 +71,6 @@ public class ProductDialogFragment extends DialogFragment {
 	private Button okButton;
 
 	private FragmentProductDialogBinding binding;
-	werwefwefwe
 	private View dialog;
 
 	@NonNull
@@ -117,17 +116,6 @@ public class ProductDialogFragment extends DialogFragment {
 		} else {
 			adapter.withSavedInstanceState(savedInstanceState);
 		}
-
-		// OK Button
-		okButton = binding.okButton;
-		okButton.setOnClickListener(view -> {
-			EnumSet<Product> products = getProductsFromItems(adapter.getSelectedItems());
-			viewModel.setProducts(products);
-			getDialog().cancel();
-		});
-		// Cancel Button
-		Button cancelButton = binding.cancelButton;
-		cancelButton.setOnClickListener(view -> getDialog().cancel());
 
 		return v;
 	}

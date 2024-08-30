@@ -19,25 +19,23 @@
 
 package de.grobox.transportr.departures
 
-import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import de.grobox.transportr.R
-import de.grobox.transportr.databinding.ListItemDepartureBinding
 import com.google.android.material.card.MaterialCardView
+import de.grobox.transportr.databinding.ListItemDepartureBinding
 import de.grobox.transportr.ui.LineView
 import de.grobox.transportr.utils.DateUtils.formatDelay
-import de.grobox.transportr.utils.DateUtils.formatTime
 import de.grobox.transportr.utils.DateUtils.formatRelativeTime
+import de.grobox.transportr.utils.DateUtils.formatTime
 import de.grobox.transportr.utils.TransportrUtils.getLocationName
 import de.schildbach.pte.dto.Departure
-import java.util.*
+import java.util.Date
 
 internal class DepartureViewHolder(binding: ListItemDepartureBinding) : RecyclerView.ViewHolder(binding.root) {
 
-    private val card: CardView = binding.root
+    private val card: MaterialCardView = binding.root
     private var line: LineView = binding.line
     private val lineName: TextView = binding.lineNameView
     private val timeRel: TextView = binding.departureTimeRel
