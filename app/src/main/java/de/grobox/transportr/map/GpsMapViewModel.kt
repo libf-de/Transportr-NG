@@ -25,7 +25,7 @@ import androidx.lifecycle.MutableLiveData
 import de.grobox.transportr.map.GpsMapViewModel.GpsFabState
 import de.grobox.transportr.map.PositionController.PositionState
 
-internal interface GpsMapViewModel {
+interface GpsMapViewModel {
 
     val positionController: PositionController
 
@@ -41,7 +41,7 @@ internal interface GpsMapViewModel {
     }
 }
 
-internal class GpsMapViewModelImpl(override val positionController: PositionController) : GpsMapViewModel {
+class GpsMapViewModelImpl(override val positionController: PositionController) : GpsMapViewModel {
     override val isCameraTracking = MutableLiveData<Boolean>()
     override val isPositionStale = MutableLiveData<Boolean>()
     override val gpsFabState = MediatorLiveData<GpsFabState>().apply {

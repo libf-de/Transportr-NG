@@ -33,14 +33,14 @@ import de.grobox.transportr.trips.detail.TripUtils.hasFare
 import de.grobox.transportr.trips.search.TripAdapter.OnTripClickListener
 import de.grobox.transportr.ui.LineView
 import de.grobox.transportr.utils.DateUtils.formatDuration
-import de.grobox.transportr.utils.DateUtils.formatTime
 import de.grobox.transportr.utils.DateUtils.formatRelativeTime
+import de.grobox.transportr.utils.DateUtils.formatTime
 import de.grobox.transportr.utils.TransportrUtils.getLocationName
 import de.schildbach.pte.dto.Trip
 import de.schildbach.pte.dto.Trip.Individual
 import de.schildbach.pte.dto.Trip.Public
 
-internal class TripViewHolder(private val v: View) : BaseViewHolder(v) {
+class TripViewHolder(private val v: View) : BaseViewHolder(v) {
 
     private val fromTimeRel: TextView = v.findViewById(R.id.fromTimeRel)
     private val fromLocation: TextView = v.findViewById(R.id.fromLocation)

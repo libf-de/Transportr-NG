@@ -26,7 +26,7 @@ import android.view.View
 import com.mikepenz.fastadapter.expandable.items.AbstractExpandableItem
 import de.grobox.transportr.R
 
-internal class TransportNetworkItem(val transportNetwork: TransportNetwork, idExtra: Int) :
+class TransportNetworkItem(val transportNetwork: TransportNetwork, idExtra: Int) :
     AbstractExpandableItem<TransportNetworkItem, TransportNetworkViewHolder, TransportNetworkItem>() {
 
     private val identifier = transportNetwork.id.ordinal + 10000 * idExtra

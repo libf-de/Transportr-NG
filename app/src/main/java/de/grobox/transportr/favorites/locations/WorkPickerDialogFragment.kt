@@ -19,7 +19,6 @@
 
 package de.grobox.transportr.favorites.locations
 
-import de.grobox.transportr.AppComponent
 import de.grobox.transportr.R
 import de.grobox.transportr.locations.WrapLocation
 
@@ -27,10 +26,6 @@ import de.grobox.transportr.locations.WrapLocation
 abstract class WorkPickerDialogFragment : SpecialLocationFragment() {
 
     override val hint = R.string.work_hint
-
-    override fun inject(component: AppComponent) {
-        component.inject(this)
-    }
 
     override fun onSpecialLocationSet(location: WrapLocation) {
         viewModel.setWork(location)

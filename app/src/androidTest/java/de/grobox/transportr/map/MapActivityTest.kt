@@ -27,7 +27,10 @@ import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.RootMatchers.isPlatformPopup
-import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.isRoot
+import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
@@ -45,8 +48,12 @@ import de.grobox.transportr.networks.TransportNetwork
 import de.grobox.transportr.networks.TransportNetworkManager
 import de.grobox.transportr.waitForId
 import org.hamcrest.CoreMatchers.anything
-import org.junit.*
 import org.junit.Assert.assertEquals
+import org.junit.Before
+import org.junit.FixMethodOrder
+import org.junit.Ignore
+import org.junit.Rule
+import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.MethodSorters
 import javax.inject.Inject
@@ -76,7 +83,6 @@ class MapActivityTest : ScreengrabTest() {
         super.setUp()
 
         activityRule.runOnUiThread {
-            component.inject(this)
             val transportNetwork: TransportNetwork = manager.getTransportNetworkByNetworkId(networkId) ?: throw RuntimeException()
             manager.setTransportNetwork(transportNetwork)
             // ensure networkId got updated before continuing

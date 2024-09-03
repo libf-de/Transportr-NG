@@ -31,7 +31,7 @@ import de.schildbach.pte.dto.Trip
 import de.schildbach.pte.dto.TripOptions
 import java.util.*
 
-internal class TripReloader(
+class TripReloader(
         private val networkProvider: NetworkProvider,
         private val settingsManager: SettingsManager,
         private val query: TripQuery,

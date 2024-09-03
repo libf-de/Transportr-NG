@@ -80,7 +80,7 @@ public class FavoriteTripItem extends StoredSearch implements Comparable<Favorit
 		this.favorite = false;
 	}
 
-	FavoriteTripType getType() {
+	public FavoriteTripType getType() {
 		return type;
 	}
 

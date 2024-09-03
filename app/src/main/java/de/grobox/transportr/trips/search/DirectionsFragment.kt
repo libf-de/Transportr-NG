@@ -24,20 +24,27 @@ import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.*
+import android.view.View.GONE
+import android.view.View.INVISIBLE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.Animation.RELATIVE_TO_SELF
 import android.view.animation.TranslateAnimation
+import android.widget.ImageButton
+import android.widget.TextView
+import androidx.appcompat.widget.Toolbar
 import androidx.appcompat.widget.TooltipCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModelProvider
 import de.grobox.transportr.R
 import de.grobox.transportr.TransportrFragment
 import de.grobox.transportr.data.locations.FavoriteLocation.FavLocationType
 import de.grobox.transportr.data.locations.FavoriteLocation.FavLocationType.FROM
 import de.grobox.transportr.data.locations.FavoriteLocation.FavLocationType.TO
 import de.grobox.transportr.data.locations.FavoriteLocation.FavLocationType.VIA
+import de.grobox.transportr.databinding.FragmentDirectionsFormBinding
+import de.grobox.transportr.locations.LocationGpsView
+import de.grobox.transportr.locations.LocationView
 import de.grobox.transportr.settings.SettingsManager
 import de.grobox.transportr.ui.TimeDateFragment
 import de.grobox.transportr.utils.Constants.DATE
@@ -49,28 +56,67 @@ import de.grobox.transportr.utils.DateUtils.formatTime
 import de.grobox.transportr.utils.DateUtils.isNow
 import de.grobox.transportr.utils.DateUtils.isToday
 import de.schildbach.pte.dto.Product
-import kotlinx.android.synthetic.main.fragment_directions_form.*
-import java.util.*
+import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
+import java.util.Calendar
+import java.util.EnumSet
 import javax.annotation.ParametersAreNonnullByDefault
-import javax.inject.Inject
 
 @ParametersAreNonnullByDefault
 class DirectionsFragment : TransportrFragment() {
 
-    @Inject
-    internal lateinit var settingsManager: SettingsManager
-    @Inject
-    internal lateinit var viewModelFactory: ViewModelProvider.Factory
+    internal val settingsManager: SettingsManager by inject()
 
-    private lateinit var viewModel: DirectionsViewModel
+    private val viewModel: DirectionsViewModel by activityViewModel()
+
+    private var _binding: FragmentDirectionsFormBinding? = null
+    private val binding get() = _binding!!
+
+    private lateinit var fromLocation: LocationGpsView
+    private lateinit var viaLocation: LocationView
+    private lateinit var toLocation: LocationView
+    private lateinit var fromCard: View
+    private lateinit var viaCard: View
+    private lateinit var toCard: View
+    private lateinit var toolbar: Toolbar
+    private lateinit var timeBackground: View
+    private lateinit var time: TextView
+    private lateinit var date: TextView
+    private lateinit var departure: TextView
+    private lateinit var favIcon: ImageButton
+    private lateinit var productsIcon: View
+    private lateinit var productsMarked: View
+    private lateinit var swapIcon: View
+    private lateinit var viaIcon: ImageButton
+
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val v = inflater.inflate(R.layout.fragment_directions_form, container, false)
-        component.inject(this)
+        _binding = FragmentDirectionsFormBinding.inflate(inflater, container, false)
 
-        viewModel = ViewModelProvider(activity!!, viewModelFactory).get(DirectionsViewModel::class.java)
+        fromLocation = binding.fromLocation
+        viaLocation = binding.viaLocation
+        toLocation = binding.toLocation
+        fromCard = binding.fromCard
+        viaCard = binding.viaCard
+        toCard = binding.toCard
+        toolbar = binding.toolbar
+        timeBackground = binding.timeBackground
+        time = binding.time
+        date = binding.date
+        departure = binding.departure
+        favIcon = binding.favIcon
+        productsIcon = binding.productsIcon
+        productsMarked = binding.productsMarked
+        swapIcon = binding.swapIcon
+        viaIcon = binding.viaIcon
 
-        return v
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -128,7 +174,7 @@ class DirectionsFragment : TransportrFragment() {
             if (viewModel.lastQueryCalendar.value == null) throw IllegalStateException()
             val fragment = TimeDateFragment.newInstance(viewModel.lastQueryCalendar.value!!, viewModel.isDeparture.value!!)
             fragment.setTimeDateListener(viewModel)
-            fragment.show(activity!!.supportFragmentManager, TimeDateFragment.TAG)
+            fragment.show(requireActivity().supportFragmentManager, TimeDateFragment.TAG)
         }
         timeBackground.setOnLongClickListener {
             viewModel.resetCalender()
@@ -165,7 +211,7 @@ class DirectionsFragment : TransportrFragment() {
             viewModel.setToLocation(toLocation.getLocation())
             viewModel.onTimeAndDateSet(savedInstanceState.getSerializable(DATE) as Calendar)
         }
-        (activity!!.supportFragmentManager.findFragmentByTag(TimeDateFragment.TAG) as? TimeDateFragment)?.setTimeDateListener(viewModel)
+        (requireActivity().supportFragmentManager.findFragmentByTag(TimeDateFragment.TAG) as? TimeDateFragment)?.setTimeDateListener(viewModel)
     }
 
     private fun onCalendarUpdated(calendar: Calendar?) {

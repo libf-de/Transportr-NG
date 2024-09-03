@@ -20,7 +20,7 @@
 package de.grobox.transportr.locations;
 
 import com.google.common.base.Strings;
-import com.mapbox.mapboxsdk.geometry.LatLng;
+import org.maplibre.android.geometry.LatLng;
 
 import java.io.Serializable;
 import java.util.Set;
@@ -156,7 +156,7 @@ public class WrapLocation implements Serializable {
 		}
 	}
 
-	String getFullName() {
+	public String getFullName() {
 		if (name != null) {
 			return place == null ? name : name + ", " + place;
 		} else {

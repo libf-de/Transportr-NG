@@ -20,6 +20,7 @@
 package de.grobox.transportr.departures;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import androidx.annotation.NonNull;
@@ -40,6 +41,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.color.MaterialColors;
 import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout;
 import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection;
 
@@ -51,6 +53,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.grobox.transportr.R;
 import de.grobox.transportr.TransportrActivity;
+import de.grobox.transportr.databinding.ActivityDeparturesBinding;
 import de.grobox.transportr.locations.WrapLocation;
 import de.grobox.transportr.ui.LceAnimator;
 import de.grobox.transportr.ui.TimeDateFragment;
@@ -70,13 +73,14 @@ import static de.schildbach.pte.dto.QueryDeparturesResult.Status.OK;
 
 @ParametersAreNonnullByDefault
 public class DeparturesActivity extends TransportrActivity
-		implements LoaderCallbacks<QueryDeparturesResult>, TimeDateListener {
+implements LoaderCallbacks<QueryDeparturesResult>, TimeDateListener {
 
-	public final static int MAX_DEPARTURES = 12;
-	private final static int SAFETY_MARGIN = 6;
+	public static final int MAX_DEPARTURES = 12;
+	private static final int SAFETY_MARGIN = 6;
 
 	private enum SearchState {INITIAL, TOP, BOTTOM}
 
+	private ActivityDeparturesBinding binding;
 	private ProgressBar progressBar;
 	private View errorLayout;
 	private TextView errorText;
@@ -101,16 +105,17 @@ public class DeparturesActivity extends TransportrActivity
 	@Override
 	public void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		binding = ActivityDeparturesBinding.inflate(getLayoutInflater());
 
 		Intent intent = getIntent();
 		location = (WrapLocation) intent.getSerializableExtra(WRAP_LOCATION);
 		if (location == null || location.getLocation() == null)
 			throw new IllegalArgumentException("No Location");
 
-		setContentView(R.layout.activity_departures);
+		setContentView(binding.getRoot());
 
 		// Toolbar
-		Toolbar toolbar = findViewById(R.id.toolbar);
+		Toolbar toolbar = binding.toolbar;
 		setSupportActionBar(toolbar);
 		toolbar.setSubtitle(location.getName());
 		ActionBar actionBar = getSupportActionBar();
@@ -120,8 +125,8 @@ public class DeparturesActivity extends TransportrActivity
 		}
 
 		// Swipe to Refresh
-		swipe = findViewById(R.id.swipe);
-		swipe.setColorSchemeResources(R.color.accent);
+		swipe = binding.swipe;
+		swipe.setColorSchemeColors(MaterialColors.getColor(this, R.attr.colorPrimary, Color.TRANSPARENT));
 		swipe.setDirection(SwipyRefreshLayoutDirection.BOTH);
 		swipe.setDistanceToTriggerSync(getDragDistance(this));
 		swipe.setOnRefreshListener(direction -> loadMoreDepartures(direction != TOP));
@@ -129,7 +134,7 @@ public class DeparturesActivity extends TransportrActivity
 
 		// Departures List
 		adapter = new DepartureAdapter();
-		list = findViewById(R.id.list);
+		list = binding.list;
 		list.setVisibility(INVISIBLE);
 		list.setAdapter(adapter);
 		list.setLayoutManager(new LinearLayoutManager(this));
@@ -139,8 +144,8 @@ public class DeparturesActivity extends TransportrActivity
 		Loader<QueryDeparturesResult> loader = getSupportLoaderManager().initLoader(LOADER_DEPARTURES, args, this);
 
 		// Progress Bar and Error View
-		progressBar = findViewById(R.id.progressBar);
-		errorLayout = findViewById(R.id.errorLayout);
+		progressBar = binding.progressBar;
+		errorLayout = binding.errorLayout;
 		errorText = errorLayout.findViewById(R.id.errorText);
 		errorLayout.findViewById(R.id.errorButton).setOnClickListener(view -> {
 			LceAnimator.showLoading(progressBar, list, errorLayout);
@@ -262,7 +267,7 @@ public class DeparturesActivity extends TransportrActivity
 	@NonNull
 	@Override
 	public DeparturesLoader onCreateLoader(int i, @Nullable Bundle args) {
-		return new DeparturesLoader(this, manager.getTransportNetwork().getValue(), args);
+		return new DeparturesLoader(this, this.getManager().getTransportNetwork().getValue(), args);
 	}
 
 	@Override

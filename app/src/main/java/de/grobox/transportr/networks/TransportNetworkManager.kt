@@ -19,25 +19,24 @@
 
 package de.grobox.transportr.networks
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.annotation.VisibleForTesting
+import androidx.lifecycle.map
 import de.grobox.transportr.settings.SettingsManager
 import de.schildbach.pte.NetworkId
-import javax.inject.Inject
 
-class TransportNetworkManager @Inject
+class TransportNetworkManager
 constructor(private val settingsManager: SettingsManager) {
 
-    val transportNetwork = MutableLiveData<TransportNetwork>()
-    val networkId: LiveData<NetworkId> = Transformations.map<TransportNetwork, NetworkId>(transportNetwork, { it.id })
+    val transportNetwork = MutableLiveData<TransportNetwork?>()
+    val networkId: LiveData<NetworkId?> = transportNetwork.map { it?.id }
     private var transportNetwork2: TransportNetwork? = null
     private var transportNetwork3: TransportNetwork? = null
 
     init {
         val network = loadTransportNetwork(1)
-        network?.let { transportNetwork.value = network }
+        network?.let { transportNetwork.value = it }
 
         transportNetwork2 = loadTransportNetwork(2)
         transportNetwork3 = loadTransportNetwork(3)

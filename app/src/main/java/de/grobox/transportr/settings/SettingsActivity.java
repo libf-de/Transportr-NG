@@ -31,12 +31,11 @@ public class SettingsActivity extends TransportrActivity {
 	@Override
 	public void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
-		setUpCustomToolbar(false);
+		setContentView(R.layout.compose_activity);
 
 		if (savedInstanceState == null) {
 			getSupportFragmentManager().beginTransaction()
-					.replace(R.id.fragment_container, new SettingsFragment())
+					.replace(R.id.fragment_container, new SettingsComposeFragment())
 					.commit();
 		}
 	}

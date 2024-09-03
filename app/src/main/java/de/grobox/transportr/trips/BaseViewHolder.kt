@@ -25,16 +25,15 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import de.grobox.transportr.R
 import de.grobox.transportr.utils.DateUtils.formatDelay
 import de.grobox.transportr.utils.DateUtils.formatTime
 import de.schildbach.pte.dto.Position
 import de.schildbach.pte.dto.Stop
-import java.util.*
+import java.util.Date
 
-internal abstract class BaseViewHolder(v: View) : RecyclerView.ViewHolder(v) {
+abstract class BaseViewHolder(v: View) : RecyclerView.ViewHolder(v) {
 
     protected val context: Context = v.context
     protected val fromTime: TextView = v.findViewById(R.id.fromTime)
@@ -49,7 +48,7 @@ internal abstract class BaseViewHolder(v: View) : RecyclerView.ViewHolder(v) {
 
         if (stop.isArrivalTimePredicted && stop.arrivalDelay != null) {
             val delay = stop.arrivalDelay
-            time.time = time.time - delay
+            time.time -= delay
             formatDelay(delayView.context, delay).let {
                 delayView.apply {
                     text = it.delay
@@ -70,7 +69,7 @@ internal abstract class BaseViewHolder(v: View) : RecyclerView.ViewHolder(v) {
 
         if (stop.isDepartureTimePredicted && stop.departureDelay != null) {
             val delay = stop.departureDelay
-            time.time = time.time - delay
+            time.time -= delay
             formatDelay(delayView.context, delay).let {
                 delayView.apply {
                     text = it.delay

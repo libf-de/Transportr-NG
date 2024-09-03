@@ -20,20 +20,24 @@ package de.grobox.transportr.trips.search
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
-import android.os.CountDownTimer
 import android.util.Pair
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.color.MaterialColors
+import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout
 import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout.OnRefreshListener
 import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection
 import de.grobox.transportr.R
 import de.grobox.transportr.TransportrFragment
+import de.grobox.transportr.databinding.FragmentTripsBinding
 import de.grobox.transportr.trips.detail.TripDetailActivity
 import de.grobox.transportr.trips.search.TripAdapter.OnTripClickListener
 import de.grobox.transportr.trips.search.TripsRepository.QueryMoreState
@@ -41,29 +45,37 @@ import de.grobox.transportr.ui.LceAnimator
 import de.grobox.transportr.utils.Linkify
 import de.grobox.transportr.utils.TransportrUtils.getDragDistance
 import de.schildbach.pte.dto.Trip
-import kotlinx.android.synthetic.main.fragment_trips.*
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import java.util.regex.Pattern
-import javax.annotation.ParametersAreNonnullByDefault
-import javax.inject.Inject
 
 class TripsFragment : TransportrFragment(), OnRefreshListener, OnTripClickListener {
-    
-    @Inject
-    internal lateinit var viewModelFactory: ViewModelProvider.Factory
-    
-    private lateinit var viewModel: DirectionsViewModel
-    
+    private val viewModel: DirectionsViewModel by activityViewModel()
+
+    private var _binding: FragmentTripsBinding? = null
+    private val binding get() = _binding!!
+
     private val adapter = TripAdapter(this)
     private var topSwipingEnabled = false
     private var queryMoreDirection = SwipyRefreshLayoutDirection.BOTH
 
+    private lateinit var swipe: SwipyRefreshLayout;
+    private lateinit var list: RecyclerView;
+    private lateinit var errorButton: Button;
+    private lateinit var errorText: TextView;
+    private lateinit var errorLayout: View;
+    private lateinit var progressBar: View;
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val v = inflater.inflate(R.layout.fragment_trips, container, false)
-        component.inject(this)
+        _binding = FragmentTripsBinding.inflate(inflater, container, false)
 
-        viewModel = ViewModelProvider(activity!!, viewModelFactory).get(DirectionsViewModel::class.java)
+        swipe = binding.swipe
+        list = binding.list
+        errorButton = binding.errorButton
+        errorText = binding.errorText
+        errorLayout = binding.errorLayout
+        progressBar = binding.progressBar
 
-        return v
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -74,7 +86,8 @@ class TripsFragment : TransportrFragment(), OnRefreshListener, OnTripClickListen
 
         // Swipe to Refresh
         swipe.let {
-            it.setColorSchemeColors(R.color.accent)
+            val color = MaterialColors.getColor(context, R.attr.colorPrimary, Color.TRANSPARENT)
+            it.setColorSchemeColors(color)
             it.setDistanceToTriggerSync(getDragDistance(context))
             it.setOnRefreshListener(this)
         }
@@ -84,7 +97,7 @@ class TripsFragment : TransportrFragment(), OnRefreshListener, OnTripClickListen
         list.setHasFixedSize(false)
         viewModel.topSwipeEnabled.observe(viewLifecycleOwner, { enabled -> onSwipeEnabledChanged(enabled) })
         viewModel.queryMoreState.observe(viewLifecycleOwner, { state -> updateSwipeState(state) })
-        viewModel.trips.observe(viewLifecycleOwner, { trips -> onTripsLoaded(trips) })
+        viewModel.trips.observe(viewLifecycleOwner) { trips -> onTripsLoaded(trips) }
         viewModel.queryError.observe(viewLifecycleOwner, { error -> onError(error) })
         viewModel.queryPTEError.observe(viewLifecycleOwner, { error -> onPTEError(error) })
         viewModel.queryMoreError.observe(viewLifecycleOwner, { error -> onMoreError(error) })

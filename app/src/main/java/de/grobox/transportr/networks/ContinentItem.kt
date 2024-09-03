@@ -28,7 +28,7 @@ import com.mikepenz.fastadapter.expandable.items.AbstractExpandableItem
 import com.mikepenz.fastadapter.listeners.OnClickListener
 import de.grobox.transportr.R
 
-internal class ContinentItem(private val continent: Continent, context: Context) :
+class ContinentItem(private val continent: Continent, context: Context) :
     AbstractExpandableItem<ContinentItem, ContinentViewHolder, CountryItem>() {
 
     init {

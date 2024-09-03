@@ -21,7 +21,7 @@ package de.grobox.transportr.networks
 
 import android.content.Context
 
-internal interface Region {
+interface Region {
 
     fun getName(context: Context): String
 

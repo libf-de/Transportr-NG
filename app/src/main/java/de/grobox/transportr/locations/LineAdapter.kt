@@ -27,7 +27,7 @@ import de.grobox.transportr.ui.LineView
 import de.schildbach.pte.dto.Line
 
 
-internal class LineAdapter : RecyclerView.Adapter<LineViewHolder>() {
+class LineAdapter : RecyclerView.Adapter<LineViewHolder>() {
 
     private var lines: List<Line> = emptyList()
 
@@ -50,7 +50,7 @@ internal class LineAdapter : RecyclerView.Adapter<LineViewHolder>() {
 
 }
 
-internal class LineViewHolder(private val lineView: LineView) : RecyclerView.ViewHolder(lineView) {
+class LineViewHolder(private val lineView: LineView) : RecyclerView.ViewHolder(lineView) {
 
     fun bind(line: Line) = lineView.setLine(line)
 

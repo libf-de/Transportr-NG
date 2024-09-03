@@ -19,17 +19,13 @@
 
 package de.grobox.transportr.map
 
-import android.app.Application
-import android.location.Location
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import android.net.Uri
 import android.util.Log
-import android.widget.Toast
-import com.mapbox.mapboxsdk.geometry.LatLng
-import com.mapbox.mapboxsdk.geometry.LatLngBounds
-import de.grobox.transportr.R
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.switchMap
+import org.maplibre.android.geometry.LatLng
+import org.maplibre.android.geometry.LatLngBounds
 import de.grobox.transportr.TransportrApplication
 import de.grobox.transportr.data.locations.FavoriteLocation
 import de.grobox.transportr.data.locations.LocationRepository
@@ -39,12 +35,8 @@ import de.grobox.transportr.locations.WrapLocation
 import de.grobox.transportr.networks.TransportNetworkManager
 import de.grobox.transportr.utils.IntentUtils
 import de.grobox.transportr.utils.SingleLiveEvent
-import java.util.*
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-internal class MapViewModel @Inject internal constructor(
+class MapViewModel internal constructor(
         application: TransportrApplication,
         transportNetworkManager: TransportNetworkManager,
         locationRepository: LocationRepository,
@@ -53,15 +45,15 @@ internal class MapViewModel @Inject internal constructor(
     ) : SavedSearchesViewModel(application, transportNetworkManager, locationRepository, searchesRepository), GpsMapViewModel by GpsMapViewModelImpl(positionController) {
 
     private val peekHeight = MutableLiveData<Int>()
-    private val selectedLocationClicked = MutableLiveData<LatLng>()
-    private val updatedLiveBounds = MutableLiveData<LatLngBounds>()
-    private val selectedLocation = MutableLiveData<WrapLocation>()
+    private val selectedLocationClicked = MutableLiveData<LatLng?>()
+    private val updatedLiveBounds = MutableLiveData<LatLngBounds?>()
+    private val selectedLocation = MutableLiveData<WrapLocation?>()
     private val findNearbyStations = SingleLiveEvent<WrapLocation>()
     private val nearbyStationsFound = SingleLiveEvent<Boolean>()
 
     val mapClicked = SingleLiveEvent<Void>()
     val markerClicked = SingleLiveEvent<Void>()
-    val liveBounds: LiveData<LatLngBounds> = Transformations.switchMap<List<FavoriteLocation>, LatLngBounds>(locations, this::switchMap)
+    val liveBounds: LiveData<LatLngBounds?> = locations.switchMap(this::switchMap)
     var transportNetworkWasChanged = false
 
     fun getPeekHeight(): LiveData<Int> {
@@ -72,7 +64,7 @@ internal class MapViewModel @Inject internal constructor(
         this.peekHeight.value = peekHeight
     }
 
-    fun getSelectedLocationClicked(): LiveData<LatLng> {
+    fun getSelectedLocationClicked(): LiveData<LatLng?> {
         return selectedLocationClicked
     }
 
@@ -92,7 +84,7 @@ internal class MapViewModel @Inject internal constructor(
         selectedLocation.postValue(null)
     }
 
-    fun getSelectedLocation(): LiveData<WrapLocation> {
+    fun getSelectedLocation(): LiveData<WrapLocation?> {
         return selectedLocation
     }
 
@@ -118,11 +110,11 @@ internal class MapViewModel @Inject internal constructor(
             selectLocation(location)
         } else {
             Log.w(MapViewModel::class.java.simpleName, "Invalid geo intent: " + geoUri.toString())
-            Toast.makeText(getApplication<Application>().applicationContext, R.string.error_geo_intent, Toast.LENGTH_SHORT).show()
+            //Toast.makeText(application.applicationContext, R.string.error_geo_intent, Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun switchMap(input: List<FavoriteLocation>?): MutableLiveData<LatLngBounds> {
+    private fun switchMap(input: List<FavoriteLocation>?): MutableLiveData<LatLngBounds?> {
         if (input == null) {
             updatedLiveBounds.setValue(null)
         } else {

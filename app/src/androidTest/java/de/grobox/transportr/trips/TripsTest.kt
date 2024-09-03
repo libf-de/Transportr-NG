@@ -60,7 +60,7 @@ class TripsTest : ScreengrabTest() {
         super.setUp()
 
         activityRule.runOnUiThread {
-            component.inject(this)
+            //component.inject(this)
             val transportNetwork: TransportNetwork = manager.getTransportNetworkByNetworkId(networkId) ?: throw RuntimeException()
             manager.setTransportNetwork(transportNetwork)
         }

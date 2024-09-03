@@ -29,12 +29,11 @@ import android.util.Pair
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.MutableLiveData
 import de.grobox.transportr.R
-import de.grobox.transportr.data.locations.FavoriteLocation.FavLocationType.*
+import de.grobox.transportr.data.locations.FavoriteLocation.FavLocationType.FROM
+import de.grobox.transportr.data.locations.FavoriteLocation.FavLocationType.TO
+import de.grobox.transportr.data.locations.FavoriteLocation.FavLocationType.VIA
 import de.grobox.transportr.data.locations.LocationRepository
 import de.grobox.transportr.data.searches.SearchesRepository
-import de.grobox.transportr.networks.TransportNetwork
-import de.grobox.transportr.networks.TransportNetworkManager
-import de.grobox.transportr.networks.TransportNetworkManager_Factory
 import de.grobox.transportr.settings.SettingsManager
 import de.grobox.transportr.trips.TripQuery
 import de.grobox.transportr.utils.SingleLiveEvent
@@ -42,7 +41,17 @@ import de.grobox.transportr.utils.TransportrUtils
 import de.schildbach.pte.NetworkProvider
 import de.schildbach.pte.dto.QueryTripsContext
 import de.schildbach.pte.dto.QueryTripsResult
-import de.schildbach.pte.dto.QueryTripsResult.Status.*
+import de.schildbach.pte.dto.QueryTripsResult.Status.AMBIGUOUS
+import de.schildbach.pte.dto.QueryTripsResult.Status.INVALID_DATE
+import de.schildbach.pte.dto.QueryTripsResult.Status.NO_TRIPS
+import de.schildbach.pte.dto.QueryTripsResult.Status.OK
+import de.schildbach.pte.dto.QueryTripsResult.Status.SERVICE_DOWN
+import de.schildbach.pte.dto.QueryTripsResult.Status.TOO_CLOSE
+import de.schildbach.pte.dto.QueryTripsResult.Status.UNKNOWN_FROM
+import de.schildbach.pte.dto.QueryTripsResult.Status.UNKNOWN_LOCATION
+import de.schildbach.pte.dto.QueryTripsResult.Status.UNKNOWN_TO
+import de.schildbach.pte.dto.QueryTripsResult.Status.UNKNOWN_VIA
+import de.schildbach.pte.dto.QueryTripsResult.Status.UNRESOLVABLE_ADDRESS
 import de.schildbach.pte.dto.Trip
 import de.schildbach.pte.dto.TripOptions
 import java.io.InterruptedIOException
@@ -54,7 +63,8 @@ class TripsRepository(
         private val networkProvider: NetworkProvider,
         private val settingsManager: SettingsManager,
         private val locationRepository: LocationRepository,
-        private val searchesRepository: SearchesRepository) {
+        private val searchesRepository: SearchesRepository
+) {
 
     companion object {
         private val TAG = TripsRepository::class.java.simpleName
@@ -78,10 +88,10 @@ class TripsRepository(
     }
 
     private fun clearState() {
-        trips.value = null
+        trips.value = emptySet()
         queryMoreState.value = QueryMoreState.NONE
         queryTripsContext = null
-        isFavTrip.value = null
+        isFavTrip.value = false
         uid = 0L
     }
 

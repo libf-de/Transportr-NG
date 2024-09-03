@@ -31,25 +31,25 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.annotation.CallSuper
 import androidx.annotation.RequiresPermission
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.mapbox.mapboxsdk.location.LocationComponent
-import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
-import com.mapbox.mapboxsdk.location.LocationComponentOptions
-import com.mapbox.mapboxsdk.location.OnCameraTrackingChangedListener
-import com.mapbox.mapboxsdk.location.modes.CameraMode
-import com.mapbox.mapboxsdk.location.modes.RenderMode
-import com.mapbox.mapboxsdk.maps.MapboxMap
-import com.mapbox.mapboxsdk.maps.Style
 import de.grobox.transportr.R
 import de.grobox.transportr.map.GpsMapViewModel.GpsFabState
 import de.grobox.transportr.map.PositionController.Companion.FIX_EXPIRY
-import de.grobox.transportr.map.PositionController.PositionState
-import de.grobox.transportr.map.PositionController.PositionState.*
+import de.grobox.transportr.map.PositionController.PositionState.DENIED
+import de.grobox.transportr.map.PositionController.PositionState.DISABLED
+import de.grobox.transportr.map.PositionController.PositionState.ENABLED
 import de.grobox.transportr.utils.Constants.REQUEST_LOCATION_PERMISSION
+import org.maplibre.android.location.LocationComponent
+import org.maplibre.android.location.LocationComponentActivationOptions
+import org.maplibre.android.location.LocationComponentOptions
+import org.maplibre.android.location.OnCameraTrackingChangedListener
+import org.maplibre.android.location.modes.CameraMode
+import org.maplibre.android.location.modes.RenderMode
+import org.maplibre.android.maps.MapLibreMap
+import org.maplibre.android.maps.Style
 
-internal abstract class GpsMapFragment<ViewModel : GpsMapViewModel> : BaseMapFragment() {
+abstract class GpsMapFragment<ViewModel : GpsMapViewModel> : BaseMapFragment() {
 
     internal abstract val viewModel: ViewModel
 
@@ -89,7 +89,7 @@ internal abstract class GpsMapFragment<ViewModel : GpsMapViewModel> : BaseMapFra
     }
 
     @CallSuper
-    override fun onMapReady(mapboxMap: MapboxMap) {
+    override fun onMapReady(mapboxMap: MapLibreMap) {
         super.onMapReady(mapboxMap)
     }
 
@@ -178,7 +178,7 @@ internal abstract class GpsMapFragment<ViewModel : GpsMapViewModel> : BaseMapFra
         }
     }
 
-    protected fun MapboxMap.zoomToMyLocation() {
+    protected fun MapLibreMap.zoomToMyLocation() {
         locationComponent.setCameraMode(
             CameraMode.TRACKING, 750,
             if (cameraPosition.zoom < LOCATION_ZOOM) LOCATION_ZOOM.toDouble() else null,

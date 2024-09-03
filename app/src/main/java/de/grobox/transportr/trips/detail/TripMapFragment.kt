@@ -19,22 +19,15 @@
 
 package de.grobox.transportr.trips.detail
 
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
-import android.os.Bundle
 import androidx.annotation.LayoutRes
-import android.util.DisplayMetrics
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import com.mapbox.mapboxsdk.geometry.LatLng
-import com.mapbox.mapboxsdk.maps.MapboxMap
 import de.grobox.transportr.R
 import de.grobox.transportr.map.GpsMapFragment
 import de.schildbach.pte.dto.Trip
-import javax.inject.Inject
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
+import org.maplibre.android.geometry.LatLng
+import org.maplibre.android.maps.MapLibreMap
 
-internal class TripMapFragment : GpsMapFragment<TripDetailViewModel>() {
+class TripMapFragment : GpsMapFragment<TripDetailViewModel>() {
 
     companion object {
         @JvmField
@@ -45,19 +38,9 @@ internal class TripMapFragment : GpsMapFragment<TripDetailViewModel>() {
         @LayoutRes
         get() = R.layout.fragment_trip_map
 
-    @Inject
-    internal lateinit var viewModelFactory: ViewModelProvider.Factory
+    override val viewModel: TripDetailViewModel by activityViewModel()
 
-    override lateinit var viewModel: TripDetailViewModel
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        component.inject(this)
-        viewModel = ViewModelProvider(activity!!, viewModelFactory).get(TripDetailViewModel::class.java)
-
-        return super.onCreateView(inflater, container, savedInstanceState)
-    }
-
-    override fun onMapReady(mapboxMap: MapboxMap) {
+    override fun onMapReady(mapboxMap: MapLibreMap) {
         super.onMapReady(mapboxMap)
 
         // set bottom padding, so everything gets centered in top half of screen

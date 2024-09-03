@@ -28,7 +28,7 @@ import com.mikepenz.fastadapter.expandable.items.AbstractExpandableItem
 import com.mikepenz.fastadapter.listeners.OnClickListener
 import de.grobox.transportr.R
 
-internal class CountryItem(private val country: Country) : AbstractExpandableItem<CountryItem, CountryViewHolder, TransportNetworkItem>() {
+class CountryItem(private val country: Country) : AbstractExpandableItem<CountryItem, CountryViewHolder, TransportNetworkItem>() {
 
     init {
         withSubItems(country.getSubItems())

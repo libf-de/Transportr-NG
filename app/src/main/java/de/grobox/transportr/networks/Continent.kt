@@ -25,7 +25,7 @@ import androidx.annotation.StringRes
 import javax.annotation.concurrent.Immutable
 
 @Immutable
-internal class Continent constructor(
+class Continent constructor(
     @param:StringRes @field:StringRes @get:StringRes val name: Int,
     @param:DrawableRes @field:DrawableRes @get:DrawableRes val contour: Int,
     internal val countries: List<Country>

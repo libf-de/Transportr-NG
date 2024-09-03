@@ -21,30 +21,38 @@ package de.grobox.transportr.trips.detail
 
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
-import androidx.core.content.ContextCompat.getColor
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import de.grobox.transportr.R
 import de.grobox.transportr.TransportrFragment
+import de.grobox.transportr.databinding.FragmentTripDetailBinding
 import de.grobox.transportr.trips.detail.TripDetailViewModel.SheetState
-import de.grobox.transportr.trips.detail.TripDetailViewModel.SheetState.*
+import de.grobox.transportr.trips.detail.TripDetailViewModel.SheetState.BOTTOM
+import de.grobox.transportr.trips.detail.TripDetailViewModel.SheetState.EXPANDED
+import de.grobox.transportr.trips.detail.TripDetailViewModel.SheetState.MIDDLE
 import de.grobox.transportr.trips.detail.TripUtils.getStandardFare
 import de.grobox.transportr.trips.detail.TripUtils.hasFare
 import de.grobox.transportr.trips.detail.TripUtils.intoCalendar
 import de.grobox.transportr.trips.detail.TripUtils.share
 import de.grobox.transportr.utils.DateUtils.formatDuration
-import de.grobox.transportr.utils.DateUtils.formatTime
 import de.grobox.transportr.utils.DateUtils.formatRelativeTime
-import de.grobox.transportr.utils.TransportrUtils.getColorFromAttr
+import de.grobox.transportr.utils.DateUtils.formatTime
+import de.grobox.transportr.utils.FullScreenUtil
 import de.schildbach.pte.dto.Trip
-import kotlinx.android.synthetic.main.fragment_trip_detail.*
-import javax.inject.Inject
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
 class TripDetailFragment : TransportrFragment(), Toolbar.OnMenuItemClickListener {
 
@@ -52,10 +60,25 @@ class TripDetailFragment : TransportrFragment(), Toolbar.OnMenuItemClickListener
         val TAG = TripDetailFragment::class.java.simpleName
     }
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelProvider.Factory
+    private val viewModel: TripDetailViewModel by activityViewModel()
 
-    private lateinit var viewModel: TripDetailViewModel
+    private var _binding: FragmentTripDetailBinding? = null
+    private val binding get() = _binding!!
+
+    private lateinit var fromTimeRel: TextView
+    private lateinit var fromTime: TextView
+    private lateinit var from: TextView
+    private lateinit var toTime: TextView
+    private lateinit var to: TextView
+    private lateinit var duration: TextView
+    private lateinit var durationTop: TextView
+    private lateinit var price: TextView
+    private lateinit var priceTop: TextView
+    private lateinit var toolbar: Toolbar
+    private lateinit var topBar: View
+    private lateinit var bottomBar: View
+    private lateinit var list: RecyclerView
+    private lateinit var closeButton: ImageView
 
     private val timeUpdater: CountDownTimer = object : CountDownTimer(Long.MAX_VALUE, 1000 * 30) {
         override fun onTick(millisUntilFinished: Long) {
@@ -73,21 +96,38 @@ class TripDetailFragment : TransportrFragment(), Toolbar.OnMenuItemClickListener
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_trip_detail, container, false)
+        _binding = FragmentTripDetailBinding.inflate(inflater, container, false)
+
+        fromTimeRel = binding.fromTimeRel
+        fromTime = binding.fromTime
+        from = binding.from
+        toTime = binding.toTime
+        to = binding.to
+        duration = binding.duration
+        durationTop = binding.durationTop
+        price = binding.price
+        priceTop = binding.priceTop
+        toolbar = binding.toolbar
+        topBar = binding.topBar
+        bottomBar = binding.bottomBar
+        list = binding.list
+        closeButton = binding.closeButton
+
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setUpToolbar(toolbar)
         setHasOptionsMenu(true)
-        component.inject(this)
 
         toolbar.setNavigationOnClickListener { _ -> onToolbarClose() }
         toolbar.setOnMenuItemClickListener(this)
         list.layoutManager = LinearLayoutManager(context)
         bottomBar.setOnClickListener { _ -> onBottomBarClick() }
 
-        viewModel = ViewModelProvider(activity!!, viewModelFactory).get(TripDetailViewModel::class.java)
+
         viewModel.getTrip().observe(viewLifecycleOwner, Observer<Trip> { this.onTripChanged(it) })
         viewModel.sheetState.observe(viewLifecycleOwner, Observer<SheetState> { this.onSheetStateChanged(it) })
     }
@@ -166,29 +206,23 @@ class TripDetailFragment : TransportrFragment(), Toolbar.OnMenuItemClickListener
     }
 
     private fun onSheetStateChanged(sheetState: SheetState?) {
+        FullScreenUtil.applyImageViewTopInset(closeButton)
         when (sheetState) {
             null -> return
             BOTTOM -> {
-                toolbar.visibility = GONE
+                closeButton.visibility = GONE
                 topBar.visibility = GONE
                 bottomBar.visibility = VISIBLE
             }
             MIDDLE -> {
-                toolbar.visibility = GONE
+
+                closeButton.visibility = GONE
                 topBar.visibility = VISIBLE
-                topBar.setBackgroundColor(context.getColorFromAttr(R.attr.colorPrimary))
-                fromTimeRel.setTextColor(getColor(context, R.color.md_white_1000))
-                durationTop.setTextColor(getColor(context, R.color.md_white_1000))
-                priceTop.setTextColor(getColor(context, R.color.md_white_1000))
                 bottomBar.visibility = GONE
             }
             EXPANDED -> {
-                toolbar.visibility = VISIBLE
+                closeButton.visibility = VISIBLE
                 topBar.visibility = VISIBLE
-                topBar.setBackgroundColor(context.getColorFromAttr(android.R.attr.colorBackground))
-                fromTimeRel.setTextColor(context.getColorFromAttr(android.R.attr.textColorPrimary))
-                durationTop.setTextColor(context.getColorFromAttr(android.R.attr.textColorSecondary))
-                priceTop.setTextColor(context.getColorFromAttr(android.R.attr.textColorSecondary))
                 bottomBar.visibility = GONE
             }
         }

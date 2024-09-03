@@ -1,7 +1,7 @@
 /*
  *    Transportr
  *
- *    Copyright (c) 2013 - 2021 Torsten Grote
+ *    Copyright (c) 2013 - 2024 Torsten Grote
  *
  *    This program is Free Software: you can redistribute it and/or modify
  *    it under the terms of the GNU General Public License as
@@ -17,22 +17,5 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.grobox.transportr;
+package de.grobox.transportr.composables
 
-import androidx.lifecycle.ViewModel;
-
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-import dagger.MapKey;
-
-@Documented
-@Target({ ElementType.METHOD })
-@Retention(RetentionPolicy.RUNTIME)
-@MapKey
-@interface ViewModelKey {
-	Class<? extends ViewModel> value();
-}

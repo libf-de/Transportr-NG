@@ -20,7 +20,6 @@
 package de.grobox.transportr.trips.detail
 
 import android.text.Html.fromHtml
-import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.ImageButton
@@ -33,8 +32,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.common.base.Strings
 import com.google.common.base.Strings.isNullOrEmpty
 import de.grobox.transportr.R
+import de.grobox.transportr.databinding.ListItemLegBinding
 import de.grobox.transportr.trips.BaseViewHolder
-import de.grobox.transportr.trips.detail.LegViewHolder.LegType.*
+import de.grobox.transportr.trips.detail.LegViewHolder.LegType.FIRST
+import de.grobox.transportr.trips.detail.LegViewHolder.LegType.FIRST_LAST
+import de.grobox.transportr.trips.detail.LegViewHolder.LegType.MIDDLE
 import de.grobox.transportr.ui.LineView
 import de.grobox.transportr.utils.DateUtils
 import de.grobox.transportr.utils.DateUtils.formatDuration
@@ -42,13 +44,13 @@ import de.grobox.transportr.utils.TransportrUtils.getLocationName
 import de.schildbach.pte.dto.Line
 import de.schildbach.pte.dto.Stop
 import de.schildbach.pte.dto.Style.RED
-import de.schildbach.pte.dto.Trip.*
-import kotlinx.android.synthetic.main.list_item_leg.view.*
+import de.schildbach.pte.dto.Trip.Individual
+import de.schildbach.pte.dto.Trip.Leg
+import de.schildbach.pte.dto.Trip.Public
 
+class LegViewHolder(binding: ListItemLegBinding, private val listener: LegClickListener, private val showLineName: Boolean) : BaseViewHolder(binding.root) {
 
-internal class LegViewHolder(v: View, private val listener: LegClickListener, private val showLineName: Boolean) : BaseViewHolder(v) {
-
-    internal enum class LegType {
+    enum class LegType {
         FIRST, MIDDLE, LAST, FIRST_LAST
     }
 
@@ -56,22 +58,22 @@ internal class LegViewHolder(v: View, private val listener: LegClickListener, pr
         internal val DEFAULT_LINE_COLOR = RED
     }
 
-    private val fromCircle: ImageView = v.fromCircle
-    private val fromLocation: TextView = v.fromLocation
-    private val fromButton: ImageButton = v.fromButton
+    private val fromCircle: ImageView = binding.fromCircle
+    private val fromLocation: TextView = binding.fromLocation
+    private val fromButton: ImageButton = binding.fromButton
 
-    private val lineBar: ImageView = v.lineBar
-    private val lineView: LineView = v.lineView
-    private val lineDestination: TextView = v.lineDestination
-    private val message: TextView = v.message
-    private val duration: TextView = v.duration
-    private val stopsText: TextView = v.stopsText
-    private val stopsButton: ImageButton = v.stopsButton
-    private val stopsList: RecyclerView = v.stopsList
+    private val lineBar: ImageView = binding.lineBar
+    private val lineView: LineView = binding.lineView
+    private val lineDestination: TextView = binding.lineDestination
+    private val message: TextView = binding.message
+    private val duration: TextView = binding.duration
+    private val stopsText: TextView = binding.stopsText
+    private val stopsButton: ImageButton = binding.stopsButton
+    private val stopsList: RecyclerView = binding.stopsList
 
-    private val toCircle: ImageView = v.toCircle
-    private val toLocation: TextView = v.toLocation
-    private val toButton: ImageButton = v.toButton
+    private val toCircle: ImageView = binding.toCircle
+    private val toLocation: TextView = binding.toLocation
+    private val toButton: ImageButton = binding.toButton
 
     private val adapter = StopAdapter(listener)
 

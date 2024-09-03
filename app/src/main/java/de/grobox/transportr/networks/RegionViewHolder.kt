@@ -19,7 +19,6 @@
 
 package de.grobox.transportr.networks
 
-import android.os.Build
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -30,7 +29,7 @@ import de.grobox.transportr.R
 import de.grobox.transportr.networks.TransportNetwork.Status.ALPHA
 import de.grobox.transportr.networks.TransportNetwork.Status.STABLE
 
-internal abstract class RegionViewHolder<in Reg : Region>(v: View) : RecyclerView.ViewHolder(v) {
+abstract class RegionViewHolder<in Reg : Region>(v: View) : RecyclerView.ViewHolder(v) {
     protected val name: TextView = v.findViewById(R.id.name)
 
     open fun bind(region: Reg, expanded: Boolean) {
@@ -38,7 +37,7 @@ internal abstract class RegionViewHolder<in Reg : Region>(v: View) : RecyclerVie
     }
 }
 
-internal class TransportNetworkViewHolder(v: View) : RegionViewHolder<TransportNetwork>(v) {
+class TransportNetworkViewHolder(v: View) : RegionViewHolder<TransportNetwork>(v) {
     private val logo: ImageView = v.findViewById(R.id.logo)
     private val desc: TextView = v.findViewById(R.id.desc)
     private val status: TextView = v.findViewById(R.id.status)
@@ -60,7 +59,7 @@ internal class TransportNetworkViewHolder(v: View) : RegionViewHolder<TransportN
     }
 }
 
-internal abstract class ExpandableRegionViewHolder<in Reg : Region>(v: View) : RegionViewHolder<Reg>(v) {
+abstract class ExpandableRegionViewHolder<in Reg : Region>(v: View) : RegionViewHolder<Reg>(v) {
     private val chevron: ImageView = v.findViewById(R.id.chevron)
 
     override fun bind(region: Reg, expanded: Boolean) {
@@ -72,7 +71,7 @@ internal abstract class ExpandableRegionViewHolder<in Reg : Region>(v: View) : R
     }
 }
 
-internal class CountryViewHolder(v: View) : ExpandableRegionViewHolder<Country>(v) {
+class CountryViewHolder(v: View) : ExpandableRegionViewHolder<Country>(v) {
     private val flag: TextView = v.findViewById(R.id.flag)
 
     override fun bind(region: Country, expanded: Boolean) {
@@ -82,7 +81,7 @@ internal class CountryViewHolder(v: View) : ExpandableRegionViewHolder<Country>(
     }
 }
 
-internal class ContinentViewHolder(v: View) : ExpandableRegionViewHolder<Continent>(v) {
+class ContinentViewHolder(v: View) : ExpandableRegionViewHolder<Continent>(v) {
     private val contour: ImageView = v.findViewById(R.id.contour)
 
     override fun bind(region: Continent, expanded: Boolean) {
