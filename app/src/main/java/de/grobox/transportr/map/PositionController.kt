@@ -43,7 +43,7 @@ import de.grobox.transportr.locations.WrapLocation
 import de.grobox.transportr.utils.NotifyingLiveData
 import java.util.concurrent.TimeUnit
 
- internal class PositionController(val context: Context)
+ class PositionController(val context: Context)
     : AbstractManager(), NotifyingLiveData.OnActivationCallback, ReverseGeocoder.ReverseGeocoderCallback, LocationListener {
 
     private val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager

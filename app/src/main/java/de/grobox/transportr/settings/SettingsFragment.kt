@@ -23,23 +23,24 @@ import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatDelegate.*
+import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
+import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
+import androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
-import androidx.lifecycle.Observer
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import de.grobox.transportr.R
-import de.grobox.transportr.TransportrApplication
 import de.grobox.transportr.map.MapActivity
 import de.grobox.transportr.networks.PickTransportNetworkActivity
 import de.grobox.transportr.networks.TransportNetwork
 import de.grobox.transportr.networks.TransportNetworkManager
 import de.grobox.transportr.settings.SettingsManager.Companion.LANGUAGE
 import de.grobox.transportr.settings.SettingsManager.Companion.THEME
-import javax.inject.Inject
+import org.koin.android.ext.android.inject
 
 class SettingsFragment : PreferenceFragmentCompat() {
 
@@ -47,14 +48,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
         val TAG: String = SettingsFragment::class.java.simpleName
     }
 
-    @Inject
-    internal lateinit var manager: TransportNetworkManager
+    internal val manager: TransportNetworkManager by inject()
     private lateinit var networkPref: Preference
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        (activity!!.application as TransportrApplication).component.inject(this)
-        super.onCreate(savedInstanceState)
-    }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, s: String?) {
         // Load the preferences from an XML resource
@@ -72,8 +67,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
             val intent = Intent(activity, PickTransportNetworkActivity::class.java)
             val x : Float = view?.x ?: view?.findFocus()?.x ?: 0f
             val y : Float = view?.y ?: view?.findFocus()?.y ?: 0f
-            val options = ActivityOptionsCompat.makeScaleUpAnimation(view!!, x.toInt(), y.toInt(), 0, 0)
-            ActivityCompat.startActivity(activity!!, intent, options.toBundle())
+            val options = ActivityOptionsCompat.makeScaleUpAnimation(requireView(), x.toInt(), y.toInt(), 0, 0)
+            ActivityCompat.startActivity(requireActivity(), intent, options.toBundle())
             true
         }
 
@@ -95,8 +90,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
     }
 
-    private fun onTransportNetworkChanged(network: TransportNetwork) {
-        context?.let { networkPref.summary = network.getName(it) }
+    private fun onTransportNetworkChanged(network: TransportNetwork?) {
+        context?.let { networkPref.summary = network?.getName(it) ?: "(unknown)" }
     }
 
     private fun reload() {
@@ -110,7 +105,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
     }
 
-    override fun onDisplayPreferenceDialog(preference: Preference?) {
+    override fun onDisplayPreferenceDialog(preference: Preference) {
         when (preference) {
             // show a material design 3 dialog instead of the default md2 preference dialog
             is ListPreference -> {

@@ -24,7 +24,6 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.MenuItem
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.AppBarLayout.OnOffsetChangedListener
 import de.grobox.transportr.R
@@ -35,8 +34,11 @@ import de.grobox.transportr.locations.WrapLocation
 import de.grobox.transportr.locations.WrapLocation.WrapType.GPS
 import de.grobox.transportr.trips.search.SavedSearchesFragment.HomePickerFragment
 import de.grobox.transportr.trips.search.SavedSearchesFragment.WorkPickerFragment
-import de.grobox.transportr.utils.Constants.*
-import javax.inject.Inject
+import de.grobox.transportr.utils.Constants.FAV_TRIP_UID
+import de.grobox.transportr.utils.Constants.FROM
+import de.grobox.transportr.utils.Constants.TO
+import de.grobox.transportr.utils.Constants.VIA
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class DirectionsActivity : TransportrActivity(), OnOffsetChangedListener {
 
@@ -49,10 +51,7 @@ class DirectionsActivity : TransportrActivity(), OnOffsetChangedListener {
         const val INTENT_URI_FAVORITE = "transportr://favorite"
     }
 
-    @Inject
-    internal lateinit var viewModelFactory: ViewModelProvider.Factory
-
-    private lateinit var viewModel: DirectionsViewModel
+    private val viewModel: DirectionsViewModel by viewModel()
     private lateinit var binding: ActivityDirectionsBinding
 
     private val isShowingTrips: Boolean
@@ -67,12 +66,11 @@ class DirectionsActivity : TransportrActivity(), OnOffsetChangedListener {
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        component.inject(this)
+
         binding = ActivityDirectionsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         // get view model and observe data
-        viewModel = ViewModelProvider(this, viewModelFactory).get(DirectionsViewModel::class.java)
         viewModel.showTrips.observe(this, Observer { showTrips() })
 
         val appBarLayout = binding.appBarLayout;
@@ -128,7 +126,8 @@ class DirectionsActivity : TransportrActivity(), OnOffsetChangedListener {
 
     private fun showTrips() {
         supportFragmentManager.beginTransaction()
-            .replace(R.id.fragmentContainer, TripsFragment(), TripsFragment.TAG)
+            .replace(R.id.fragmentContainer, TripsComposeFragment(), TripsFragment.TAG)
+            .addToBackStack(null)
             .commit()
         binding.fragmentContainer.requestFocus()
     }

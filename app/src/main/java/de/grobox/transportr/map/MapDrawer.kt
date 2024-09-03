@@ -23,24 +23,31 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
-import com.mapbox.mapboxsdk.annotations.Icon
-import com.mapbox.mapboxsdk.annotations.IconFactory
-import com.mapbox.mapboxsdk.annotations.Marker
-import com.mapbox.mapboxsdk.annotations.MarkerOptions
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
-import com.mapbox.mapboxsdk.exceptions.InvalidLatLngBoundsException
-import com.mapbox.mapboxsdk.geometry.LatLng
-import com.mapbox.mapboxsdk.geometry.LatLngBounds
-import com.mapbox.mapboxsdk.maps.MapboxMap
 import de.grobox.transportr.R
 import de.grobox.transportr.utils.hasLocation
 import de.schildbach.pte.dto.Location
+import org.maplibre.android.annotations.Icon
+import org.maplibre.android.annotations.IconFactory
+import org.maplibre.android.annotations.Marker
+import org.maplibre.android.annotations.MarkerOptions
+import org.maplibre.android.camera.CameraUpdateFactory
+import org.maplibre.android.exceptions.InvalidLatLngBoundsException
+import org.maplibre.android.geometry.LatLng
+import org.maplibre.android.geometry.LatLngBounds
+import org.maplibre.android.maps.MapLibreMap
 
-internal abstract class MapDrawer(protected val context: Context) {
+abstract class MapDrawer(protected val context: Context) {
+    private var iconFactory: IconFactory? = null
 
-    private val iconFactory = IconFactory.getInstance(context)
+    init {
+        try {
+            iconFactory = IconFactory.getInstance(context)
+        } catch (err: Exception) {
+            err.printStackTrace()
+        }
+    }
 
-    protected fun markLocation(map: MapboxMap, location: Location, icon: Icon, title: String, snippet: String? = null): Marker? {
+    protected fun markLocation(map: MapLibreMap, location: Location, icon: Icon, title: String, snippet: String? = null): Marker? {
         if (!location.hasLocation()) return null
         return map.addMarker(MarkerOptions()
                 .icon(icon)
@@ -50,7 +57,7 @@ internal abstract class MapDrawer(protected val context: Context) {
         )
     }
 
-    protected fun zoomToBounds(map: MapboxMap, builder: LatLngBounds.Builder, animate: Boolean) {
+    protected fun zoomToBounds(map: MapLibreMap, builder: LatLngBounds.Builder, animate: Boolean) {
         try {
             val latLngBounds = builder.build()
             val padding = (map.cameraPosition.padding?.let { BaseMapFragment.MapPadding(it) } ?: BaseMapFragment.MapPadding()) +
@@ -65,12 +72,12 @@ internal abstract class MapDrawer(protected val context: Context) {
         }
     }
 
-    protected fun Drawable.toIcon(): Icon {
+    protected fun Drawable.toIcon(): Icon? {
         val bitmap = Bitmap.createBitmap(intrinsicWidth, intrinsicHeight, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         setBounds(0, 0, canvas.width, canvas.height)
         draw(canvas)
-        return iconFactory.fromBitmap(bitmap)
+        return iconFactory?.fromBitmap(bitmap)
     }
 
 }

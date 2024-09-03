@@ -33,7 +33,7 @@ import de.grobox.transportr.utils.TransportrUtils.getLocationName
 import de.schildbach.pte.dto.Departure
 import java.util.Date
 
-internal class DepartureViewHolder(binding: ListItemDepartureBinding) : RecyclerView.ViewHolder(binding.root) {
+class DepartureViewHolder(binding: ListItemDepartureBinding) : RecyclerView.ViewHolder(binding.root) {
 
     private val card: MaterialCardView = binding.root
     private var line: LineView = binding.line

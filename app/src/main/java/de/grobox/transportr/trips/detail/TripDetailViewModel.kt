@@ -22,8 +22,8 @@ package de.grobox.transportr.trips.detail
 import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.mapbox.mapboxsdk.geometry.LatLng
-import com.mapbox.mapboxsdk.geometry.LatLngBounds
+import org.maplibre.android.geometry.LatLng
+import org.maplibre.android.geometry.LatLngBounds
 import de.grobox.transportr.R
 import de.grobox.transportr.TransportrApplication
 import de.grobox.transportr.locations.WrapLocation
@@ -40,10 +40,8 @@ import de.grobox.transportr.utils.hasLocation
 import de.schildbach.pte.dto.Location
 import de.schildbach.pte.dto.Trip
 import de.schildbach.pte.dto.Trip.Leg
-import javax.inject.Inject
 
-internal class TripDetailViewModel
-@Inject internal constructor(
+class TripDetailViewModel internal constructor(
     application: TransportrApplication,
     transportNetworkManager: TransportNetworkManager,
     override val positionController: PositionController,

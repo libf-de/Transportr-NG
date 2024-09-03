@@ -28,7 +28,7 @@ import de.grobox.transportr.trips.detail.LegViewHolder.LegType
 import de.grobox.transportr.trips.detail.LegViewHolder.LegType.*
 import de.schildbach.pte.dto.Trip.Leg
 
-internal class LegAdapter internal constructor(
+class LegAdapter internal constructor(
         private val legs: List<Leg>,
         private val listener: LegClickListener,
         private val showLineName: Boolean) : Adapter<LegViewHolder>() {

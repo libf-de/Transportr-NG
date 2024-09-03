@@ -34,24 +34,25 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import de.grobox.transportr.R
 import de.grobox.transportr.TransportrFragment
 import de.grobox.transportr.databinding.FragmentTripDetailBinding
 import de.grobox.transportr.trips.detail.TripDetailViewModel.SheetState
-import de.grobox.transportr.trips.detail.TripDetailViewModel.SheetState.*
+import de.grobox.transportr.trips.detail.TripDetailViewModel.SheetState.BOTTOM
+import de.grobox.transportr.trips.detail.TripDetailViewModel.SheetState.EXPANDED
+import de.grobox.transportr.trips.detail.TripDetailViewModel.SheetState.MIDDLE
 import de.grobox.transportr.trips.detail.TripUtils.getStandardFare
 import de.grobox.transportr.trips.detail.TripUtils.hasFare
 import de.grobox.transportr.trips.detail.TripUtils.intoCalendar
 import de.grobox.transportr.trips.detail.TripUtils.share
 import de.grobox.transportr.utils.DateUtils.formatDuration
-import de.grobox.transportr.utils.DateUtils.formatTime
 import de.grobox.transportr.utils.DateUtils.formatRelativeTime
+import de.grobox.transportr.utils.DateUtils.formatTime
 import de.grobox.transportr.utils.FullScreenUtil
 import de.schildbach.pte.dto.Trip
-import javax.inject.Inject
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
 class TripDetailFragment : TransportrFragment(), Toolbar.OnMenuItemClickListener {
 
@@ -59,10 +60,7 @@ class TripDetailFragment : TransportrFragment(), Toolbar.OnMenuItemClickListener
         val TAG = TripDetailFragment::class.java.simpleName
     }
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelProvider.Factory
-
-    private lateinit var viewModel: TripDetailViewModel
+    private val viewModel: TripDetailViewModel by activityViewModel()
 
     private var _binding: FragmentTripDetailBinding? = null
     private val binding get() = _binding!!
@@ -123,14 +121,13 @@ class TripDetailFragment : TransportrFragment(), Toolbar.OnMenuItemClickListener
 
         setUpToolbar(toolbar)
         setHasOptionsMenu(true)
-        component.inject(this)
 
         toolbar.setNavigationOnClickListener { _ -> onToolbarClose() }
         toolbar.setOnMenuItemClickListener(this)
         list.layoutManager = LinearLayoutManager(context)
         bottomBar.setOnClickListener { _ -> onBottomBarClick() }
 
-        viewModel = ViewModelProvider(activity!!, viewModelFactory).get(TripDetailViewModel::class.java)
+
         viewModel.getTrip().observe(viewLifecycleOwner, Observer<Trip> { this.onTripChanged(it) })
         viewModel.sheetState.observe(viewLifecycleOwner, Observer<SheetState> { this.onSheetStateChanged(it) })
     }

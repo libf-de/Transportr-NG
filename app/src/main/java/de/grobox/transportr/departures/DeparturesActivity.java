@@ -73,10 +73,10 @@ import static de.schildbach.pte.dto.QueryDeparturesResult.Status.OK;
 
 @ParametersAreNonnullByDefault
 public class DeparturesActivity extends TransportrActivity
-		implements LoaderCallbacks<QueryDeparturesResult>, TimeDateListener {
+implements LoaderCallbacks<QueryDeparturesResult>, TimeDateListener {
 
-	public final static int MAX_DEPARTURES = 12;
-	private final static int SAFETY_MARGIN = 6;
+	public static final int MAX_DEPARTURES = 12;
+	private static final int SAFETY_MARGIN = 6;
 
 	private enum SearchState {INITIAL, TOP, BOTTOM}
 
@@ -267,7 +267,7 @@ public class DeparturesActivity extends TransportrActivity
 	@NonNull
 	@Override
 	public DeparturesLoader onCreateLoader(int i, @Nullable Bundle args) {
-		return new DeparturesLoader(this, manager.getTransportNetwork().getValue(), args);
+		return new DeparturesLoader(this, this.getManager().getTransportNetwork().getValue(), args);
 	}
 
 	@Override

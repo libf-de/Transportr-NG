@@ -26,6 +26,7 @@ import de.grobox.transportr.data.locations.FavoriteLocation.FavLocationType
 import de.grobox.transportr.data.locations.LocationRepository
 import de.grobox.transportr.data.searches.SearchesRepository
 import de.grobox.transportr.favorites.trips.SavedSearchesViewModel
+import de.grobox.transportr.locations.CombinedSuggestionRepository
 import de.grobox.transportr.locations.LocationView.LocationViewListener
 import de.grobox.transportr.locations.WrapLocation
 import de.grobox.transportr.map.PositionController
@@ -42,12 +43,17 @@ import de.schildbach.pte.NetworkId
 import de.schildbach.pte.NetworkProvider
 import de.schildbach.pte.dto.Product
 import de.schildbach.pte.dto.Trip
-import java.util.*
-import javax.inject.Inject
+import java.util.Calendar
+import java.util.EnumSet
 
-class DirectionsViewModel @Inject internal constructor(
-    application: TransportrApplication, transportNetworkManager: TransportNetworkManager, private val  settingsManager: SettingsManager,
-    locationRepository: LocationRepository, searchesRepository: SearchesRepository, positionController: PositionController
+class DirectionsViewModel internal constructor(
+    application: TransportrApplication,
+    transportNetworkManager: TransportNetworkManager,
+    private val  settingsManager: SettingsManager,
+    locationRepository: LocationRepository,
+    searchesRepository: SearchesRepository,
+    positionController: PositionController,
+    private val combinedSuggestionRepository: CombinedSuggestionRepository,
 ) : SavedSearchesViewModel(application, transportNetworkManager, locationRepository, searchesRepository), TimeDateListener, LocationViewListener {
 
     private val _tripsRepository: TripsRepository
@@ -63,6 +69,11 @@ class DirectionsViewModel @Inject internal constructor(
     private val _products = MutableLiveData<EnumSet<Product>>(EnumSet.copyOf(settingsManager.getPreferredProducts()))
     private val _isDeparture = MutableLiveData(true)
     private val _isExpanded = MutableLiveData(false)
+
+    private val _displayTrips = MutableLiveData(false)
+    val displayTrips: LiveData<Boolean> = _displayTrips
+
+    @Deprecated("use displayTrips")
     val showTrips = SingleLiveEvent<Void>()
     val topSwipeEnabled = MutableLiveData(false)
 
@@ -70,16 +81,40 @@ class DirectionsViewModel @Inject internal constructor(
     val viaLocation: LiveData<WrapLocation?> = _viaLocation
     val toLocation: LiveData<WrapLocation?> = _toLocation
 
+    val locationSuggestions: LiveData<Set<WrapLocation>> = combinedSuggestionRepository.suggestions
+    val suggestionsLoading: LiveData<Boolean> = combinedSuggestionRepository.isLoading
+
+    fun suggestLocations(query: String) {
+        combinedSuggestionRepository.updateSuggestions(query)
+    }
+
+    fun cancelSuggestLocations() {
+        combinedSuggestionRepository.cancelSuggestions()
+    }
+
+    fun resetSuggestions() {
+        combinedSuggestionRepository.reset()
+    }
+
     fun setFromLocation(location: WrapLocation?) {
         _fromLocation.value = location
+        maybeSearch()
     }
 
     fun setViaLocation(location: WrapLocation?) {
         _viaLocation.value = location
+        maybeSearch()
     }
 
     fun setToLocation(location: WrapLocation?) {
         _toLocation.value = location
+        maybeSearch()
+    }
+
+    fun maybeSearch() {
+        if (_fromLocation.value != null && _toLocation.value != null) {
+            search()
+        }
     }
 
     fun swapFromAndToLocations() {
@@ -184,6 +219,8 @@ class DirectionsViewModel @Inject internal constructor(
 
         val tripQuery = TripQuery(from, via, to, calendar.time, _isDeparture.value, _products.value)
         _tripsRepository.search(tripQuery)
+
+        _displayTrips.postValue(true)
         showTrips.call()
     }
 

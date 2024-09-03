@@ -34,7 +34,15 @@ import de.grobox.transportr.R
 import de.schildbach.pte.dto.Location
 import de.schildbach.pte.dto.LocationType
 import de.schildbach.pte.dto.Product
-import de.schildbach.pte.dto.Product.*
+import de.schildbach.pte.dto.Product.BUS
+import de.schildbach.pte.dto.Product.CABLECAR
+import de.schildbach.pte.dto.Product.FERRY
+import de.schildbach.pte.dto.Product.HIGH_SPEED_TRAIN
+import de.schildbach.pte.dto.Product.ON_DEMAND
+import de.schildbach.pte.dto.Product.REGIONAL_TRAIN
+import de.schildbach.pte.dto.Product.SUBURBAN_TRAIN
+import de.schildbach.pte.dto.Product.SUBWAY
+import de.schildbach.pte.dto.Product.TRAM
 import java.text.DecimalFormat
 import kotlin.math.roundToInt
 
@@ -64,8 +72,9 @@ object TransportrUtils {
     }
 
     @JvmStatic
-    fun getLocationName(l: Location): String? {
+    fun getLocationName(l: Location?): String? {
         return when {
+            l == null -> ""
             l.type == LocationType.COORD -> getCoordName(l)
             l.uniqueShortName() != null -> l.uniqueShortName()
             else -> ""

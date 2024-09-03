@@ -32,7 +32,7 @@ import de.schildbach.pte.dto.Stop
 import java.util.Date
 
 
-internal class StopViewHolder(binding: ListItemStopBinding, private val listener : LegClickListener) : BaseViewHolder(binding.root) {
+class StopViewHolder(binding: ListItemStopBinding, private val listener : LegClickListener) : BaseViewHolder(binding.root) {
 
     private val circle: ImageView = binding.circle
     private val stopLocation: TextView = binding.stopLocation

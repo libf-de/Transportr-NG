@@ -16,339 +16,329 @@
  *    You should have received a copy of the GNU General Public License
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package de.grobox.transportr.map
 
-package de.grobox.transportr.map;
-
-import android.app.Activity;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Bundle;
-import android.os.StrictMode;
-import android.os.StrictMode.ThreadPolicy;
-import android.os.StrictMode.VmPolicy;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.ImageView;
-import android.widget.TextView;
-
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.navigation.NavigationView;
-import com.mapbox.mapboxsdk.geometry.LatLng;
-
-import javax.annotation.ParametersAreNonnullByDefault;
-import javax.inject.Inject;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.core.splashscreen.SplashScreen;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.lifecycle.ViewModelProvider;
-import de.grobox.transportr.BuildConfig;
-import de.grobox.transportr.R;
-import de.grobox.transportr.TransportrActivity;
-import de.grobox.transportr.about.AboutActivity;
-import de.grobox.transportr.about.ContributorsActivity;
-import de.grobox.transportr.data.locations.FavoriteLocation.FavLocationType;
-import de.grobox.transportr.locations.LocationFragment;
-import de.grobox.transportr.locations.LocationView;
-import de.grobox.transportr.locations.LocationView.LocationViewListener;
-import de.grobox.transportr.locations.WrapLocation;
-import de.grobox.transportr.networks.PickTransportNetworkActivity;
-import de.grobox.transportr.networks.TransportNetwork;
-import de.grobox.transportr.settings.SettingsActivity;
-import de.grobox.transportr.ui.TransportrChangeLog;
-import de.grobox.transportr.utils.FullScreenUtil;
-import de.grobox.transportr.utils.OnboardingBuilder;
-
-import static android.content.Intent.ACTION_VIEW;
-import static com.google.android.material.bottomsheet.BottomSheetBehavior.PEEK_HEIGHT_AUTO;
-import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED;
-import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED;
-import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_HIDDEN;
-import static de.grobox.transportr.locations.WrapLocation.WrapType.GPS;
-import static de.grobox.transportr.trips.search.DirectionsActivity.ACTION_SEARCH;
-import static de.grobox.transportr.utils.Constants.WRAP_LOCATION;
-import static de.grobox.transportr.utils.IntentUtils.findDirections;
-import static uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt.STATE_DISMISSED;
-import static uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt.STATE_FOCAL_PRESSED;
+import android.content.Intent
+import android.net.Uri
+import android.os.Bundle
+import android.os.StrictMode
+import android.os.StrictMode.ThreadPolicy
+import android.os.StrictMode.VmPolicy
+import android.view.MenuItem
+import android.view.View
+import android.view.inputmethod.InputMethodManager
+import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.core.app.ActivityCompat
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
+import com.google.android.material.navigation.NavigationView
+import org.maplibre.android.geometry.LatLng
+import de.grobox.transportr.BuildConfig
+import de.grobox.transportr.R
+import de.grobox.transportr.TransportrActivity
+import de.grobox.transportr.about.AboutActivity
+import de.grobox.transportr.about.ContributorsActivity
+import de.grobox.transportr.data.locations.FavoriteLocation.FavLocationType
+import de.grobox.transportr.databinding.ActivityMapBinding
+import de.grobox.transportr.locations.LocationFragment
+import de.grobox.transportr.locations.LocationView.LocationViewListener
+import de.grobox.transportr.locations.WrapLocation
+import de.grobox.transportr.locations.WrapLocation.WrapType
+import de.grobox.transportr.networks.PickTransportNetworkActivity
+import de.grobox.transportr.networks.TransportNetwork
+import de.grobox.transportr.settings.SettingsActivity
+import de.grobox.transportr.trips.search.DirectionsActivity
+import de.grobox.transportr.ui.TransportrChangeLog
+import de.grobox.transportr.utils.Constants
+import de.grobox.transportr.utils.FullScreenUtil.Companion.applyTopInset
+import de.grobox.transportr.utils.FullScreenUtil.Companion.drawBehindStatusbar
+import de.grobox.transportr.utils.IntentUtils.findDirections
+import de.grobox.transportr.utils.OnboardingBuilder
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt
+import javax.annotation.ParametersAreNonnullByDefault
 
 @ParametersAreNonnullByDefault
-public class MapActivity extends TransportrActivity implements LocationViewListener, NavigationView.OnNavigationItemSelectedListener {
+class MapActivity : TransportrActivity(), LocationViewListener, NavigationView.OnNavigationItemSelectedListener {
+    private val viewModel: MapViewModel by viewModel()
 
-	@Inject ViewModelProvider.Factory viewModelFactory;
+    private lateinit var binding: ActivityMapBinding
 
-	private MapViewModel viewModel;
-	private LocationView search;
-	private BottomSheetBehavior bottomSheetBehavior;
+    //private var search: LocationView? = null
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<FrameLayout>
 
-	private @Nullable LocationFragment locationFragment;
-	private boolean transportNetworkInitialized = false;
+    private var locationFragment: LocationFragment? = null
+    private var transportNetworkInitialized = false
 
-	@Override
-	public void onCreate(@Nullable Bundle savedInstanceState) {
-		SplashScreen.installSplashScreen(this);
-		super.onCreate(savedInstanceState);
-		if (BuildConfig.DEBUG) enableStrictMode();
-		getComponent().inject(this);
-		setContentView(R.layout.activity_map);
-		setupDrawer();
-		FullScreenUtil.Companion.drawBehindStatusbar(this);
-		FullScreenUtil.Companion.applyTopInset(findViewById(R.id.searchCardView), 16);
+    public override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
+        super.onCreate(savedInstanceState)
+        if (BuildConfig.DEBUG) enableStrictMode()
 
-		View menu = findViewById(R.id.menu);
-		menu.setOnClickListener(view -> {
-			InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
-			View currentFocus = getCurrentFocus();
-			if (currentFocus != null) imm.hideSoftInputFromWindow(currentFocus.getWindowToken(), 0);
-			DrawerLayout drawer = findViewById(R.id.drawerLayout);
-			drawer.open();
-		});
+        binding = ActivityMapBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-		search = findViewById(R.id.search);
-		search.setLocationViewListener(this);
+        setupDrawer()
+        drawBehindStatusbar(this)
+        applyTopInset( binding.searchCardView, 16)
 
-		View bottomSheet = findViewById(R.id.bottomSheet);
-		bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
-		bottomSheetBehavior.setBottomSheetCallback(new BottomSheetCallback() {
-			@Override
-			public void onStateChanged(@NonNull View bottomSheet, int newState) {
-				if (newState == STATE_HIDDEN) {
-					search.clearLocation();
-					search.reset();
-					viewModel.setPeekHeight(0);
-				}
-			}
+        binding.menu.setOnClickListener {
+            val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+            currentFocus?.let {
+                imm.hideSoftInputFromWindow(it.windowToken, 0)
+            }
+            binding.drawerLayout.open()
+        }
 
-			@Override
-			public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-			}
-		});
+        binding.search.setLocationViewListener(this)
 
-		// get view model and observe data
-		viewModel = new ViewModelProvider(this, viewModelFactory).get(MapViewModel.class);
-		viewModel.getTransportNetwork().observe(this, this::onTransportNetworkChanged);
-		viewModel.getHome().observe(this, homeLocation -> search.setHomeLocation(homeLocation));
-		viewModel.getWork().observe(this, workLocation -> search.setWorkLocation(workLocation));
-		viewModel.getLocations().observe(this, favoriteLocations -> search.setFavoriteLocations(favoriteLocations));
-		viewModel.getMapClicked().observe(this, no -> onMapClicked());
-		viewModel.getMarkerClicked().observe(this, no -> onMarkerClicked());
-		viewModel.getSelectedLocation().observe(this, this::onLocationSelected);
-		viewModel.getSelectedLocationClicked().observe(this, this::onSelectedLocationClicked);
-		viewModel.getPeekHeight().observe(this, height -> {
-			if (height != null) bottomSheetBehavior.setPeekHeight(height);
-		});
+        bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheet)
+        bottomSheetBehavior.setBottomSheetCallback(object : BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                if (newState == BottomSheetBehavior.STATE_HIDDEN) {
+                    binding.search.clearLocation()
+                    binding.search.reset()
+                    viewModel.setPeekHeight(0)
+                }
+            }
 
-		FloatingActionButton directionsFab = findViewById(R.id.directionsFab);
-		directionsFab.setOnClickListener(view -> {
-			WrapLocation from = new WrapLocation(GPS);
-			WrapLocation to = null;
-			if (locationFragment != null && locationFragmentVisible()) {
-				to = locationFragment.getLocation();
-			}
-			findDirections(MapActivity.this, from, null, to);
-		});
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                // unused
+            }
+        })
 
-		Intent intent = getIntent();
-		if (intent != null) onNewIntent(intent);
+        // get view model and observe data
+        viewModel.transportNetwork.observe(this, this::onTransportNetworkChanged)
+        viewModel.home.observe(this, binding.search::setHomeLocation)
+        viewModel.work.observe(this, binding.search::setWorkLocation)
+        viewModel.locations.observe(this, binding.search::setFavoriteLocations)
+        viewModel.mapClicked.observe(this) {
+            onMapClicked()
+        }
+        viewModel.markerClicked.observe(this) {
+            onMarkerClicked()
+        }
+        viewModel.getSelectedLocation().observe(this, this::onLocationSelected)
+        viewModel.getSelectedLocationClicked().observe(this, this::onSelectedLocationClicked)
+        viewModel.getPeekHeight().observe(this, bottomSheetBehavior::setPeekHeight)
 
-		if (savedInstanceState == null) {
-			showSavedSearches();
-			checkAndShowChangelog();
-		} else {
-			locationFragment = (LocationFragment) getSupportFragmentManager().findFragmentByTag(LocationFragment.TAG);
-		}
-	}
+        binding.directionsFab.setOnClickListener {
+            val from = WrapLocation(WrapType.GPS)
+            val to: WrapLocation? = locationFragment?.location.takeIf { locationFragmentVisible() }
 
-	private void showSavedSearches() {
-		SavedSearchesFragment f = new SavedSearchesFragment();
-		getSupportFragmentManager().beginTransaction()
-				.replace(R.id.bottomSheet, f, SavedSearchesFragment.class.getSimpleName())
-				.commitNow(); // otherwise takes some time and empty bottomSheet will not be shown
-		bottomSheetBehavior.setState(STATE_COLLAPSED);
-		viewModel.setPeekHeight(PEEK_HEIGHT_AUTO);
-	}
+            findDirections(this@MapActivity, from, null, to)
+        }
 
-	private void onTransportNetworkChanged(TransportNetwork network) {
-		if (transportNetworkInitialized) {
-			viewModel.selectLocation(null);
-			search.setLocation(null);
-			closeDrawer();
-			showSavedSearches();
-			recreate();
-		} else {
-			// it didn't really change, this is just the first notification from LiveData Observer
-			search.setTransportNetwork(network);
-			transportNetworkInitialized = true;
-		}
-	}
+        onNewIntent(intent)
 
-	private void setupDrawer() {
-		NavigationView navigationView = findViewById(R.id.navigationView);
-		navigationView.setNavigationItemSelectedListener(this);
-		View header = navigationView.getHeaderView(0);
-		TransportNetwork network = manager.getTransportNetwork().getValue();
-		header.setOnClickListener(view -> {
-			openPickNetworkProviderActivity();
-		});
-		if (network != null) {
-			TextView title = header.findViewById(R.id.network_name);
-			TextView description = header.findViewById(R.id.network_description);
-			ImageView image = header.findViewById(R.id.network_image);
-			title.setText(network.getName(this));
-			description.setText(network.getDescription(this));
-			image.setImageResource(network.getLogo());
-		}
-		TransportNetwork networkTwo = manager.getTransportNetwork(2);
-		TransportNetwork networkThree = manager.getTransportNetwork(3);
+        if (savedInstanceState == null) {
+            showSavedSearches()
+            checkAndShowChangelog()
+        } else {
+            locationFragment = supportFragmentManager.findFragmentByTag(LocationFragment.TAG) as LocationFragment?
+        }
+    }
 
-		if (networkTwo != null) {
-			ImageView image = header.findViewById(R.id.network_image_two);
-			image.setImageResource(networkTwo.getLogo());
-			image.setOnClickListener(view -> {
-				manager.setTransportNetwork(networkTwo);
-				closeDrawer();
-			});
-		}
+    private fun showSavedSearches() {
+        val f = SavedSearchesFragment()
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.bottomSheet, f, SavedSearchesFragment::class.java.simpleName)
+            .commitNow() // otherwise takes some time and empty bottomSheet will not be shown
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        viewModel.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO)
+    }
 
-		if (networkThree != null) {
-			ImageView image = header.findViewById(R.id.network_image_three);
-			image.setImageResource(networkThree.getLogo());
-			image.setOnClickListener(view -> {
-				manager.setTransportNetwork(networkThree);
-				closeDrawer();
-			});
-		}
-	}
+    private fun onTransportNetworkChanged(network: TransportNetwork?) {
+        if (transportNetworkInitialized) {
+            viewModel.selectLocation(null)
+            binding.search.setLocation(null)
+            closeDrawer()
+            showSavedSearches()
+            recreate()
+        } else {
+            // it didn't really change, this is just the first notification from LiveData Observer
+            binding.search.setTransportNetwork(network)
+            transportNetworkInitialized = true
+        }
+    }
 
-	private void closeDrawer() {
-		DrawerLayout drawer = findViewById(R.id.drawerLayout);
-		drawer.close();
-	}
+    private fun setupDrawer() {
+        binding.navigationView.setNavigationItemSelectedListener(this)
 
-	private void openPickNetworkProviderActivity() {
-		Intent intent = new Intent(this, PickTransportNetworkActivity.class);
-		ActivityCompat.startActivity(this, intent, null);
-	}
+        ViewCompat.setOnApplyWindowInsetsListener(binding.navigationView) { v: View, insets: WindowInsetsCompat ->
+            val sb = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(sb.left,
+                sb.top,
+                sb.right,
+                sb.bottom
+            )
+            insets
+        }
 
-	@Override
-	public void onLocationItemClick(final WrapLocation loc, FavLocationType type) {
-		viewModel.selectLocation(loc);
-	}
+        val header = binding.navigationView.getHeaderView(0)
+        header.setOnClickListener {
+            openPickNetworkProviderActivity()
+        }
 
-	@Override
-	public void onLocationCleared(FavLocationType type) {
-		bottomSheetBehavior.setState(STATE_HIDDEN);
-		viewModel.selectLocation(null);
-		search.postDelayed(() -> { // show dropdown again after it got hidden by hiding the bottom sheet
-			search.onClick();
-		}, 500);
-	}
+        // Network
+        manager.transportNetwork.value?.let {
+            val title = header.findViewById<TextView>(R.id.network_name)
+            val description = header.findViewById<TextView>(R.id.network_description)
+            val image = header.findViewById<ImageView>(R.id.network_image)
+            title.text = it.getName(this)
+            description.text = it.getDescription(this)
+            image.setImageResource(it.logo)
+        }
 
-	private void onLocationSelected(@Nullable WrapLocation loc) {
-		if (loc == null) return;
+        // Network 2
+        manager.getTransportNetwork(2)?.let { network2: TransportNetwork ->
+            val image = header.findViewById<ImageView>(R.id.network_image_two)
+            image.setImageResource(network2.logo)
+            image.setOnClickListener {
+                manager.setTransportNetwork(network2)
+                closeDrawer()
+            }
+        }
 
-		locationFragment = LocationFragment.newInstance(loc);
-		getSupportFragmentManager().beginTransaction()
-				.replace(R.id.bottomSheet, locationFragment, LocationFragment.TAG)
-				.commit(); // takes some time and empty bottomSheet will not be shown
-		bottomSheetBehavior.setState(STATE_COLLAPSED);
+        // Network 3
+        manager.getTransportNetwork(3)?.let { network3: TransportNetwork ->
+            val image = header.findViewById<ImageView>(R.id.network_image_three)
+            image.setImageResource(network3.logo)
+            image.setOnClickListener {
+                manager.setTransportNetwork(network3)
+                closeDrawer()
+            }
+        }
+    }
 
-		// show on-boarding dialog
-		if (getSettingsManager().showLocationFragmentOnboarding()) {
-			new OnboardingBuilder(this)
-					.setTarget(R.id.bottomSheet)
-					.setPrimaryText(R.string.onboarding_location_title)
-					.setSecondaryText(R.string.onboarding_location_message)
-					.setPromptStateChangeListener((prompt, state) -> {
-						if (state == STATE_DISMISSED || state == STATE_FOCAL_PRESSED) {
-							getSettingsManager().locationFragmentOnboardingShown();
-							viewModel.selectedLocationClicked(loc.getLatLng());
-						}
-					})
-					.show();
-		}
-	}
+    private fun closeDrawer() {
+        binding.drawerLayout.close()
+    }
 
-	private void onSelectedLocationClicked(@Nullable LatLng latLng) {
-		if (latLng == null) return;
-		bottomSheetBehavior.setState(STATE_EXPANDED);
-	}
+    private fun openPickNetworkProviderActivity() {
+        val intent = Intent(this, PickTransportNetworkActivity::class.java)
+        ActivityCompat.startActivity(this, intent, null)
+    }
 
-	private void onMapClicked() {
-		search.clearFocus();  // also hides soft keyboard
-	}
+    override fun onLocationItemClick(loc: WrapLocation, type: FavLocationType) {
+        viewModel.selectLocation(loc)
+    }
 
-	private void onMarkerClicked() {
-		if (locationFragment != null) search.setLocation(locationFragment.getLocation());
-		bottomSheetBehavior.setState(STATE_COLLAPSED);
-	}
+    override fun onLocationCleared(type: FavLocationType) {
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+        viewModel.selectLocation(null)
+        binding.search.postDelayed({ // show dropdown again after it got hidden by hiding the bottom sheet
+            binding.search.onClick()
+        }, 500)
+    }
 
-	private boolean locationFragmentVisible() {
-		return locationFragment != null && locationFragment.isVisible() && bottomSheetBehavior.getState() != STATE_HIDDEN;
-	}
+    private fun onLocationSelected(loc: WrapLocation?) {
+        if (loc == null) return
 
-	@Override
-	protected void onNewIntent(Intent intent) {
-		super.onNewIntent(intent);
-		if (intent == null || intent.getAction() == null) return;
+        locationFragment = LocationFragment.newInstance(loc)
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.bottomSheet, locationFragment!!, LocationFragment.TAG)
+            .commit() // takes some time and empty bottomSheet will not be shown
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
 
-		if (intent.getAction().equals(ACTION_VIEW) && intent.getData() != null) {
-			viewModel.setGeoUri(intent.getData());
-		} else if (intent.getAction().equals(ACTION_SEARCH)) {
-			WrapLocation location = (WrapLocation) intent.getSerializableExtra(WRAP_LOCATION);
-			viewModel.selectLocation(location);
-			viewModel.findNearbyStations(location);
-		}
-	}
+        // show on-boarding dialog
+        if (settingsManager.showLocationFragmentOnboarding()) {
+            OnboardingBuilder(this)
+                .setTarget(R.id.bottomSheet)
+                .setPrimaryText(R.string.onboarding_location_title)
+                .setSecondaryText(R.string.onboarding_location_message)
+                .setPromptStateChangeListener { _: MaterialTapTargetPrompt?, state: Int ->
+                    if (state == MaterialTapTargetPrompt.STATE_DISMISSED || state == MaterialTapTargetPrompt.STATE_FOCAL_PRESSED) {
+                        settingsManager.locationFragmentOnboardingShown()
+                        viewModel.selectedLocationClicked(loc.latLng)
+                    }
+                }
+                .show()
+        }
+    }
 
-	private void checkAndShowChangelog() {
-		TransportrChangeLog cl = new TransportrChangeLog(this, getSettingsManager());
-		if (cl.isFirstRun() && !cl.isFirstRunEver()) {
-			cl.getMaterialDialog(cl.isFirstRunEver()).show();
-		}
-	}
+    private fun onSelectedLocationClicked(latLng: LatLng?) {
+        if (latLng == null) return
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+    }
 
-	private void enableStrictMode() {
-		ThreadPolicy.Builder threadPolicy = new ThreadPolicy.Builder();
-		threadPolicy.detectAll();
-		threadPolicy.penaltyLog();
-		StrictMode.setThreadPolicy(threadPolicy.build());
+    private fun onMapClicked() {
+        binding.search.clearFocus() // also hides soft keyboard
+    }
 
-		VmPolicy.Builder vmPolicy = new VmPolicy.Builder();
-		vmPolicy.detectAll();
-		vmPolicy.penaltyLog();
-		StrictMode.setVmPolicy(vmPolicy.build());
-	}
+    private fun onMarkerClicked() {
+        locationFragment?.let {
+            binding.search.setLocation(it.location)
+        }
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+    }
 
-	@Override
-	public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-		switch (item.getItemId()) {
-			case R.id.settings: {
-				startActivity(new Intent(this, SettingsActivity.class));
-				break;
-			}
-			case R.id.changelog: {
-				new TransportrChangeLog(this, settingsManager).getMaterialDialog(true).show();
-				break;
-			}
-			case R.id.about: {
-				startActivity(new Intent(this, AboutActivity.class));
-				break;
-			}
-			case R.id.contributors: {
-				startActivity(new Intent(this, ContributorsActivity.class));
-				break;
-			}
-			case R.id.bug_report: {
-				startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.bug_tracker))));
-				break;
-			}
-		}
-		closeDrawer();
-		return true;
-	}
+    private fun locationFragmentVisible(): Boolean {
+        return locationFragment != null &&
+                locationFragment!!.isVisible &&
+                bottomSheetBehavior.state != BottomSheetBehavior.STATE_HIDDEN
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        if (intent.action == null) return
+
+        if (intent.action == Intent.ACTION_VIEW && intent.data != null) {
+            viewModel.setGeoUri(intent.data!!)
+        } else if (intent.action == DirectionsActivity.ACTION_SEARCH) {
+            val location = intent.getSerializableExtra(Constants.WRAP_LOCATION) as WrapLocation?
+            viewModel.selectLocation(location)
+            viewModel.findNearbyStations(location!!)
+        }
+    }
+
+    private fun checkAndShowChangelog() {
+        val cl = TransportrChangeLog(this, settingsManager)
+        if (cl.isFirstRun && !cl.isFirstRunEver) {
+            cl.getMaterialDialog(cl.isFirstRunEver).show()
+        }
+    }
+
+    private fun enableStrictMode() {
+        val threadPolicy = ThreadPolicy.Builder()
+        threadPolicy.detectAll()
+        threadPolicy.penaltyLog()
+        StrictMode.setThreadPolicy(threadPolicy.build())
+
+        val vmPolicy = VmPolicy.Builder()
+        vmPolicy.detectAll()
+        vmPolicy.penaltyLog()
+        StrictMode.setVmPolicy(vmPolicy.build())
+    }
+
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.settings -> {
+                startActivity(Intent(this, SettingsActivity::class.java))
+            }
+
+            R.id.changelog -> {
+                TransportrChangeLog(this, settingsManager).getMaterialDialog(true).show()
+            }
+
+            R.id.about -> {
+                startActivity(Intent(this, AboutActivity::class.java))
+            }
+
+            R.id.contributors -> {
+                startActivity(Intent(this, ContributorsActivity::class.java))
+            }
+
+            R.id.bug_report -> {
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.bug_tracker))))
+            }
+        }
+        closeDrawer()
+        return true
+    }
 }

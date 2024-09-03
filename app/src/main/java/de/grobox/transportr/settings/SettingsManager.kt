@@ -26,18 +26,20 @@ import android.content.res.Resources
 import android.os.Build
 import android.os.PowerManager
 import android.preference.PreferenceManager
-import androidx.appcompat.app.AppCompatDelegate.*
+import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
+import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
+import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
 import androidx.core.content.ContextCompat
 import de.grobox.transportr.R
 import de.schildbach.pte.NetworkId
 import de.schildbach.pte.NetworkProvider.Optimize
 import de.schildbach.pte.NetworkProvider.WalkSpeed
 import de.schildbach.pte.dto.Product
-import java.util.*
-import javax.inject.Inject
+import java.util.Locale
 
 
-class SettingsManager @Inject constructor(private val context: Context) {
+class SettingsManager constructor(private val context: Context) {
 
     val settings: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
@@ -175,9 +177,9 @@ class SettingsManager @Inject constructor(private val context: Context) {
 
         internal const val LANGUAGE = "pref_key_language"
         internal const val THEME = "pref_key_theme"
-        private const val SHOW_WHEN_LOCKED = "pref_key_show_when_locked"
-        private const val WALK_SPEED = "pref_key_walk_speed"
-        private const val OPTIMIZE = "pref_key_optimize"
+        internal const val SHOW_WHEN_LOCKED = "pref_key_show_when_locked"
+        internal const val WALK_SPEED = "pref_key_walk_speed"
+        internal const val OPTIMIZE = "pref_key_optimize"
         private const val LOCATION_ONBOARDING = "locationOnboarding"
         private const val TRIP_DETAIL_ONBOARDING = "tripDetailOnboarding"
         private const val LAST_PRODUCT_PREFIX = "pref_key_last_product_prefix_"

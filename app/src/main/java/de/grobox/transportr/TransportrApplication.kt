@@ -20,25 +20,31 @@ package de.grobox.transportr
 
 import android.app.Application
 import com.google.android.material.color.DynamicColors
-import com.mapbox.mapboxsdk.Mapbox
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.startKoin
+import org.maplibre.android.MapLibre
 
 open class TransportrApplication : Application() {
-    lateinit var component: AppComponent
-        private set
+    //lateinit var component: AppComponent
+    //    private set
 
     override fun onCreate() {
         DynamicColors.applyToActivitiesIfAvailable(this)
 
         super.onCreate()
 
-        Mapbox.getInstance(applicationContext)
+        startKoin {
+            // declare used Android context
+            androidContext(this@TransportrApplication)
 
-        component = createComponent()
-    }
+            // declare modules
+            modules(
+                TransportrModule,
+                DatabaseModule,
+                ViewModelModule
+            )
+        }
 
-    protected open fun createComponent(): AppComponent {
-        return DaggerAppComponent.builder()
-            .appModule(AppModule(this))
-            .build()
+        MapLibre.getInstance(applicationContext)
     }
 }

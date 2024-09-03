@@ -25,9 +25,6 @@ import android.content.Context.LAYOUT_INFLATER_SERVICE
 import android.os.AsyncTask.Status.FINISHED
 import android.os.Bundle
 import android.os.Parcelable
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
-import androidx.core.view.ViewCompat
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.AttributeSet
@@ -37,8 +34,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnFocusChangeListener
 import android.view.inputmethod.InputMethodManager
-import android.widget.*
+import android.widget.AutoCompleteTextView
+import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.ProgressBar
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.ViewCompat
 import com.google.common.base.Strings.isNullOrEmpty
 import de.grobox.transportr.R
 import de.grobox.transportr.data.locations.FavoriteLocation
@@ -193,7 +197,7 @@ open class LocationView @JvmOverloads constructor(context: Context, attrs: Attri
         super.dispatchThawSelfOnly(container)
     }
 
-    fun setTransportNetwork(transportNetwork: TransportNetwork) {
+    fun setTransportNetwork(transportNetwork: TransportNetwork?) {
         this.transportNetwork = transportNetwork
     }
 

@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-	package="de.grobox.transportr"
-	xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:tools="http://schemas.android.com/tools"
 	android:installLocation="auto">
 
@@ -72,6 +70,12 @@
 			android:windowSoftInputMode="stateHidden"/>
 
 		<activity
+			android:name="de.grobox.transportr.trips.search.DirectionsComposeActivity"
+			android:exported="true"
+			android:theme="@style/AppTheme.MapFullscreen"
+			android:windowSoftInputMode="stateHidden"/>
+
+		<activity
 			android:name="de.grobox.transportr.departures.DeparturesActivity"
 			android:label="@string/drawer_departures"
 			android:parentActivityName="de.grobox.transportr.map.MapActivity" />
@@ -82,12 +86,18 @@
 			android:theme="@style/AppTheme.MapFullscreen" />
 
 		<activity
+			android:name="de.grobox.transportr.trips.detail.TripDetailComposeActivity"
+			android:parentActivityName="de.grobox.transportr.trips.search.DirectionsActivity"
+			android:theme="@style/AppTheme.MapFullscreen" />
+
+		<activity
 			android:name="de.grobox.transportr.networks.PickTransportNetworkActivity"
 			android:label="@string/pick_network_activity"/>
 
 		<activity
 			android:name="de.grobox.transportr.settings.SettingsActivity"
-			android:label="@string/drawer_settings"/>
+			android:label="@string/drawer_settings"
+			android:theme="@style/AppTheme.MapFullscreen" />
 
 		<activity
 			android:name="de.grobox.transportr.about.AboutActivity"

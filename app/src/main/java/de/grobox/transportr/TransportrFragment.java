@@ -31,10 +31,10 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 public abstract class TransportrFragment extends Fragment {
 
-	protected AppComponent getComponent() {
-		if (getActivity() == null) throw new IllegalStateException();
-		return ((TransportrApplication) getActivity().getApplication()).getComponent();
-	}
+//	protected AppComponent getComponent() {
+//		if (getActivity() == null) throw new IllegalStateException();
+//		return ((TransportrApplication) getActivity().getApplication()).getComponent();
+//	}
 
 	protected void runOnUiThread(final Runnable task) {
 		if (getActivity() == null) throw new IllegalStateException();

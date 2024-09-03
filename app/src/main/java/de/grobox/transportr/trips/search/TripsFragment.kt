@@ -22,7 +22,6 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.os.CountDownTimer
 import android.util.Pair
 import android.view.LayoutInflater
 import android.view.View
@@ -30,7 +29,6 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.color.MaterialColors
@@ -47,16 +45,11 @@ import de.grobox.transportr.ui.LceAnimator
 import de.grobox.transportr.utils.Linkify
 import de.grobox.transportr.utils.TransportrUtils.getDragDistance
 import de.schildbach.pte.dto.Trip
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import java.util.regex.Pattern
-import javax.annotation.ParametersAreNonnullByDefault
-import javax.inject.Inject
 
 class TripsFragment : TransportrFragment(), OnRefreshListener, OnTripClickListener {
-    
-    @Inject
-    internal lateinit var viewModelFactory: ViewModelProvider.Factory
-    
-    private lateinit var viewModel: DirectionsViewModel
+    private val viewModel: DirectionsViewModel by activityViewModel()
 
     private var _binding: FragmentTripsBinding? = null
     private val binding get() = _binding!!
@@ -74,9 +67,6 @@ class TripsFragment : TransportrFragment(), OnRefreshListener, OnTripClickListen
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = FragmentTripsBinding.inflate(inflater, container, false)
-        component.inject(this)
-
-        viewModel = ViewModelProvider(requireActivity(), viewModelFactory).get(DirectionsViewModel::class.java)
 
         swipe = binding.swipe
         list = binding.list
@@ -107,7 +97,7 @@ class TripsFragment : TransportrFragment(), OnRefreshListener, OnTripClickListen
         list.setHasFixedSize(false)
         viewModel.topSwipeEnabled.observe(viewLifecycleOwner, { enabled -> onSwipeEnabledChanged(enabled) })
         viewModel.queryMoreState.observe(viewLifecycleOwner, { state -> updateSwipeState(state) })
-        viewModel.trips.observe(viewLifecycleOwner, { trips -> onTripsLoaded(trips) })
+        viewModel.trips.observe(viewLifecycleOwner) { trips -> onTripsLoaded(trips) }
         viewModel.queryError.observe(viewLifecycleOwner, { error -> onError(error) })
         viewModel.queryPTEError.observe(viewLifecycleOwner, { error -> onPTEError(error) })
         viewModel.queryMoreError.observe(viewLifecycleOwner, { error -> onMoreError(error) })

@@ -24,7 +24,7 @@ import androidx.annotation.StringRes
 import javax.annotation.concurrent.Immutable
 
 @Immutable
-internal class Country constructor(
+class Country constructor(
     @param:StringRes @field:StringRes @get:StringRes val name: Int,
     val flag: String,
     val sticky: Boolean = false,
@@ -43,7 +43,7 @@ internal class Country constructor(
         return List(networks.size, { networks[it].getItem() })
     }
 
-    internal class Comparator constructor(private val context: Context) : java.util.Comparator<Country> {
+    class Comparator constructor(private val context: Context) : java.util.Comparator<Country> {
         override fun compare(c1: Country, c2: Country): Int {
             if (c1.sticky && !c2.sticky) return -1
             if (!c1.sticky && c2.sticky) return 1

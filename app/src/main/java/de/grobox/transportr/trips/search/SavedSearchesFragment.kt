@@ -19,31 +19,21 @@
 
 package de.grobox.transportr.trips.search
 
-import androidx.lifecycle.ViewModelProvider
 import de.grobox.transportr.favorites.locations.HomePickerDialogFragment
 import de.grobox.transportr.favorites.locations.WorkPickerDialogFragment
 import de.grobox.transportr.favorites.trips.FavoriteTripsFragment
-import de.grobox.transportr.locations.LocationsViewModel
 import de.grobox.transportr.locations.WrapLocation
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
 
 class SavedSearchesFragment : FavoriteTripsFragment<DirectionsViewModel>() {
 
+    override val viewModel: DirectionsViewModel by activityViewModel()
+    override val homePickerDialogFragment: HomePickerDialogFragment = HomePickerFragment()
+    override val workPickerDialogFragment: WorkPickerDialogFragment = WorkPickerFragment()
+
     companion object {
         private val viewModelClass = DirectionsViewModel::class.java
-    }
-
-    override fun getViewModel(): DirectionsViewModel {
-        component.inject(this)
-        return ViewModelProvider(activity!!, viewModelFactory).get(viewModelClass)
-    }
-
-    override fun getHomePickerDialogFragment(): HomePickerDialogFragment {
-        return HomePickerFragment()
-    }
-
-    override fun getWorkPickerDialogFragment(): WorkPickerDialogFragment {
-        return WorkPickerFragment()
     }
 
     override fun onSpecialLocationClicked(location: WrapLocation) {
@@ -52,15 +42,17 @@ class SavedSearchesFragment : FavoriteTripsFragment<DirectionsViewModel>() {
     }
 
     class HomePickerFragment : HomePickerDialogFragment() {
-        override fun viewModel(): LocationsViewModel {
-            return ViewModelProvider(activity!!, viewModelFactory).get(viewModelClass)
-        }
+        override val viewModel: DirectionsViewModel by activityViewModel()
+//        override fun viewModel(): LocationsViewModel {
+//            return ViewModelProvider(activity!!, viewModelFactory).get(viewModelClass)
+//        }
     }
 
     class WorkPickerFragment : WorkPickerDialogFragment() {
-        override fun viewModel(): LocationsViewModel {
-            return ViewModelProvider(activity!!, viewModelFactory).get(viewModelClass)
-        }
+        override val viewModel: DirectionsViewModel by activityViewModel()
+//        override fun viewModel(): LocationsViewModel {
+//            return ViewModelProvider(activity!!, viewModelFactory).get(viewModelClass)
+//        }
     }
 
 }

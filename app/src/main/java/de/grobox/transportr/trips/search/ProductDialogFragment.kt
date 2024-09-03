@@ -16,246 +16,196 @@
  *    You should have received a copy of the GNU General Public License
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package de.grobox.transportr.trips.search
 
-package de.grobox.transportr.trips.search;
-
-import android.app.Dialog;
-
-import androidx.annotation.NonNull;
-import androidx.lifecycle.ViewModelProvider;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.os.Bundle;
-import androidx.fragment.app.DialogFragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.ImageView;
-import android.widget.TextView;
-
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter;
-import com.mikepenz.fastadapter.items.AbstractItem;
-
-import org.jetbrains.annotations.NotNull;
-
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-import javax.inject.Inject;
-
-import de.grobox.transportr.R;
-import de.grobox.transportr.TransportrApplication;
-import de.grobox.transportr.databinding.FragmentProductDialogBinding;
-import de.schildbach.pte.dto.Product;
-
-import static de.grobox.transportr.utils.TransportrUtils.getDrawableForProduct;
+import android.app.Dialog
+import android.content.Context
+import android.content.DialogInterface
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.CheckBox
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.fragment.app.DialogFragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter
+import com.mikepenz.fastadapter.items.AbstractItem
+import com.mikepenz.fastadapter.select.SelectExtension
+import de.grobox.transportr.R
+import de.grobox.transportr.databinding.FragmentProductDialogBinding
+import de.grobox.transportr.utils.TransportrUtils.getDrawableForProduct
+import de.schildbach.pte.dto.Product
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
+import java.util.EnumSet
+import javax.annotation.ParametersAreNonnullByDefault
 
 @ParametersAreNonnullByDefault
-public class ProductDialogFragment extends DialogFragment {
+class ProductDialogFragment : DialogFragment() {
+    private val viewModel: DirectionsViewModel by activityViewModel()
+    private var adapter: FastItemAdapter<ProductItem>? = null
+    private val okButton: Button? = null
 
-	public static final String TAG = ProductDialogFragment.class.getSimpleName();
+    private var binding: FragmentProductDialogBinding? = null
+    private var dialog: View? = null
 
-	@Inject ViewModelProvider.Factory viewModelFactory;
-
-	private DirectionsViewModel viewModel;
-	private FastItemAdapter<ProductItem> adapter;
-	private Button okButton;
-
-	private FragmentProductDialogBinding binding;
-	private View dialog;
-
-	@NonNull
-	@Override
-	public Dialog onCreateDialog(@androidx.annotation.Nullable Bundle savedInstanceState) {
-		dialog = onCreateView(LayoutInflater.from(requireContext()), null, savedInstanceState);
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        dialog = onCreateView(LayoutInflater.from(requireContext()), null, savedInstanceState)
 
 
-		MaterialAlertDialogBuilder mb = new MaterialAlertDialogBuilder(requireContext());
-		mb.setView(dialog);
-		mb.setTitle(R.string.select_products);
-		mb.setIcon(R.drawable.product_bus);
-		mb.setNegativeButton(R.string.cancel, (dialog, which) -> {
-			getDialog().cancel();
-		});
-		mb.setPositiveButton(R.string.ok, (dialog, which) -> {
-			EnumSet<Product> products = getProductsFromItems(adapter.getSelectedItems());
-			viewModel.setProducts(products);
-			getDialog().cancel();
-		});
-		return mb.create();
-	}
+        val mb = MaterialAlertDialogBuilder(requireContext())
+        mb.setView(dialog)
+        mb.setTitle(R.string.select_products)
+        mb.setIcon(R.drawable.product_bus)
+        mb.setNegativeButton(R.string.cancel) { dialog: DialogInterface?, which: Int ->
+            getDialog()!!.cancel()
+        }
+        mb.setPositiveButton(R.string.ok) { dialog: DialogInterface?, which: Int ->
+            val products = getProductsFromItems(
+                adapter!!.selectedItems
+            )
+            viewModel.setProducts(products)
+            getDialog()!!.cancel()
+        }
+        return mb.create()
+    }
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-		binding = FragmentProductDialogBinding.inflate(inflater, container, false);
-		View v = binding.getRoot();
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        binding = FragmentProductDialogBinding.inflate(inflater, container, false)
+        val v: View = binding!!.root
 
-		// RecyclerView
-		RecyclerView productsView = binding.productsView;
-		productsView.setLayoutManager(new LinearLayoutManager(getContext()));
-		adapter = new FastItemAdapter<>();
-		adapter.withSelectable(true);
-		productsView.setAdapter(adapter);
-		for (Product product : Product.ALL) {
-			adapter.add(new ProductItem(product));
-		}
+        // RecyclerView
+        val productsView = binding!!.productsView
+        productsView.layoutManager = LinearLayoutManager(context)
+        adapter = FastItemAdapter()
+        adapter!!.withSelectable(true)
+        productsView.adapter = adapter
+        for (product in Product.ALL) {
+            adapter!!.add(ProductItem(product))
+        }
 
-		// Get view model and observe products
-		viewModel = new ViewModelProvider(requireActivity(), viewModelFactory).get(DirectionsViewModel.class);
-		if (savedInstanceState == null) {
-			viewModel.getProducts().observe(requireActivity(), this::onProductsChanged);
-		} else {
-			adapter.withSavedInstanceState(savedInstanceState);
-		}
+        // Get view model and observe products
+        //viewModel = ViewModelProvider(requireActivity(), viewModelFactory).get<DirectionsViewModel>(DirectionsViewModel::class.java)
+        if (savedInstanceState == null) {
+            viewModel.products.observe(requireActivity(), ::onProductsChanged)
+        } else {
+            adapter!!.withSavedInstanceState(savedInstanceState)
+        }
 
-		return v;
-	}
+        return v
+    }
 
-	@Override
-	public void onDestroyView() {
-		super.onDestroyView();
-		binding = null;
-	}
+    override fun onDestroyView() {
+        super.onDestroyView()
+        binding = null
+    }
 
-	@Override
-	public void onStart() {
-		super.onStart();
+    override fun onStart() {
+        super.onStart()
 
-		// adjust width and height to be shown properly in landscape orientation
-		Dialog dialog = getDialog();
-		if (dialog != null) {
-			Window window = dialog.getWindow();
-			if (window != null) {
-				int width = ViewGroup.LayoutParams.MATCH_PARENT;
-				int height = ViewGroup.LayoutParams.MATCH_PARENT;
-				window.setLayout(width, height);
-			}
-		}
-	}
+        // adjust width and height to be shown properly in landscape orientation
+        val dialog = getDialog()
+        if (dialog != null) {
+            val window = dialog.window
+            if (window != null) {
+                val width = ViewGroup.LayoutParams.MATCH_PARENT
+                val height = ViewGroup.LayoutParams.MATCH_PARENT
+                window.setLayout(width, height)
+            }
+        }
+    }
 
-	@Override
-	public void onAttach(@NonNull @NotNull Context context) {
-		super.onAttach(context);
-		((TransportrApplication) getActivity().getApplicationContext()).getComponent().inject(this);
-	}
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        adapter!!.saveInstanceState(outState)
+    }
 
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		adapter.saveInstanceState(outState);
-	}
+    private fun onProductsChanged(products: EnumSet<Product>) {
+        var i = 0
+        for (product in Product.ALL) {
+            if (products.contains(product)) {
+                adapter!!.select(i)
+            }
+            i++
+        }
+    }
 
-	private void onProductsChanged(EnumSet<Product> products) {
-		int i = 0;
-		for (Product product : Product.ALL) {
-			if (products.contains(product)) {
-				adapter.select(i);
-			}
-			i++;
-		}
-	}
+    private fun getProductsFromItems(items: Set<ProductItem>): EnumSet<Product> {
+        val products = EnumSet.noneOf(Product::class.java)
+        for (item in items) {
+            products.add(item.product)
+        }
+        return products
+    }
 
-	private EnumSet<Product> getProductsFromItems(Set<ProductItem> items) {
-		EnumSet<Product> products = EnumSet.noneOf(Product.class);
-		for (ProductItem item : items) {
-			products.add(item.product);
-		}
-		return products;
-	}
+    private fun setOkEnabled(enabled: Boolean) {
+        okButton!!.isEnabled = enabled
+    }
 
-	private void setOkEnabled(boolean enabled) {
-		okButton.setEnabled(enabled);
-	}
+    internal inner class ProductItem(val product: Product) : AbstractItem<ProductItem?, ProductItem.ViewHolder>() {
+        override fun getType(): Int {
+            return product.ordinal
+        }
 
-	class ProductItem extends AbstractItem<ProductItem, ProductItem.ViewHolder> {
-		private final Product product;
+        override fun getLayoutRes(): Int {
+            return R.layout.list_item_product
+        }
 
-		ProductItem(Product product) {
-			this.product = product;
-		}
+        override fun bindView(ui: ViewHolder, payloads: List<Any>) {
+            super.bindView(ui, payloads)
 
-		@Override
-		public int getType() {
-			return product.ordinal();
-		}
+            val selectExt = adapter!!.getExtension(SelectExtension::class.java)
 
-		@Override
-		public int getLayoutRes() {
-			return R.layout.list_item_product;
-		}
+            ui.image.setImageResource(getDrawableForProduct(product))
+            ui.name.text = productToString(ui.name.context, product)
+            ui.checkBox.isChecked = isSelected
+            ui.layout.setOnClickListener { v: View? ->
+                val position = adapter!!.getAdapterPosition(this@ProductItem)
+                if(this@ProductItem.isSelected) {
+                    selectExt?.deselect(position)
+                } else {
+                    selectExt?.select(position)
+                }
 
-		@Override
-		public void bindView(final ViewHolder ui, List<Object> payloads) {
-			super.bindView(ui, payloads);
+                // if no products are selected, disable the ok-button
+//                if (selectExt?.selectedItems?.size == 0) {
+//                    setOkEnabled(false)
+//                } else {
+//                    setOkEnabled(true)
+//                }
+            }
+        }
 
-			ui.image.setImageResource(getDrawableForProduct(product));
-			ui.name.setText(productToString(ui.name.getContext(), product));
-			ui.checkBox.setChecked(isSelected());
-			ui.layout.setOnClickListener(v -> {
-				int position = adapter.getAdapterPosition(ProductItem.this);
-				adapter.toggleSelection(position);
-				Set products = adapter.getSelectedItems();
-				// if no products are selected, disable the ok-button
-				if (products.size() == 0) {
-					setOkEnabled(false);
-				} else {
-					setOkEnabled(true);
-				}
-			});
-		}
+        override fun getViewHolder(view: View): ViewHolder {
+            return ViewHolder(view)
+        }
 
-		@Override
-		public ViewHolder getViewHolder(View view) {
-			return new ProductItem.ViewHolder(view);
-		}
+        internal inner class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
+            val layout: ViewGroup = v as ViewGroup
+            val image: ImageView = v.findViewById(R.id.productImage)
+            val name: TextView = v.findViewById(R.id.productName)
+            val checkBox: CheckBox = v.findViewById(R.id.productCheckBox)
+        }
+    }
 
-		class ViewHolder extends RecyclerView.ViewHolder {
-			private final ViewGroup layout;
-			private final ImageView image;
-			private final TextView name;
-			private final CheckBox checkBox;
+    private fun productToString(context: Context, p: Product): String {
+        return if (p == Product.HIGH_SPEED_TRAIN) context.getString(R.string.product_high_speed_train)
+        else if (p == Product.REGIONAL_TRAIN) context.getString(R.string.product_regional_train)
+        else if (p == Product.SUBURBAN_TRAIN) context.getString(R.string.product_suburban_train)
+        else if (p == Product.SUBWAY) context.getString(R.string.product_subway)
+        else if (p == Product.TRAM) context.getString(R.string.product_tram)
+        else if (p == Product.BUS) context.getString(R.string.product_bus)
+        else if (p == Product.FERRY) context.getString(R.string.product_ferry)
+        else if (p == Product.CABLECAR) context.getString(R.string.product_cablecar)
+        else if (p == Product.ON_DEMAND) context.getString(R.string.product_on_demand)
+        else throw RuntimeException()
+    }
 
-			ViewHolder(View v) {
-				super(v);
-
-				layout = (ViewGroup) v;
-				image = v.findViewById(R.id.productImage);
-				name = v.findViewById(R.id.productName);
-				checkBox = v.findViewById(R.id.productCheckBox);
-			}
-		}
-	}
-
-	private String productToString(Context context, Product p) {
-		if (p == Product.HIGH_SPEED_TRAIN)
-			return context.getString(R.string.product_high_speed_train);
-		else if (p == Product.REGIONAL_TRAIN)
-			return context.getString(R.string.product_regional_train);
-		else if (p == Product.SUBURBAN_TRAIN)
-			return context.getString(R.string.product_suburban_train);
-		else if (p == Product.SUBWAY)
-			return context.getString(R.string.product_subway);
-		else if (p == Product.TRAM)
-			return context.getString(R.string.product_tram);
-		else if (p == Product.BUS)
-			return context.getString(R.string.product_bus);
-		else if (p == Product.FERRY)
-			return context.getString(R.string.product_ferry);
-		else if (p == Product.CABLECAR)
-			return context.getString(R.string.product_cablecar);
-		else if (p == Product.ON_DEMAND)
-			return context.getString(R.string.product_on_demand);
-		else
-			throw new RuntimeException();
-	}
-
+    companion object {
+        val TAG: String = ProductDialogFragment::class.java.simpleName
+    }
 }

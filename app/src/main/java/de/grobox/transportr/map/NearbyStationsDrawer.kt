@@ -21,28 +21,29 @@ package de.grobox.transportr.map
 
 import android.content.Context
 import androidx.core.content.ContextCompat
-import com.mapbox.mapboxsdk.annotations.Icon
-import com.mapbox.mapboxsdk.annotations.Marker
-import com.mapbox.mapboxsdk.geometry.LatLngBounds
-import com.mapbox.mapboxsdk.maps.MapboxMap
+import org.maplibre.android.annotations.Icon
+import org.maplibre.android.annotations.Marker
+import org.maplibre.android.geometry.LatLngBounds
+import org.maplibre.android.maps.MapLibreMap
 import de.grobox.transportr.R
 import de.grobox.transportr.locations.WrapLocation
 import de.grobox.transportr.utils.hasLocation
 import de.schildbach.pte.dto.Location
 import de.schildbach.pte.dto.Product
-import java.util.*
 
 
-internal class NearbyStationsDrawer(context: Context) : MapDrawer(context) {
+class NearbyStationsDrawer(context: Context) : MapDrawer(context) {
 
     private val nearbyLocations = HashMap<Marker, Location>()
 
-    fun draw(map: MapboxMap, nearbyStations: List<Location>) {
+    fun draw(map: MapLibreMap, nearbyStations: List<Location>) {
         val builder = LatLngBounds.Builder()
         for (location in nearbyStations) {
+            val icon = getIconForProduct(location.products)
             if (!location.hasLocation()) continue
             if (nearbyLocations.containsValue(location)) continue
-            val marker = markLocation(map, location, getIconForProduct(location.products), location.uniqueShortName())
+            if (icon == null) continue
+            val marker = markLocation(map, location, icon, location.uniqueShortName())
             marker?.let {
                 nearbyLocations.put(marker, location)
                 builder.include(marker.position)
@@ -62,7 +63,7 @@ internal class NearbyStationsDrawer(context: Context) : MapDrawer(context) {
         nearbyLocations.clear()
     }
 
-    private fun getIconForProduct(p: Set<Product>?): Icon {
+    private fun getIconForProduct(p: Set<Product>?): Icon? {
         val firstProduct = if (p == null || p.isEmpty()) null else p.iterator().next()
         val res = when (firstProduct) {
             Product.HIGH_SPEED_TRAIN -> R.drawable.product_high_speed_train_marker

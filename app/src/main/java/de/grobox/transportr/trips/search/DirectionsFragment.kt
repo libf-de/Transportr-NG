@@ -24,18 +24,18 @@ import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.*
+import android.view.View.GONE
+import android.view.View.INVISIBLE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.Animation.RELATIVE_TO_SELF
 import android.view.animation.TranslateAnimation
 import android.widget.ImageButton
 import android.widget.TextView
-import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.Toolbar
 import androidx.appcompat.widget.TooltipCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModelProvider
 import de.grobox.transportr.R
 import de.grobox.transportr.TransportrFragment
 import de.grobox.transportr.data.locations.FavoriteLocation.FavLocationType
@@ -56,19 +56,18 @@ import de.grobox.transportr.utils.DateUtils.formatTime
 import de.grobox.transportr.utils.DateUtils.isNow
 import de.grobox.transportr.utils.DateUtils.isToday
 import de.schildbach.pte.dto.Product
-import java.util.*
+import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
+import java.util.Calendar
+import java.util.EnumSet
 import javax.annotation.ParametersAreNonnullByDefault
-import javax.inject.Inject
 
 @ParametersAreNonnullByDefault
 class DirectionsFragment : TransportrFragment() {
 
-    @Inject
-    internal lateinit var settingsManager: SettingsManager
-    @Inject
-    internal lateinit var viewModelFactory: ViewModelProvider.Factory
+    internal val settingsManager: SettingsManager by inject()
 
-    private lateinit var viewModel: DirectionsViewModel
+    private val viewModel: DirectionsViewModel by activityViewModel()
 
     private var _binding: FragmentDirectionsFormBinding? = null
     private val binding get() = _binding!!
@@ -94,9 +93,7 @@ class DirectionsFragment : TransportrFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = FragmentDirectionsFormBinding.inflate(inflater, container, false)
-        component.inject(this)
 
-        viewModel = ViewModelProvider(activity!!, viewModelFactory).get(DirectionsViewModel::class.java)
         fromLocation = binding.fromLocation
         viaLocation = binding.viaLocation
         toLocation = binding.toLocation
@@ -177,7 +174,7 @@ class DirectionsFragment : TransportrFragment() {
             if (viewModel.lastQueryCalendar.value == null) throw IllegalStateException()
             val fragment = TimeDateFragment.newInstance(viewModel.lastQueryCalendar.value!!, viewModel.isDeparture.value!!)
             fragment.setTimeDateListener(viewModel)
-            fragment.show(activity!!.supportFragmentManager, TimeDateFragment.TAG)
+            fragment.show(requireActivity().supportFragmentManager, TimeDateFragment.TAG)
         }
         timeBackground.setOnLongClickListener {
             viewModel.resetCalender()
@@ -214,7 +211,7 @@ class DirectionsFragment : TransportrFragment() {
             viewModel.setToLocation(toLocation.getLocation())
             viewModel.onTimeAndDateSet(savedInstanceState.getSerializable(DATE) as Calendar)
         }
-        (activity!!.supportFragmentManager.findFragmentByTag(TimeDateFragment.TAG) as? TimeDateFragment)?.setTimeDateListener(viewModel)
+        (requireActivity().supportFragmentManager.findFragmentByTag(TimeDateFragment.TAG) as? TimeDateFragment)?.setTimeDateListener(viewModel)
     }
 
     private fun onCalendarUpdated(calendar: Calendar?) {

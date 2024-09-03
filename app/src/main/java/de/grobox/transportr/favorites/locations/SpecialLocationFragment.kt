@@ -33,10 +33,6 @@ import android.view.inputmethod.InputMethodManager
 import androidx.annotation.StringRes
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
-import de.grobox.transportr.AppComponent
-import de.grobox.transportr.R
-import de.grobox.transportr.TransportrApplication
 import de.grobox.transportr.data.locations.FavoriteLocation.FavLocationType
 import de.grobox.transportr.databinding.FragmentSpecialLocationBinding
 import de.grobox.transportr.favorites.trips.FavoriteTripListener
@@ -44,19 +40,16 @@ import de.grobox.transportr.locations.LocationView
 import de.grobox.transportr.locations.LocationsViewModel
 import de.grobox.transportr.locations.WrapLocation
 import de.grobox.transportr.settings.SettingsManager
+import org.koin.android.ext.android.inject
 import javax.annotation.ParametersAreNonnullByDefault
-import javax.inject.Inject
 
 
 @ParametersAreNonnullByDefault
 abstract class SpecialLocationFragment : DialogFragment(), LocationView.LocationViewListener {
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelProvider.Factory
-    @Inject
-    internal lateinit var settingsManager: SettingsManager
+    val settingsManager: SettingsManager by inject()
+    abstract val viewModel: LocationsViewModel
 
-    protected lateinit var viewModel: LocationsViewModel
     var listener: FavoriteTripListener? = null
 
     private var _binding: FragmentSpecialLocationBinding? = null;
@@ -69,11 +62,7 @@ abstract class SpecialLocationFragment : DialogFragment(), LocationView.Location
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        inject((activity!!.application as TransportrApplication).component)
     }
-
-    protected abstract fun inject(component: AppComponent)
-    protected abstract fun viewModel(): LocationsViewModel  // a method to init when activity has been created
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = FragmentSpecialLocationBinding.inflate(inflater, container, false)
@@ -87,17 +76,17 @@ abstract class SpecialLocationFragment : DialogFragment(), LocationView.Location
         loc.setLocationViewListener(this)
 
         // Get view model and observe data
-        viewModel = viewModel().apply {
-            transportNetwork.observe(viewLifecycleOwner, Observer {
-                    transportNetwork -> transportNetwork?.let { loc.setTransportNetwork(it) }
-            })
-            locations.observe(viewLifecycleOwner, Observer { favoriteLocations ->
-                favoriteLocations?.let {
-                    loc.setFavoriteLocations(it)
-                    loc.post { loc.onClick() }  // don't know why this only works when posted
-                }
-            })
-        }
+        viewModel.transportNetwork.observe(viewLifecycleOwner, Observer {
+                transportNetwork -> transportNetwork?.let { loc.setTransportNetwork(it) }
+        })
+
+        viewModel.locations.observe(viewLifecycleOwner, Observer { favoriteLocations ->
+            favoriteLocations?.let {
+                loc.setFavoriteLocations(it)
+                loc.post { loc.onClick() }  // don't know why this only works when posted
+            }
+        })
+
         return v
     }
 

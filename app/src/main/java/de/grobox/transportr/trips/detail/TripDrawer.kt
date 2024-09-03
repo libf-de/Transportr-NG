@@ -22,18 +22,18 @@ package de.grobox.transportr.trips.detail
 
 import android.content.Context
 import android.graphics.Color
-import android.graphics.PorterDuff.Mode.SRC_IN
 import android.graphics.PorterDuff.Mode.MULTIPLY
+import android.graphics.PorterDuff.Mode.SRC_IN
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.LayerDrawable
 import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
 import com.google.android.material.color.MaterialColors
-import com.mapbox.mapboxsdk.annotations.Icon
-import com.mapbox.mapboxsdk.annotations.PolylineOptions
-import com.mapbox.mapboxsdk.geometry.LatLng
-import com.mapbox.mapboxsdk.geometry.LatLngBounds
-import com.mapbox.mapboxsdk.maps.MapboxMap
+import org.maplibre.android.annotations.Icon
+import org.maplibre.android.annotations.PolylineOptions
+import org.maplibre.android.geometry.LatLng
+import org.maplibre.android.geometry.LatLngBounds
+import org.maplibre.android.maps.MapLibreMap
 import de.grobox.transportr.R
 import de.grobox.transportr.map.MapDrawer
 import de.grobox.transportr.utils.DateUtils.formatTime
@@ -42,16 +42,17 @@ import de.schildbach.pte.dto.Location
 import de.schildbach.pte.dto.Point
 import de.schildbach.pte.dto.Stop
 import de.schildbach.pte.dto.Trip
-import de.schildbach.pte.dto.Trip.*
-import java.util.*
+import de.schildbach.pte.dto.Trip.Individual
+import de.schildbach.pte.dto.Trip.Leg
+import de.schildbach.pte.dto.Trip.Public
 
-internal class TripDrawer(context: Context) : MapDrawer(context) {
+class TripDrawer(context: Context) : MapDrawer(context) {
 
     private enum class MarkerType {
         BEGIN, CHANGE, STOP, END, WALK
     }
 
-    fun draw(map: MapboxMap, trip: Trip, zoom: Boolean) {
+    fun draw(map: MapLibreMap, trip: Trip, zoom: Boolean) {
         // draw leg path first, so it is always at the bottom
         var i = 1
         val builder = LatLngBounds.Builder()
@@ -78,7 +79,7 @@ internal class TripDrawer(context: Context) : MapDrawer(context) {
                 // Draw intermediate stops below all others
                 leg.intermediateStops?.let {
                     for (stop in it) {
-                        val stopIcon = getMarkerIcon(MarkerType.STOP, backgroundColor, foregroundColor)
+                        val stopIcon = getMarkerIcon(MarkerType.STOP, backgroundColor, foregroundColor) ?: continue
                         val text = getStopText(stop)
                         markLocation(map, stop.location, stopIcon, text)
                     }
@@ -86,22 +87,22 @@ internal class TripDrawer(context: Context) : MapDrawer(context) {
 
                 // Draw first station or change station
                 if (i == 1 || i == 2 && trip.legs[0] is Individual) {
-                    val icon = getMarkerIcon(MarkerType.BEGIN, backgroundColor, foregroundColor)
+                    val icon = getMarkerIcon(MarkerType.BEGIN, backgroundColor, foregroundColor) ?: continue
                     markLocation(map, leg.departure, icon, getStationText(leg, MarkerType.BEGIN))
                 } else {
-                    val icon = getMarkerIcon(MarkerType.CHANGE, backgroundColor, foregroundColor)
+                    val icon = getMarkerIcon(MarkerType.CHANGE, backgroundColor, foregroundColor) ?: continue
                     markLocation(map, leg.departure, icon, getStationText(trip.legs[i - 2], leg))
                 }
 
                 // Draw final station only at the end or if end is walking
                 if (i == trip.legs.size || i == trip.legs.size - 1 && trip.legs[i] is Individual) {
-                    val icon = getMarkerIcon(MarkerType.END, backgroundColor, foregroundColor)
+                    val icon = getMarkerIcon(MarkerType.END, backgroundColor, foregroundColor) ?: continue
                     markLocation(map, leg.arrival, icon, getStationText(leg, MarkerType.END))
                 }
             } else if (leg is Individual) {
                 // only draw an icon if walk is required in the middle of a trip
                 if (i > 1 && i < trip.legs.size) {
-                    val icon = getMarkerIcon(MarkerType.WALK, backgroundColor, foregroundColor)
+                    val icon = getMarkerIcon(MarkerType.WALK, backgroundColor, foregroundColor) ?: continue
                     markLocation(map, leg.departure, icon, getStationText(trip.legs[i - 2], leg))
                 }
             }
@@ -159,11 +160,11 @@ internal class TripDrawer(context: Context) : MapDrawer(context) {
         return ContextCompat.getColor(context, android.R.color.black)
     }
 
-    private fun markLocation(map: MapboxMap, location: Location, icon: Icon, text: String) {
+    private fun markLocation(map: MapLibreMap, location: Location, icon: Icon, text: String) {
         markLocation(map, location, icon, location.uniqueShortName(), text)
     }
 
-    private fun getMarkerIcon(type: MarkerType, backgroundColor: Int, foregroundColor: Int): Icon {
+    private fun getMarkerIcon(type: MarkerType, backgroundColor: Int, foregroundColor: Int): Icon? {
         // Get Drawable
         val drawable: Drawable
         if (type == MarkerType.STOP) {

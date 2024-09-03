@@ -30,7 +30,7 @@ import java.util.Collection;
 import de.grobox.transportr.R;
 import de.schildbach.pte.dto.Trip;
 
-class TripAdapter extends RecyclerView.Adapter<TripViewHolder> {
+public class TripAdapter extends RecyclerView.Adapter<TripViewHolder> {
 
 	private final SortedList<Trip> items = new SortedList<>(Trip.class, new SortedList.Callback<Trip>() {
 		@Override
@@ -96,7 +96,7 @@ class TripAdapter extends RecyclerView.Adapter<TripViewHolder> {
 		this.items.addAll(departures);
 	}
 
-	interface OnTripClickListener {
+	public interface OnTripClickListener {
 		void onClick(Trip trip);
 	}
 

@@ -29,15 +29,18 @@ import android.net.Uri
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
-import com.mapbox.mapboxsdk.geometry.LatLng
 import de.grobox.transportr.R
 import de.grobox.transportr.departures.DeparturesActivity
 import de.grobox.transportr.locations.WrapLocation
 import de.grobox.transportr.map.MapActivity
-import de.grobox.transportr.trips.search.DirectionsActivity
 import de.grobox.transportr.trips.search.DirectionsActivity.Companion.ACTION_PRE_FILL
 import de.grobox.transportr.trips.search.DirectionsActivity.Companion.ACTION_SEARCH
-import de.grobox.transportr.utils.Constants.*
+import de.grobox.transportr.trips.search.DirectionsComposeActivity
+import de.grobox.transportr.utils.Constants.FROM
+import de.grobox.transportr.utils.Constants.TO
+import de.grobox.transportr.utils.Constants.VIA
+import de.grobox.transportr.utils.Constants.WRAP_LOCATION
+import org.maplibre.android.geometry.LatLng
 import java.io.UnsupportedEncodingException
 import java.net.URLEncoder
 import java.util.regex.Pattern
@@ -55,7 +58,7 @@ object IntentUtils {
         search: Boolean = true,
         clearTop: Boolean = false
     ) {
-        val intent = Intent(context, DirectionsActivity::class.java)
+        val intent = Intent(context, DirectionsComposeActivity::class.java)
         if (clearTop) intent.flags = FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
         if (search) intent.action = ACTION_SEARCH
         else intent.action = ACTION_PRE_FILL

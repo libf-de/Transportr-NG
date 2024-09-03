@@ -28,7 +28,7 @@ import de.grobox.transportr.databinding.ListItemStopBinding
 import de.grobox.transportr.trips.detail.LegViewHolder.Companion.DEFAULT_LINE_COLOR
 import de.schildbach.pte.dto.Stop
 
-internal class StopAdapter internal constructor(private val listener: LegClickListener) : Adapter<StopViewHolder>() {
+class StopAdapter internal constructor(private val listener: LegClickListener) : Adapter<StopViewHolder>() {
 
     private var stops: List<Stop>? = null
     @ColorInt private var color: Int = DEFAULT_LINE_COLOR

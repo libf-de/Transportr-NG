@@ -16,149 +16,139 @@
  *    You should have received a copy of the GNU General Public License
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package de.grobox.transportr.trips.detail
 
-package de.grobox.transportr.trips.detail;
-
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.FrameLayout;
-import android.widget.ImageButton;
-
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-
-import javax.annotation.ParametersAreNonnullByDefault;
-import javax.inject.Inject;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.lifecycle.ViewModelProvider;
-import de.grobox.transportr.R;
-import de.grobox.transportr.TransportrActivity;
-import de.grobox.transportr.locations.WrapLocation;
-import de.grobox.transportr.trips.detail.TripDetailViewModel.SheetState;
-import de.grobox.transportr.ui.ThreeStateBottomSheetBehavior;
-import de.grobox.transportr.utils.FullScreenUtil;
-import de.grobox.transportr.utils.OnboardingBuilder;
-import de.schildbach.pte.dto.Trip;
-
-import static android.view.WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED;
-import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED;
-import static com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED;
-import static de.grobox.transportr.trips.detail.TripDetailViewModel.SheetState.BOTTOM;
-import static de.grobox.transportr.trips.detail.TripDetailViewModel.SheetState.EXPANDED;
-import static de.grobox.transportr.trips.detail.TripDetailViewModel.SheetState.MIDDLE;
-import static uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt.STATE_DISMISSED;
-import static uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt.STATE_FOCAL_PRESSED;
+import android.os.Build
+import android.os.Bundle
+import android.view.View
+import android.view.WindowManager
+import android.widget.ImageButton
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
+import de.grobox.transportr.R
+import de.grobox.transportr.TransportrActivity
+import de.grobox.transportr.databinding.ActivityTripDetailBinding
+import de.grobox.transportr.locations.WrapLocation
+import de.grobox.transportr.trips.detail.TripDetailFragment.Companion.TAG
+import de.grobox.transportr.ui.ThreeStateBottomSheetBehavior
+import de.grobox.transportr.utils.FullScreenUtil.Companion.applyTopInset
+import de.grobox.transportr.utils.FullScreenUtil.Companion.drawBehindStatusbar
+import de.grobox.transportr.utils.OnboardingBuilder
+import de.schildbach.pte.dto.Trip
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt
+import javax.annotation.ParametersAreNonnullByDefault
 
 @ParametersAreNonnullByDefault
-public class TripDetailActivity extends TransportrActivity {
+class TripDetailActivity : TransportrActivity() {
+    private val viewModel: TripDetailViewModel by viewModel()
 
-	public static final String TRIP = "de.schildbach.pte.dto.Trip";
-	public static final String FROM = "de.schildbach.pte.dto.Trip.from";
-	public static final String VIA = "de.schildbach.pte.dto.Trip.via";
-	public static final String TO = "de.schildbach.pte.dto.Trip.to";
+    private lateinit var bottomSheetBehavior: ThreeStateBottomSheetBehavior<*>
 
-	@Inject ViewModelProvider.Factory viewModelFactory;
+    private lateinit var binding: ActivityTripDetailBinding
 
-	private ThreeStateBottomSheetBehavior bottomSheetBehavior;
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
-	@Override
-	protected void onCreate(@Nullable Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		FullScreenUtil.Companion.drawBehindStatusbar(this);
-		FullScreenUtil.Companion.applyTopInset(findViewById(R.id.appBarLayout));
+        binding = ActivityTripDetailBinding.inflate(layoutInflater)
 
-		getComponent().inject(this);
+        drawBehindStatusbar(this)
+        applyTopInset(binding.appBarLayout)
 
-		TripDetailViewModel viewModel = new ViewModelProvider(this, viewModelFactory).get(TripDetailViewModel.class);
-		Intent intent = getIntent();
-		Trip trip = (Trip) intent.getSerializableExtra(TRIP);
-		WrapLocation from = (WrapLocation) intent.getSerializableExtra(FROM);
-		WrapLocation via = (WrapLocation) intent.getSerializableExtra(VIA);
-		WrapLocation to = (WrapLocation) intent.getSerializableExtra(TO);
-		viewModel.setTrip(trip);
-		viewModel.setFrom(from);
-		viewModel.setVia(via);
-		viewModel.setTo(to);
+        val trip = intent.getSerializableExtra(TRIP) as Trip?
+        val from = intent.getSerializableExtra(FROM) as WrapLocation?
+        val via = intent.getSerializableExtra(VIA) as WrapLocation?
+        val to = intent.getSerializableExtra(TO) as WrapLocation?
+        viewModel.setTrip(trip!!)
+        viewModel.from = from
+        viewModel.via = via
+        viewModel.to = to
 
-		if (viewModel.showWhenLocked()) {
-			getWindow().addFlags(FLAG_SHOW_WHEN_LOCKED);
-		}
+        if (viewModel.showWhenLocked()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                setShowWhenLocked(true)
+            } else {
+                window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED)
+            }
 
-		setContentView(R.layout.activity_trip_detail);
-		setUpCustomToolbar(true);
+        }
 
-		FrameLayout bottomContainer = findViewById(R.id.bottomContainer);
-		bottomSheetBehavior = ThreeStateBottomSheetBehavior.from(bottomContainer);
-		bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
-			@Override
-			public void onStateChanged(@NonNull View bottomSheet, int newState) {
-				if (newState == STATE_COLLAPSED) {
-					if (bottomSheetBehavior.isMiddle()) {
-						viewModel.getSheetState().setValue(MIDDLE);
-					} else if (bottomSheetBehavior.isBottom()) {
-						viewModel.getSheetState().setValue(BOTTOM);
-					}
-				} else if (newState == STATE_EXPANDED) {
-					viewModel.getSheetState().setValue(EXPANDED);
-				}
-			}
+        setContentView(binding.root)
+        setUpCustomToolbar(true)
 
-			@Override
-			public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-			}
-		});
-		viewModel.getSheetState().observe(this, this::onSheetStateChanged);
+        bottomSheetBehavior = ThreeStateBottomSheetBehavior.from(binding.bottomContainer)
+        bottomSheetBehavior.setBottomSheetCallback(object : BottomSheetCallback() {
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
+                    if (bottomSheetBehavior.isMiddle) {
+                        viewModel.sheetState.setValue(TripDetailViewModel.SheetState.MIDDLE)
+                    } else if (bottomSheetBehavior.isBottom) {
+                        viewModel.sheetState.setValue(TripDetailViewModel.SheetState.BOTTOM)
+                    }
+                } else if (newState == BottomSheetBehavior.STATE_EXPANDED) {
+                    viewModel.sheetState.setValue(TripDetailViewModel.SheetState.EXPANDED)
+                }
+            }
 
-		if (savedInstanceState == null) {
-			viewModel.getSheetState().setValue(MIDDLE);
-			getSupportFragmentManager().beginTransaction()
-					.add(R.id.topContainer, new TripMapFragment(), TripMapFragment.TAG)
-					.add(R.id.bottomContainer, new TripDetailFragment(), TripDetailFragment.Companion.getTAG())
-					.commit();
+            override fun onSlide(bottomSheet: View, slideOffset: Float) { /* do nothing */ }
+        })
 
-			showOnboarding();
-		}
+        viewModel.sheetState.observe(this) { sheetState: TripDetailViewModel.SheetState? -> this.onSheetStateChanged(sheetState) }
 
-		((ImageButton) findViewById(R.id.backView)).setOnClickListener(view -> getOnBackPressedDispatcher().onBackPressed());
-	}
+        if (savedInstanceState == null) {
+            viewModel.sheetState.setValue(TripDetailViewModel.SheetState.MIDDLE)
+            supportFragmentManager.beginTransaction()
+                .add(R.id.topContainer, TripMapFragment(), TripMapFragment.TAG)
+                .add(R.id.bottomContainer, TripDetailFragment(), TAG)
+                .commit()
 
-	private void showOnboarding() {
-		if (getSettingsManager().showTripDetailFragmentOnboarding()) {
-			new OnboardingBuilder(this)
-					.setTarget(R.id.bottomContainer)
-					.setPrimaryText(R.string.onboarding_location_title)
-					.setSecondaryText(R.string.onboarding_location_message)
-					.setPromptStateChangeListener((prompt, state) -> {
-						if (state == STATE_DISMISSED || state == STATE_FOCAL_PRESSED) {
-							getSettingsManager().tripDetailOnboardingShown();
-							bottomSheetBehavior.setState(STATE_EXPANDED);
-						}
-					})
-					.show();
-		}
-	}
+            showOnboarding()
+        }
 
-	private void onSheetStateChanged(@Nullable SheetState sheetState) {
-		if (sheetState == null) return;
-		switch (sheetState) {
-			case BOTTOM:
-				bottomSheetBehavior.setBottom();
-				bottomSheetBehavior.setState(STATE_COLLAPSED);
-				FullScreenUtil.Companion.drawBehindStatusbar(this);
-				break;
-			case MIDDLE:
-				bottomSheetBehavior.setHideable(true);  // ensures it can be swiped down
-				bottomSheetBehavior.setMiddle();
-				bottomSheetBehavior.setState(STATE_COLLAPSED);
-				FullScreenUtil.Companion.drawBehindStatusbar(this);
-				FullScreenUtil.Companion.applyTopInset(findViewById(R.id.appBarLayout));
-				break;
-			case EXPANDED:
-				FullScreenUtil.Companion.drawBehindStatusbar(this);
-				break;
-		}
-	}
+        (findViewById<View>(R.id.backView) as ImageButton).setOnClickListener { view: View? -> onBackPressedDispatcher.onBackPressed() }
+    }
 
+    private fun showOnboarding() {
+        if (settingsManager.showTripDetailFragmentOnboarding()) {
+            OnboardingBuilder(this)
+                .setTarget(R.id.bottomContainer)
+                .setPrimaryText(R.string.onboarding_location_title)
+                .setSecondaryText(R.string.onboarding_location_message)
+                .setPromptStateChangeListener { _: MaterialTapTargetPrompt?, state: Int ->
+                    if (state == MaterialTapTargetPrompt.STATE_DISMISSED || state == MaterialTapTargetPrompt.STATE_FOCAL_PRESSED) {
+                        settingsManager.tripDetailOnboardingShown()
+                        bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_EXPANDED
+                    }
+                }
+                .show()
+        }
+    }
+
+    private fun onSheetStateChanged(sheetState: TripDetailViewModel.SheetState?) {
+        if (sheetState == null) return
+        when (sheetState) {
+            TripDetailViewModel.SheetState.BOTTOM -> {
+                bottomSheetBehavior!!.setBottom()
+                bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_COLLAPSED
+                drawBehindStatusbar(this)
+            }
+
+            TripDetailViewModel.SheetState.MIDDLE -> {
+                bottomSheetBehavior.isHideable = true // ensures it can be swiped down
+                bottomSheetBehavior!!.setMiddle()
+                bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_COLLAPSED
+                drawBehindStatusbar(this)
+                applyTopInset(findViewById(R.id.appBarLayout))
+            }
+
+            TripDetailViewModel.SheetState.EXPANDED -> drawBehindStatusbar(this)
+        }
+    }
+
+    companion object {
+        const val TRIP: String = "de.schildbach.pte.dto.Trip"
+        const val FROM: String = "de.schildbach.pte.dto.Trip.from"
+        const val VIA: String = "de.schildbach.pte.dto.Trip.via"
+        const val TO: String = "de.schildbach.pte.dto.Trip.to"
+    }
 }

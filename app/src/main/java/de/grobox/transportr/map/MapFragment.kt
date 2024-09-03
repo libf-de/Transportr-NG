@@ -20,23 +20,15 @@
 package de.grobox.transportr.map
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.annotation.LayoutRes
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.loader.app.LoaderManager
 import androidx.loader.app.LoaderManager.LoaderCallbacks
 import androidx.loader.content.Loader
-import com.mapbox.mapboxsdk.annotations.Marker
-import com.mapbox.mapboxsdk.annotations.MarkerOptions
-import com.mapbox.mapboxsdk.geometry.LatLng
-import com.mapbox.mapboxsdk.maps.MapboxMap
-import com.mapbox.mapboxsdk.maps.MapboxMap.OnMarkerClickListener
-import com.mapbox.mapboxsdk.maps.Style
 import de.grobox.transportr.R
 import de.grobox.transportr.locations.NearbyLocationsLoader
 import de.grobox.transportr.locations.WrapLocation
@@ -46,14 +38,16 @@ import de.schildbach.pte.dto.Location
 import de.schildbach.pte.dto.LocationType.STATION
 import de.schildbach.pte.dto.NearbyLocationsResult
 import de.schildbach.pte.dto.NearbyLocationsResult.Status.OK
-import javax.inject.Inject
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
+import org.maplibre.android.annotations.Marker
+import org.maplibre.android.annotations.MarkerOptions
+import org.maplibre.android.geometry.LatLng
+import org.maplibre.android.maps.MapLibreMap
+import org.maplibre.android.maps.MapLibreMap.OnMarkerClickListener
+import org.maplibre.android.maps.Style
 
-internal class MapFragment : GpsMapFragment<MapViewModel>(), LoaderCallbacks<NearbyLocationsResult>, OnMarkerClickListener {
-
-    @Inject
-    internal lateinit var viewModelFactory: ViewModelProvider.Factory
-
-    override lateinit var viewModel: MapViewModel
+class MapFragment : GpsMapFragment<MapViewModel>(), LoaderCallbacks<NearbyLocationsResult>, OnMarkerClickListener {
+    override val viewModel: MapViewModel by activityViewModel()
     private lateinit var nearbyStationsDrawer: NearbyStationsDrawer
 
     private var selectedLocationMarker: Marker? = null
@@ -63,9 +57,6 @@ internal class MapFragment : GpsMapFragment<MapViewModel>(), LoaderCallbacks<Nea
         get() = R.layout.fragment_map
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        component.inject(this)
-        viewModel = ViewModelProvider(activity!!, viewModelFactory).get(MapViewModel::class.java)
-
         val v = super.onCreateView(inflater, container, savedInstanceState)
         viewModel.transportNetwork.observe(viewLifecycleOwner) { onTransportNetworkChanged(it) }
 
@@ -74,7 +65,7 @@ internal class MapFragment : GpsMapFragment<MapViewModel>(), LoaderCallbacks<Nea
         return v
     }
 
-    override fun onMapReady(mapboxMap: MapboxMap) {
+    override fun onMapReady(mapboxMap: MapLibreMap) {
         super.onMapReady(mapboxMap)
 
         val location = Location(STATION, "fake")
@@ -99,7 +90,7 @@ internal class MapFragment : GpsMapFragment<MapViewModel>(), LoaderCallbacks<Nea
         }
     }
 
-    private fun MapboxMap.isInitialPosition(): Boolean {
+    private fun MapLibreMap.isInitialPosition(): Boolean {
         return cameraPosition.zoom == minZoomLevel &&
                 cameraPosition.target == LatLng(0.0, 0.0)
     }

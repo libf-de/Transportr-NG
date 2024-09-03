@@ -23,10 +23,12 @@ import android.graphics.Color
 import android.text.format.DateFormat
 import android.text.format.DateUtils
 import android.view.View
-import androidx.core.content.ContextCompat
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.colorResource
 import com.google.android.material.color.MaterialColors
 import de.grobox.transportr.R
-import java.util.*
+import java.util.Calendar
+import java.util.Date
 import kotlin.math.abs
 
 object DateUtils {
@@ -118,7 +120,7 @@ object DateUtils {
         return millisToMinutes(d2.time - d1.time)
     }
 
-    private fun getDifferenceInMinutes(date: Date): Long {
+    internal fun getDifferenceInMinutes(date: Date): Long {
         return getDifferenceInMinutes(Date(), date)
     }
 }

@@ -30,23 +30,16 @@ import de.grobox.transportr.networks.PickTransportNetworkActivity
 import de.grobox.transportr.networks.PickTransportNetworkActivity.Companion.FORCE_NETWORK_SELECTION
 import de.grobox.transportr.networks.TransportNetworkManager
 import de.grobox.transportr.settings.SettingsManager
+import org.koin.android.ext.android.inject
 import java.util.*
-import javax.inject.Inject
 
 
 abstract class TransportrActivity : AppCompatActivity() {
 
-    @Inject
-    lateinit var manager: TransportNetworkManager
-    @Inject
-    lateinit var settingsManager: SettingsManager
-
-    protected val component: AppComponent
-        get() = (application as TransportrApplication).component
+    val manager: TransportNetworkManager by inject()
+    val settingsManager: SettingsManager by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        component.inject(this)
-
         useLanguage()
         AppCompatDelegate.setDefaultNightMode(settingsManager.theme)
         ensureTransportNetworkSelected()

@@ -20,7 +20,6 @@
 package de.grobox.transportr.trips.detail
 
 import android.text.Html.fromHtml
-import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.ImageButton
@@ -35,7 +34,9 @@ import com.google.common.base.Strings.isNullOrEmpty
 import de.grobox.transportr.R
 import de.grobox.transportr.databinding.ListItemLegBinding
 import de.grobox.transportr.trips.BaseViewHolder
-import de.grobox.transportr.trips.detail.LegViewHolder.LegType.*
+import de.grobox.transportr.trips.detail.LegViewHolder.LegType.FIRST
+import de.grobox.transportr.trips.detail.LegViewHolder.LegType.FIRST_LAST
+import de.grobox.transportr.trips.detail.LegViewHolder.LegType.MIDDLE
 import de.grobox.transportr.ui.LineView
 import de.grobox.transportr.utils.DateUtils
 import de.grobox.transportr.utils.DateUtils.formatDuration
@@ -43,12 +44,13 @@ import de.grobox.transportr.utils.TransportrUtils.getLocationName
 import de.schildbach.pte.dto.Line
 import de.schildbach.pte.dto.Stop
 import de.schildbach.pte.dto.Style.RED
-import de.schildbach.pte.dto.Trip.*
+import de.schildbach.pte.dto.Trip.Individual
+import de.schildbach.pte.dto.Trip.Leg
+import de.schildbach.pte.dto.Trip.Public
 
+class LegViewHolder(binding: ListItemLegBinding, private val listener: LegClickListener, private val showLineName: Boolean) : BaseViewHolder(binding.root) {
 
-internal class LegViewHolder(binding: ListItemLegBinding, private val listener: LegClickListener, private val showLineName: Boolean) : BaseViewHolder(binding.root) {
-
-    internal enum class LegType {
+    enum class LegType {
         FIRST, MIDDLE, LAST, FIRST_LAST
     }
 

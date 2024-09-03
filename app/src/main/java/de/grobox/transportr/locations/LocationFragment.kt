@@ -16,259 +16,220 @@
  *    You should have received a copy of the GNU General Public License
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package de.grobox.transportr.locations
 
-package de.grobox.transportr.locations;
-
-import androidx.lifecycle.ViewModelProvider;
-import android.content.Intent;
-import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.WorkerThread;
-import androidx.loader.app.LoaderManager.LoaderCallbacks;
-import androidx.core.content.ContextCompat;
-import androidx.loader.content.Loader;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewTreeObserver.OnGlobalLayoutListener;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
-import javax.annotation.ParametersAreNonnullByDefault;
-import javax.inject.Inject;
-
-import de.grobox.transportr.R;
-import de.grobox.transportr.TransportrFragment;
-import de.grobox.transportr.databinding.FragmentLocationBinding;
-import de.grobox.transportr.departures.DeparturesActivity;
-import de.grobox.transportr.departures.DeparturesLoader;
-import de.grobox.transportr.locations.ReverseGeocoder.ReverseGeocoderCallback;
-import de.grobox.transportr.map.MapViewModel;
-import de.grobox.transportr.utils.IntentUtils;
-import de.grobox.transportr.utils.TransportrUtils;
-import de.schildbach.pte.dto.Departure;
-import de.schildbach.pte.dto.Line;
-import de.schildbach.pte.dto.LineDestination;
-import de.schildbach.pte.dto.QueryDeparturesResult;
-import de.schildbach.pte.dto.StationDepartures;
-
-import static android.view.View.GONE;
-import static android.view.View.INVISIBLE;
-import static android.view.View.VISIBLE;
-import static androidx.recyclerview.widget.RecyclerView.HORIZONTAL;
-import static com.google.common.base.Strings.isNullOrEmpty;
-import static de.grobox.transportr.departures.DeparturesActivity.MAX_DEPARTURES;
-import static de.grobox.transportr.departures.DeparturesLoader.getBundle;
-import static de.grobox.transportr.utils.Constants.LOADER_DEPARTURES;
-import static de.grobox.transportr.utils.Constants.WRAP_LOCATION;
-import static de.grobox.transportr.utils.IntentUtils.startGeoIntent;
-import static de.schildbach.pte.dto.LocationType.COORD;
-import static de.schildbach.pte.dto.QueryDeparturesResult.Status.OK;
+import android.content.Intent
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.view.ViewTreeObserver.OnGlobalLayoutListener
+import android.widget.Button
+import android.widget.ImageView
+import android.widget.ProgressBar
+import android.widget.TextView
+import androidx.annotation.WorkerThread
+import androidx.core.content.ContextCompat
+import androidx.loader.app.LoaderManager
+import androidx.loader.content.Loader
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.common.base.Strings
+import de.grobox.transportr.R
+import de.grobox.transportr.TransportrFragment
+import de.grobox.transportr.databinding.FragmentLocationBinding
+import de.grobox.transportr.departures.DeparturesActivity
+import de.grobox.transportr.departures.DeparturesLoader
+import de.grobox.transportr.locations.ReverseGeocoder.ReverseGeocoderCallback
+import de.grobox.transportr.map.MapViewModel
+import de.grobox.transportr.utils.Constants
+import de.grobox.transportr.utils.IntentUtils.findNearbyStations
+import de.grobox.transportr.utils.IntentUtils.startGeoIntent
+import de.grobox.transportr.utils.TransportrUtils.getCoordName
+import de.schildbach.pte.dto.Line
+import de.schildbach.pte.dto.LocationType
+import de.schildbach.pte.dto.QueryDeparturesResult
+import org.koin.androidx.viewmodel.ext.android.activityViewModel
+import java.util.Date
+import java.util.SortedSet
+import java.util.TreeSet
+import javax.annotation.ParametersAreNonnullByDefault
 
 @ParametersAreNonnullByDefault
-public class LocationFragment extends TransportrFragment
-		implements LoaderCallbacks<QueryDeparturesResult>, ReverseGeocoderCallback, OnGlobalLayoutListener {
+class LocationFragment : TransportrFragment(), LoaderManager.LoaderCallbacks<QueryDeparturesResult?>, ReverseGeocoderCallback,
+    OnGlobalLayoutListener {
 
-	public static final String TAG = LocationFragment.class.getName();
+    private val viewModel: MapViewModel by activityViewModel<MapViewModel>()
+    lateinit var location: WrapLocation
+    private val adapter = LineAdapter()
 
-	@Inject	ViewModelProvider.Factory viewModelFactory;
+    private lateinit var binding: FragmentLocationBinding
+    private lateinit var locationIcon: ImageView
+    private lateinit var locationName: TextView
+    private lateinit var locationInfo: TextView
+    private lateinit var linesLayout: RecyclerView
+    private lateinit var nearbyStationsButton: Button
+    private lateinit var nearbyStationsProgress: ProgressBar
 
-	private MapViewModel viewModel;
-	private WrapLocation location;
-	private final LineAdapter adapter = new LineAdapter();
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        super.onCreate(savedInstanceState)
 
-	private FragmentLocationBinding binding;
-	private ImageView locationIcon;
-	private TextView locationName;
-	private TextView locationInfo;
-	private RecyclerView linesLayout;
-	private Button nearbyStationsButton;
-	private ProgressBar nearbyStationsProgress;
+        val args = arguments ?: throw IllegalStateException()
+        location = (args.getSerializable(Constants.WRAP_LOCATION) as WrapLocation?)!!
 
-	public static LocationFragment newInstance(WrapLocation location) {
-		LocationFragment f = new LocationFragment();
+        binding = FragmentLocationBinding.inflate(inflater, container, false)
 
-		Bundle args = new Bundle();
-		args.putSerializable(WRAP_LOCATION, location);
-		f.setArguments(args);
+        binding.root.setBackgroundColor(
+            ContextCompat.getColor(
+                requireContext(),
+                com.google.android.material.R.color.material_personalized_color_surface_container_low
+            )
+        )
 
-		return f;
-	}
+        viewModel.nearbyStationsFound().observe(viewLifecycleOwner) { onNearbyStationsLoaded() }
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+        // Location
+        locationIcon = binding.locationIcon
+        locationName = binding.locationName
+        locationIcon.setOnClickListener { onLocationClicked() }
+        locationName.setOnClickListener { onLocationClicked() }
 
-		Bundle args = getArguments();
-		if (args == null) throw new IllegalStateException();
-		location = (WrapLocation) args.getSerializable(WRAP_LOCATION);
-		if (location == null) throw new IllegalArgumentException("No location");
+        // Lines
+        linesLayout = binding.linesLayout
+        linesLayout.visibility = View.GONE
+        linesLayout.adapter = adapter
+        linesLayout.layoutManager = LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
+        linesLayout.setOnClickListener { onLocationClicked() }
 
-		binding = FragmentLocationBinding.inflate(inflater, container, false);
-		getComponent().inject(this);
+        // Location Info
+        locationInfo = binding.locationInfo
+        showLocation()
 
-		if (getActivity() == null) throw new IllegalStateException();
-		viewModel = new ViewModelProvider(requireActivity(), viewModelFactory).get(MapViewModel.class);
-		viewModel.nearbyStationsFound().observe(getViewLifecycleOwner(), found -> onNearbyStationsLoaded());
+        if (location.location.type == LocationType.COORD) {
+            val geocoder = ReverseGeocoder(requireActivity(), this)
+            geocoder.findLocation(location.location)
+        }
 
-		// Location
-		locationIcon = binding.locationIcon;
-		locationName = binding.locationName;
-		locationIcon.setOnClickListener(view -> onLocationClicked());
-		locationName.setOnClickListener(view -> onLocationClicked());
+        // Departures
+        val departuresButton: Button = binding.departuresButton
+        if (location.hasId()) {
+            departuresButton.setOnClickListener {
+                val intent = Intent(context, DeparturesActivity::class.java)
+                intent.putExtra(Constants.WRAP_LOCATION, location)
+                startActivity(intent)
+            }
+        } else {
+            departuresButton.visibility = View.GONE
+        }
 
-		// Lines
-		linesLayout = binding.linesLayout;
-		linesLayout.setVisibility(GONE);
-		linesLayout.setAdapter(adapter);
-		linesLayout.setLayoutManager(new LinearLayoutManager(getContext(), HORIZONTAL, false));
-		linesLayout.setOnClickListener(view -> onLocationClicked());
+        // Nearby Stations
+        nearbyStationsButton = binding.nearbyStationsButton
+        nearbyStationsProgress = binding.nearbyStationsProgress
+        nearbyStationsButton.setOnClickListener {
+            it.visibility = View.INVISIBLE
+            nearbyStationsProgress.visibility = View.VISIBLE
+            findNearbyStations(context, location)
+        }
 
-		// Location Info
-		locationInfo = binding.locationInfo;
-		showLocation();
+        // Share Location
+        val shareButton: Button = binding.shareButton
+        shareButton.setOnClickListener { startGeoIntent(requireActivity(), location) }
 
-		if (location.getLocation().type == COORD) {
-			ReverseGeocoder geocoder = new ReverseGeocoder(getActivity(), this);
-			geocoder.findLocation(location.getLocation());
-		}
+        // Overflow Button
+        val overflowButton = binding.overflowButton
+        overflowButton.setOnClickListener { view: View? -> LocationPopupMenu(context, view, location).show() }
 
-		// Departures
-		Button departuresButton = binding.departuresButton;
-		if (location.hasId()) {
-			departuresButton.setOnClickListener(view -> {
-				Intent intent = new Intent(getContext(), DeparturesActivity.class);
-				intent.putExtra(WRAP_LOCATION, location);
-				startActivity(intent);
-			});
-		} else {
-			departuresButton.setVisibility(GONE);
-		}
+        val v: View = binding.root
+        v.viewTreeObserver.addOnGlobalLayoutListener(this)
 
-		// Nearby Stations
-		nearbyStationsButton = binding.nearbyStationsButton;
-		nearbyStationsProgress = binding.nearbyStationsProgress;
-		nearbyStationsButton.setOnClickListener(view -> {
-			nearbyStationsButton.setVisibility(INVISIBLE);
-			nearbyStationsProgress.setVisibility(VISIBLE);
-			IntentUtils.findNearbyStations(getContext(), location);
-		});
+        return v
+    }
 
-		// Share Location
-		Button shareButton = binding.shareButton;
-		shareButton.setOnClickListener(view -> startGeoIntent(getActivity(), location));
+    override fun onGlobalLayout() {
+        // set peek distance to show view header
+        if (activity == null) return
+        if (linesLayout.bottom > 0) {
+            viewModel.setPeekHeight(linesLayout.bottom + resources.getDimensionPixelSize(R.dimen.locationPeekPadding))
+        } else if (locationInfo.bottom > 0) {
+            viewModel.setPeekHeight(locationInfo.bottom + resources.getDimensionPixelSize(R.dimen.locationPeekPadding))
+        }
+    }
 
-		// Overflow Button
-		ImageButton overflowButton = binding.overflowButton;
-		overflowButton.setOnClickListener(view -> new LocationPopupMenu(getContext(), view, location).show());
+    private fun showLocation() {
+        locationName.text = location.getName()
+        locationIcon.setImageDrawable(ContextCompat.getDrawable(context, location.drawable))
+        val locationInfoStr = StringBuilder()
+        if (!Strings.isNullOrEmpty(location.location.place)) {
+            locationInfoStr.append(location.location.place)
+        }
+        if (location.location.hasCoord()) {
+            if (locationInfoStr.isNotEmpty()) locationInfoStr.append(", ")
+            locationInfoStr.append(getCoordName(location.location))
+        }
+        locationInfo.text = locationInfoStr
+    }
 
-		View v = binding.getRoot();
-		v.getViewTreeObserver().addOnGlobalLayoutListener(this);
+    private fun onLocationClicked() {
+        viewModel.selectedLocationClicked(location.latLng)
+    }
 
-		return v;
-	}
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        if (location.hasId()) {
+            val args = DeparturesLoader.getBundle(location.getId(), Date(), DeparturesActivity.MAX_DEPARTURES)
+            loaderManager.initLoader(Constants.LOADER_DEPARTURES, args, this).forceLoad()
+        }
+    }
 
-	@Override
-	public void onDestroyView() {
-		super.onDestroyView();
-		binding = null;
-	}
+    override fun onCreateLoader(id: Int, args: Bundle?): DeparturesLoader {
+        return DeparturesLoader(context, viewModel.transportNetwork.value, args)
+    }
 
-	@Override
-	public void onGlobalLayout() {
-		// set peek distance to show view header
-		if (getActivity() == null) return;
-		if (linesLayout.getBottom() > 0) {
-			viewModel.setPeekHeight(linesLayout.getBottom() + getResources().getDimensionPixelSize(R.dimen.locationPeekPadding));
-		} else if (locationInfo.getBottom() > 0) {
-			viewModel.setPeekHeight(locationInfo.getBottom() + getResources().getDimensionPixelSize(R.dimen.locationPeekPadding));
-		}
-	}
+    override fun onLoadFinished(loader: Loader<QueryDeparturesResult?>, data: QueryDeparturesResult?) {
+        if (data != null && data.status == QueryDeparturesResult.Status.OK) {
+            val lines: SortedSet<Line> = TreeSet()
+            for (s in data.stationDepartures) {
+                if (s.lines != null) {
+                    for (d in s.lines!!) lines.add(d.line)
+                }
+                for (d in s.departures) lines.add(d.line)
+            }
+            adapter.swapLines(ArrayList(lines))
 
-	private void showLocation() {
-		locationName.setText(location.getName());
-		locationIcon.setImageDrawable(ContextCompat.getDrawable(getContext(), location.getDrawable()));
-		StringBuilder locationInfoStr = new StringBuilder();
-		if (!isNullOrEmpty(location.getLocation().place)) {
-			locationInfoStr.append(location.getLocation().place);
-		}
-		if (location.getLocation().hasCoord()) {
-			if (locationInfoStr.length() > 0) locationInfoStr.append(", ");
-			locationInfoStr.append(TransportrUtils.getCoordName(location.getLocation()));
-		}
-		locationInfo.setText(locationInfoStr);
-	}
+            linesLayout.alpha = 0f
+            linesLayout.visibility = View.VISIBLE
+            linesLayout.animate().setDuration(750).alpha(1f).start()
+        }
+    }
 
-	private void onLocationClicked() {
-		viewModel.selectedLocationClicked(location.getLatLng());
-	}
+    override fun onLoaderReset(loader: Loader<QueryDeparturesResult?>) { /* do nothing */ }
 
-	@Override
-	public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
-		if (location.hasId()) {
-			Bundle args = getBundle(location.getId(), new Date(), MAX_DEPARTURES);
-			getLoaderManager().initLoader(LOADER_DEPARTURES, args, this).forceLoad();
-		}
-	}
+    @WorkerThread
+    override fun onLocationRetrieved(location: WrapLocation) {
+        if (activity == null) return
+        runOnUiThread {
+            this@LocationFragment.location = location
+            showLocation()
+        }
+    }
 
-	@NonNull
-	@Override
-	public DeparturesLoader onCreateLoader(int id, @Nullable Bundle args) {
-		return new DeparturesLoader(getContext(), viewModel.getTransportNetwork().getValue(), args);
-	}
+    private fun onNearbyStationsLoaded() {
+        nearbyStationsButton.visibility = View.VISIBLE
+        nearbyStationsButton.isEnabled = false
+        nearbyStationsProgress.visibility = View.INVISIBLE
+    }
 
-	@Override
-	public void onLoadFinished(Loader<QueryDeparturesResult> loader, QueryDeparturesResult data) {
-		if (data != null && data.status == OK) {
-			SortedSet<Line> lines = new TreeSet<>();
-			for (StationDepartures s : data.stationDepartures) {
-				if (s.lines != null) {
-					for (LineDestination d : s.lines) lines.add(d.line);
-				}
-				for (Departure d : s.departures) lines.add(d.line);
-			}
-			adapter.swapLines(new ArrayList<>(lines));
+    companion object {
+        val TAG: String = LocationFragment::class.java.name
 
-			linesLayout.setAlpha(0f);
-			linesLayout.setVisibility(VISIBLE);
-			linesLayout.animate().setDuration(750).alpha(1f).start();
-		}
-	}
+        fun newInstance(location: WrapLocation?): LocationFragment {
+            val f = LocationFragment()
 
-	@Override
-	public void onLoaderReset(Loader<QueryDeparturesResult> loader) {
-	}
+            val args = Bundle()
+            args.putSerializable(Constants.WRAP_LOCATION, location)
+            f.arguments = args
 
-	@Override
-	@WorkerThread
-	public void onLocationRetrieved(@NonNull final WrapLocation location) {
-		if (getActivity() == null) return;
-		runOnUiThread(() -> {
-			LocationFragment.this.location = location;
-			showLocation();
-		});
-	}
-
-	private void onNearbyStationsLoaded() {
-		nearbyStationsButton.setVisibility(VISIBLE);
-		nearbyStationsButton.setEnabled(false);
-		nearbyStationsProgress.setVisibility(INVISIBLE);
-	}
-
-	public WrapLocation getLocation() {
-		return location;
-	}
-
+            return f
+        }
+    }
 }

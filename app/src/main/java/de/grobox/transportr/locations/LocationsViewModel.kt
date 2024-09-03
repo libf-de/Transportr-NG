@@ -16,55 +16,33 @@
  *    You should have received a copy of the GNU General Public License
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package de.grobox.transportr.locations
 
-package de.grobox.transportr.locations;
+import androidx.lifecycle.LiveData
+import de.grobox.transportr.TransportrApplication
+import de.grobox.transportr.data.locations.FavoriteLocation
+import de.grobox.transportr.data.locations.HomeLocation
+import de.grobox.transportr.data.locations.LocationRepository
+import de.grobox.transportr.data.locations.WorkLocation
+import de.grobox.transportr.networks.TransportNetworkManager
+import de.grobox.transportr.networks.TransportNetworkViewModel
 
-import androidx.lifecycle.LiveData;
+abstract class LocationsViewModel protected constructor(
+    application: TransportrApplication?,
+    transportNetworkManager: TransportNetworkManager?,
+    private val locationRepository: LocationRepository
+) : TransportNetworkViewModel(
+    application!!, transportNetworkManager!!
+) {
+    val home: LiveData<HomeLocation> = locationRepository.homeLocation
+    val work: LiveData<WorkLocation> = locationRepository.workLocation
+    val locations: LiveData<List<FavoriteLocation>> = locationRepository.favoriteLocations
 
-import java.util.List;
+    fun setHome(wrapLocation: WrapLocation?) {
+        locationRepository.setHomeLocation(wrapLocation!!)
+    }
 
-import de.grobox.transportr.TransportrApplication;
-import de.grobox.transportr.data.locations.FavoriteLocation;
-import de.grobox.transportr.data.locations.HomeLocation;
-import de.grobox.transportr.data.locations.LocationRepository;
-import de.grobox.transportr.data.locations.WorkLocation;
-import de.grobox.transportr.networks.TransportNetworkManager;
-import de.grobox.transportr.networks.TransportNetworkViewModel;
-
-public abstract class LocationsViewModel extends TransportNetworkViewModel {
-
-	private final LocationRepository locationRepository;
-
-	private final LiveData<HomeLocation> home;
-	private final LiveData<WorkLocation> work;
-	private final LiveData<List<FavoriteLocation>> locations;
-
-	protected LocationsViewModel(TransportrApplication application, TransportNetworkManager transportNetworkManager, LocationRepository locationRepository) {
-		super(application, transportNetworkManager);
-		this.locationRepository = locationRepository;
-		this.home = locationRepository.getHomeLocation();
-		this.work = locationRepository.getWorkLocation();
-		this.locations = locationRepository.getFavoriteLocations();
-	}
-
-	public void setHome(WrapLocation wrapLocation) {
-		locationRepository.setHomeLocation(wrapLocation);
-	}
-
-	public LiveData<HomeLocation> getHome() {
-		return home;
-	}
-
-	public void setWork(WrapLocation wrapLocation) {
-		locationRepository.setWorkLocation(wrapLocation);
-	}
-
-	public LiveData<WorkLocation> getWork() {
-		return work;
-	}
-
-	public LiveData<List<FavoriteLocation>> getLocations() {
-		return locations;
-	}
-
+    fun setWork(wrapLocation: WrapLocation?) {
+        locationRepository.setWorkLocation(wrapLocation!!)
+    }
 }
