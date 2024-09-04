@@ -100,7 +100,8 @@ val ViewModelModule = module {
             transportNetworkManager = get(),
             locationRepository = get(),
             searchesRepository = get(),
-            positionController = get()
+            positionController = get(),
+            combinedSuggestionRepository = get()
         )
     }
 

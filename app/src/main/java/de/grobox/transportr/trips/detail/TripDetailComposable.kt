@@ -153,10 +153,10 @@ fun TripDetailComposable(
             if(!sheetState.isVisible || fabScale != 0f) {
                 FloatingActionButton(
                     onClick = {
-                        scope.launch {
-
-                            sheetState.partialExpand()
-                        }
+                        showBottomSheet = true
+                        //scope.launch {
+                            //sheetState.partialExpand()
+                        //}
                     },
                     modifier = Modifier.scale(fabScale)
                 ) {
@@ -190,15 +190,16 @@ fun TripDetailComposable(
                 dragHandle = {
                     CustomSmallTopAppBar(
                         navigationIcon = {
-                            IconButton(
-                                onClick = {
-                                    showBottomSheet = false
+                            CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
+                                IconButton(
+                                    onClick = { scope.launch { sheetState.partialExpand() } },
+                                    modifier = Modifier.size(expanding.mapRange(0f, 40f).dp).scale(expanding)
+                                ) {
+                                    Icon(
+                                        Icons.Rounded.KeyboardArrowDown,
+                                        null
+                                    )
                                 }
-                            ) {
-                                Icon(
-                                    Icons.Rounded.KeyboardArrowDown,
-                                    null
-                                )
                             }
                         },
                         title = {
