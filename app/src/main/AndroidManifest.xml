@@ -88,7 +88,8 @@
 		<activity
 			android:name="de.grobox.transportr.trips.detail.TripDetailComposeActivity"
 			android:parentActivityName="de.grobox.transportr.trips.search.DirectionsActivity"
-			android:theme="@style/AppTheme.MapFullscreen" />
+			android:windowSoftInputMode="adjustResize"
+			android:theme="@android:style/Theme.Material.Light.NoActionBar" />
 
 		<activity
 			android:name="de.grobox.transportr.networks.PickTransportNetworkActivity"

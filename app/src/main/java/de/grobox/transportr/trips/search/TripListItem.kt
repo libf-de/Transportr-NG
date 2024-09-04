@@ -378,7 +378,7 @@ fun TripListItemPreview() {
                     Line("3_800755_28", "DB Regio AG Bayern", Product.REGIONAL_TRAIN, "RE 4950", Style(
                         Style.Shape.RECT, -7829368, 0, -1, 0)
                     ),
-                    Location(LocationType.ANY, "Coburg"),
+                    Location(LocationType.STATION, "Coburg"),
                     Stop(
                         Location(LocationType.STATION, "St_B", "StPlace B", "Lichtenfels"),
                         Date(),
