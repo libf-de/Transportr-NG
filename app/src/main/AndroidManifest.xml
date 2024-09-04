@@ -42,11 +42,11 @@
 		tools:targetApi="n">
 
 		<activity
-			android:name="de.grobox.transportr.map.MapActivity"
+			android:name="de.grobox.transportr.map.MapComposeActivity"
 			android:exported="true"
 			android:launchMode="singleTop"
 			android:windowSoftInputMode="stateHidden|adjustPan"
-			android:theme="@style/Theme.App.Starting">
+			android:theme="@android:style/Theme.Material.Light.NoActionBar">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN"/>
 				<category android:name="android.intent.category.LAUNCHER"/>
@@ -88,7 +88,8 @@
 		<activity
 			android:name="de.grobox.transportr.trips.detail.TripDetailComposeActivity"
 			android:parentActivityName="de.grobox.transportr.trips.search.DirectionsActivity"
-			android:theme="@style/AppTheme.MapFullscreen" />
+			android:windowSoftInputMode="adjustResize"
+			android:theme="@android:style/Theme.Material.Light.NoActionBar" />
 
 		<activity
 			android:name="de.grobox.transportr.networks.PickTransportNetworkActivity"

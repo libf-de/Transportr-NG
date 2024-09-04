@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import de.grobox.transportr.R
 import de.grobox.transportr.map.BaseMapFragment.MapPadding
+import de.grobox.transportr.map.NearbyStationsDrawer
 import de.grobox.transportr.trips.detail.TripDrawer
 import de.schildbach.pte.dto.Trip
 import org.maplibre.android.camera.CameraUpdateFactory
@@ -48,6 +49,11 @@ private fun makeStyleUrl(style: String = "jawg-streets", context: Context) =
 fun MapViewComposable(
     mapViewState: MapViewState,
     compassMargins: CompassMargins = CompassMargins(),
+    isHalfHeight: Boolean = false,
+    mapPadding: MapPadding = MapPadding(),
+    rotateGestures: Boolean = false,
+    showLogo: Boolean = true,
+    showAttribution: Boolean = true,
     mapStyle: String = "jawg-streets"
 ) {
     val compassMarginsInt = compassMargins.toIntArray()
@@ -57,7 +63,11 @@ fun MapViewComposable(
         factory = { context ->
             MapView(
                 ContextThemeWrapper(context, R.style.MapStyle),
-                MapLibreMapOptions().compassMargins(compassMarginsInt)
+                MapLibreMapOptions()
+                    .compassMargins(compassMarginsInt)
+                    .rotateGesturesEnabled(rotateGestures)
+                    .attributionEnabled(showAttribution)
+                    .logoEnabled(showLogo)
             ).apply {
                 val mvs = mapViewState.registerMapView(this, context)
                 getMapAsync { map ->
@@ -65,6 +75,31 @@ fun MapViewComposable(
                     if(map.style?.uri != styleUrl) map.setStyle(styleUrl) {
                         mvs.onMapStyleLoaded(it)
                     }
+
+                    if(!isHalfHeight) {
+                        mvs.mapInset = mapPadding
+
+                        map.moveCamera(
+                            CameraUpdateFactory.paddingTo(
+                                mapPadding.left.toDouble(),
+                                mapPadding.top.toDouble(),
+                                mapPadding.right.toDouble(),
+                                mapPadding.bottom.toDouble()
+                            )
+                        )
+                    } else {
+                        mvs.mapInset = MapPadding(0, 0, 0, this.height / 2)
+                        map.moveCamera(
+                            CameraUpdateFactory.paddingTo(
+                                0.0,
+                                0.0,
+                                0.0,
+                                this.height / 2.0
+                            )
+                        )
+
+                    }
+
                 }
             }
         }
@@ -74,9 +109,14 @@ fun MapViewComposable(
 class MapViewState {
     protected var context: Context? = null
     protected var mapView: MapView? = null
-    protected var mapPadding: Int = 0
-    protected var mapInset: MapPadding = MapPadding()
+    var mapPadding: Int = 0
+    internal var mapInset: MapPadding = MapPadding()
     internal var onMapStyleLoaded: (style: Style) -> Unit = {}
+
+    internal var nearbyStationsDrawer: NearbyStationsDrawer? = null
+        private set
+
+
 
     internal fun registerMapView(mapView: MapView, context: Context): MapViewState {
         this.mapView = mapView

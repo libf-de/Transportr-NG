@@ -102,15 +102,6 @@ private fun Line.getColorInt(): Int {
     return if (this.style!!.borderColor != 0) this.style!!.borderColor else DEFAULT_LINE_COLOR
 }
 
-data class LegData(
-    val displayedTime: String?,
-    val displayedDelay: String?,
-    val stationName: String,
-
-) {
-
-}
-
 
 @Composable
 fun LegListComposable(

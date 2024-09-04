@@ -21,9 +21,14 @@ package de.grobox.transportr.trips.detail
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.ui.graphics.toArgb
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import de.grobox.transportr.R
 import de.grobox.transportr.TransportrActivity
+import de.grobox.transportr.composables.BaseComposableCompat
 import de.grobox.transportr.databinding.ComposeActivityBinding
 import de.grobox.transportr.locations.WrapLocation
 import de.grobox.transportr.ui.ThreeStateBottomSheetBehavior
@@ -36,26 +41,27 @@ import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt
 import javax.annotation.ParametersAreNonnullByDefault
 
 @ParametersAreNonnullByDefault
-class TripDetailComposeActivity : TransportrActivity() {
+class TripDetailComposeActivity : ComponentActivity() {
     private val viewModel: TripDetailViewModel by viewModel()
 
     private lateinit var bottomSheetBehavior: ThreeStateBottomSheetBehavior<*>
 
-    private lateinit var binding: ComposeActivityBinding
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ComposeActivityBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        enableEdgeToEdge()
 
-        if (savedInstanceState == null) {
-            supportFragmentManager.beginTransaction()
-                .replace(binding.fragmentContainer.id, TripDetailComposeFragment())
-                .commit()
-
-            //showFavorites()
-            //processIntent(intent)
+        setContent {
+            BaseComposableCompat {
+                TripDetailComposable(
+                    viewModel = viewModel,
+                    setBarColor = { statusBar, navBar ->
+                        window.statusBarColor = statusBar.toArgb()
+                        window.navigationBarColor = navBar.toArgb()
+                    },
+                    onBackPressed = { onBackPressedDispatcher.onBackPressed() }
+                )
+            }
         }
 
         val trip = intent.getSerializableExtra(TRIP) as Trip?
@@ -91,21 +97,21 @@ class TripDetailComposeActivity : TransportrActivity() {
 //        (findViewById<View>(R.id.backView) as ImageButton).setOnClickListener { view: View? -> onBackPressedDispatcher.onBackPressed() }
     }
 
-    private fun showOnboarding() {
-        if (settingsManager.showTripDetailFragmentOnboarding()) {
-            OnboardingBuilder(this)
-                .setTarget(R.id.bottomContainer)
-                .setPrimaryText(R.string.onboarding_location_title)
-                .setSecondaryText(R.string.onboarding_location_message)
-                .setPromptStateChangeListener { _: MaterialTapTargetPrompt?, state: Int ->
-                    if (state == MaterialTapTargetPrompt.STATE_DISMISSED || state == MaterialTapTargetPrompt.STATE_FOCAL_PRESSED) {
-                        settingsManager.tripDetailOnboardingShown()
-                        bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_EXPANDED
-                    }
-                }
-                .show()
-        }
-    }
+//    private fun showOnboarding() {
+//        if (settingsManager.showTripDetailFragmentOnboarding()) {
+//            OnboardingBuilder(this)
+//                .setTarget(R.id.bottomContainer)
+//                .setPrimaryText(R.string.onboarding_location_title)
+//                .setSecondaryText(R.string.onboarding_location_message)
+//                .setPromptStateChangeListener { _: MaterialTapTargetPrompt?, state: Int ->
+//                    if (state == MaterialTapTargetPrompt.STATE_DISMISSED || state == MaterialTapTargetPrompt.STATE_FOCAL_PRESSED) {
+//                        settingsManager.tripDetailOnboardingShown()
+//                        bottomSheetBehavior!!.state = BottomSheetBehavior.STATE_EXPANDED
+//                    }
+//                }
+//                .show()
+//        }
+//    }
 
     private fun onSheetStateChanged(sheetState: TripDetailViewModel.SheetState?) {
         if (sheetState == null) return

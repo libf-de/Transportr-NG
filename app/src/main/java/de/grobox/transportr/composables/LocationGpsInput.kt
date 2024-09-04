@@ -19,21 +19,29 @@
 
 package de.grobox.transportr.composables
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Cancel
+import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -42,8 +50,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -62,6 +72,116 @@ private fun getHighlightedText(l: WrapLocation, search: String?): AnnotatedStrin
         AnnotatedString.fromHtml(str)
     } else {
         AnnotatedString.fromHtml(l.fullName)
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@Composable
+fun BaseLocationGpsInput(
+    modifier: Modifier = Modifier,
+    location: WrapLocation?,
+    suggestions: Set<WrapLocation>?,
+    onValueChange: (String) -> Unit,
+    onAcceptSuggestion: (WrapLocation) -> Unit,
+    onFocusChange: (Boolean) -> Unit = {},
+    isLoading: Boolean = false,
+    placeholder: String = "",
+) {
+    var isFocused by remember { mutableStateOf(false) }
+    var showSuggestions by remember { mutableStateOf(true) }
+    var text by remember { mutableStateOf(location?.fullName ?: "") }
+
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Row() {
+                BasicTextField(
+                    modifier = modifier.onFocusChanged {
+                        isFocused = it.isFocused
+                        onFocusChange(it.isFocused)
+                    }
+                        .weight(1f)
+                        .then(Modifier.wrapContentHeight(Alignment.CenterVertically)),
+                    value = text,
+                    onValueChange = {
+                        onValueChange(it)
+                        text = it
+                        showSuggestions = true
+                    },
+                    maxLines = 1,
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(
+                        color = MaterialTheme.colorScheme.onSurface
+                    ),
+                    singleLine = true,
+                    cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                )
+
+                if(isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(16.dp),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
+                if(text.isNotBlank()) {
+                    IconButton(
+                        onClick = {
+                            onValueChange("")
+                            text = ""
+                            showSuggestions = false
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Cancel,
+                            contentDescription = stringResource(R.string.clear_location),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+
+
+            if (text.isBlank()) {
+                Text(
+                    text = placeholder,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.align(Alignment.CenterStart)
+                )
+            }
+        }
+
+
+        if(isFocused && showSuggestions && suggestions != null) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(suggestions.toList()) { sug ->
+                    DropdownMenuItem(
+                        onClick = {
+                            onAcceptSuggestion(sug)
+                            text = sug.fullName
+                        },
+                        text = {
+                            if (sug.wrapType == WrapLocation.WrapType.GPS)
+                                Text(
+                                    text = stringResource(R.string.location_gps),
+                                    fontStyle = FontStyle.Italic
+                                )
+                            else
+                                Text(text = getHighlightedText(sug, text))
+                        },
+                        leadingIcon = {
+                            Icon(
+                                painter = painterResource(sug.drawable),
+                                contentDescription = null
+                            )
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -159,7 +279,7 @@ fun CompactLocationGpsInput(
 ) {
     var isFocused by remember { mutableStateOf(false) }
     var showSuggestions by remember { mutableStateOf(true) }
-    var text by remember { mutableStateOf("") }
+    var text by remember { mutableStateOf(location?.fullName ?: "") }
 
     CompactTextField(
         modifier = modifier.onFocusChanged {
