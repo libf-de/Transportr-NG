@@ -48,9 +48,9 @@ class TripsComposeFragment : Fragment() {
                             Intent(context, TripDetailActivity::class.java).apply {
                                 putExtra(TripDetailActivity.TRIP, it)
                                 // unfortunately, PTE does not save these locations reliably in the Trip object
-                                putExtra(TripDetailActivity.FROM, viewModel.fromLocation.value)
-                                putExtra(TripDetailActivity.VIA, viewModel.viaLocation.value)
-                                putExtra(TripDetailActivity.TO, viewModel.toLocation.value)
+//                                putExtra(TripDetailActivity.FROM, viewModel.fromLocation.value)
+//                                putExtra(TripDetailActivity.VIA, viewModel.viaLocation.value)
+//                                putExtra(TripDetailActivity.TO, viewModel.toLocation.value)
                             }
                         )
                     }

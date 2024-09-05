@@ -16,73 +16,71 @@
  *    You should have received a copy of the GNU General Public License
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package de.grobox.transportr.data
 
-package de.grobox.transportr.data;
+import androidx.room.TypeConverter
+import de.schildbach.pte.NetworkId
+import de.schildbach.pte.dto.LocationType
+import de.schildbach.pte.dto.Product
+import java.util.Date
 
 
-import androidx.room.TypeConverter;
-import androidx.annotation.Nullable;
+object Converters {
+    @JvmStatic
+    @TypeConverter
+    fun fromNetworkId(networkId: NetworkId?): String? {
+        if (networkId == null) return null
+        return networkId.name
+    }
 
-import java.util.Date;
-import java.util.Set;
+    @JvmStatic
+    @TypeConverter
+    fun toNetworkId(network: String?): NetworkId? {
+        return try {
+            NetworkId.valueOf(network!!)
+        } catch (e: IllegalArgumentException) {
+            null
+        }
+    }
 
-import de.schildbach.pte.NetworkId;
-import de.schildbach.pte.dto.LocationType;
-import de.schildbach.pte.dto.Product;
+    @JvmStatic
+    @TypeConverter
+    fun fromLocationType(locationType: LocationType): String {
+        return locationType.name
+    }
 
-public class Converters {
+    @JvmStatic
+    @TypeConverter
+    fun toLocationType(type: String?): LocationType {
+        return try {
+            LocationType.valueOf(type!!)
+        } catch (e: IllegalArgumentException) {
+            LocationType.ANY
+        }
+    }
 
-	@TypeConverter
-	public static String fromNetworkId(@Nullable NetworkId networkId) {
-		if (networkId == null) return null;
-		return networkId.name();
-	}
+    @TypeConverter
+    fun fromProducts(products: Set<Product>?): String? {
+        if (products == null) return null
+        return String(Product.toCodes(products))
+    }
 
-	@Nullable
-	@TypeConverter
-	public static NetworkId toNetworkId(String network) {
-		try {
-			return NetworkId.valueOf(network);
-		} catch (IllegalArgumentException e) {
-			return null;
-		}
-	}
+    @JvmStatic
+    @TypeConverter
+    fun toProducts(codes: String?): Set<Product>? {
+        if (codes == null) return null
+        return Product.fromCodes(codes.toCharArray())
+    }
 
-	@TypeConverter
-	public static String fromLocationType(LocationType locationType) {
-		return locationType.name();
-	}
+    @JvmStatic
+    @TypeConverter
+    fun toDate(value: Long?): Date? {
+        return if (value == null) null else Date(value)
+    }
 
-	@TypeConverter
-	public static LocationType toLocationType(String type) {
-		try {
-			return LocationType.valueOf(type);
-		} catch (IllegalArgumentException e) {
-			return LocationType.ANY;
-		}
-	}
-
-	@Nullable
-	@TypeConverter
-	public static String fromProducts(Set<Product> products) {
-		if (products == null) return null;
-		return String.valueOf(Product.toCodes(products));
-	}
-
-	@TypeConverter
-	public static Set<Product> toProducts(@Nullable String codes) {
-		if (codes == null) return null;
-		return Product.fromCodes(codes.toCharArray());
-	}
-
-	@TypeConverter
-	public static Date toDate(Long value) {
-		return value == null ? null : new Date(value);
-	}
-
-	@TypeConverter
-	public static Long fromDate(Date date) {
-		return date == null ? null : date.getTime();
-	}
-
+    @JvmStatic
+    @TypeConverter
+    fun fromDate(date: Date?): Long? {
+        return date?.time
+    }
 }

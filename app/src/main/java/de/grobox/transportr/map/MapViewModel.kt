@@ -22,6 +22,7 @@ package de.grobox.transportr.map
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
@@ -29,7 +30,6 @@ import de.grobox.transportr.TransportrApplication
 import de.grobox.transportr.data.locations.FavoriteLocation
 import de.grobox.transportr.data.locations.LocationRepository
 import de.grobox.transportr.data.searches.SearchesRepository
-import de.grobox.transportr.data.searches.StoredSearch
 import de.grobox.transportr.departures.DeparturesActivity
 import de.grobox.transportr.favorites.trips.FavoriteTripItem
 import de.grobox.transportr.favorites.trips.SavedSearchesViewModel
@@ -37,6 +37,7 @@ import de.grobox.transportr.locations.CombinedSuggestionRepository
 import de.grobox.transportr.locations.WrapLocation
 import de.grobox.transportr.networks.TransportNetworkManager
 import de.grobox.transportr.utils.IntentUtils
+import de.grobox.transportr.utils.IntentUtils.presetDirections
 import de.grobox.transportr.utils.SingleLiveEvent
 import de.schildbach.pte.dto.Line
 import de.schildbach.pte.dto.LocationType
@@ -81,8 +82,23 @@ class MapViewModel internal constructor(
     val locationSuggestions: LiveData<Set<WrapLocation>> = combinedSuggestionRepository.suggestions
     val suggestionsLoading: LiveData<Boolean> = combinedSuggestionRepository.isLoading
 
+    private val _specialLocations = MediatorLiveData<List<FavoriteTripItem>>(listOf(
+
+    ))
+    val specialLocations: LiveData<List<FavoriteTripItem>> = _specialLocations
+
     private val _sheetContentState = MutableLiveData<BottomSheetContentState>(BottomSheetContentState.SavedSearches)
     val sheetContentState: LiveData<BottomSheetContentState> = _sheetContentState
+
+    init {
+        _specialLocations.addSource(home) {
+            _specialLocations.value = listOf(FavoriteTripItem(home.value), FavoriteTripItem(work.value))
+        }
+
+        _specialLocations.addSource(work) {
+            _specialLocations.value = listOf(FavoriteTripItem(home.value), FavoriteTripItem(work.value))
+        }
+    }
 
     fun suggestLocations(query: String) {
         combinedSuggestionRepository.updateSuggestions(query)
@@ -129,7 +145,7 @@ class MapViewModel internal constructor(
             val deps = transportNetwork
                 .value
                 ?.networkProvider
-                ?.queryDepartures(location.getId(),
+                ?.queryDepartures(location.id,
                                     Date(),
                                     DeparturesActivity.MAX_DEPARTURES,
                                     false)
@@ -227,6 +243,24 @@ class MapViewModel internal constructor(
         }
         return updatedLiveBounds
     }
+
+    fun findDirectionsFromGpsToLocation(to: WrapLocation?) {
+        val from = WrapLocation(WrapLocation.WrapType.GPS)
+        IntentUtils.findDirections(application, from, null, to, true, true)
+    }
+
+    fun findDirectionsFromLocationViaLocationToLocation(from: WrapLocation?, via: WrapLocation?, to: WrapLocation?, search: Boolean = true) {
+        IntentUtils.findDirections(application, from, via, to, search, true)
+    }
+
+    fun findDeparturesOfLocation(of: WrapLocation) {
+        IntentUtils.findDepartures(application, of)
+    }
+
+    fun presetDirectionsFromLocationViaLocationToLocation(from: WrapLocation?, via: WrapLocation?, to: WrapLocation?) {
+        presetDirections(application, from, via, to, true)
+    }
+
 }
 
 sealed class NearbyLocationsState {

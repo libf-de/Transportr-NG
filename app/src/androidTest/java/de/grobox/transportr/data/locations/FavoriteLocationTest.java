@@ -66,8 +66,8 @@ public class FavoriteLocationTest extends DbTest {
 		List<FavoriteLocation> locations1 = getValue(dao.getFavoriteLocations(DB));
 		assertEquals(1, locations1.size());
 		FavoriteLocation f1 = locations1.get(0);
-		assertEquals(uid1, f1.getUid());
-		assertEquals(DB, f1.getNetworkId());
+		assertEquals(uid1, f1.uid);
+		assertEquals(DB, f1.networkId);
 		assertEquals(loc1.type, f1.type);
 		assertEquals(loc1.id, f1.id);
 		assertEquals(loc1.getLatAs1E6(), f1.lat);
@@ -84,8 +84,8 @@ public class FavoriteLocationTest extends DbTest {
 		List<FavoriteLocation> locations2 = getValue(dao.getFavoriteLocations(BVG));
 		assertEquals(1, locations2.size());
 		FavoriteLocation f2 = locations2.get(0);
-		assertEquals(uid2, f2.getUid());
-		assertEquals(BVG, f2.getNetworkId());
+		assertEquals(uid2, f2.uid);
+		assertEquals(BVG, f2.networkId);
 		assertEquals(loc2.type, f2.type);
 		assertEquals(loc2.id, f2.id);
 		assertEquals(loc2.getLatAs1E6(), f2.lat);
@@ -105,14 +105,14 @@ public class FavoriteLocationTest extends DbTest {
 		List<FavoriteLocation> locations1 = getValue(dao.getFavoriteLocations(DB));
 		assertEquals(1, locations1.size());
 		FavoriteLocation f1 = locations1.get(0);
-		assertEquals(uid1, f1.getUid());
+		assertEquals(uid1, f1.uid);
 
 		// change the favorite location and replace it in the DB
 		f1.place = "new place";
 		f1.name = "new name";
 		f1.products = null;
 		uid1 = dao.addFavoriteLocation(f1);
-		assertEquals(uid1, f1.getUid());
+		assertEquals(uid1, f1.uid);
 
 		// retrieve favorite location again
 		List<FavoriteLocation> locations2 = getValue(dao.getFavoriteLocations(DB));
@@ -120,7 +120,7 @@ public class FavoriteLocationTest extends DbTest {
 		FavoriteLocation f2 = locations2.get(0);
 
 		// assert that same location was retrieved and data changed
-		assertEquals(f1.getUid(), f2.getUid());
+		assertEquals(f1.uid, f2.uid);
 		assertEquals(f1.place, f2.place);
 		assertEquals(f1.name, f2.name);
 		assertEquals(f1.products, f2.products);
@@ -175,8 +175,8 @@ public class FavoriteLocationTest extends DbTest {
 
 		// assert that retrieval worked
 		assertNotNull(f2);
-		assertEquals(uid, f2.getUid());
-		assertEquals(DB, f2.getNetworkId());
+		assertEquals(uid, f2.uid);
+		assertEquals(DB, f2.networkId);
 		assertEquals(l1.type, f2.type);
 		assertEquals(l1.id, f2.id);
 		assertEquals(l1.getLatAs1E6(), f2.lat);

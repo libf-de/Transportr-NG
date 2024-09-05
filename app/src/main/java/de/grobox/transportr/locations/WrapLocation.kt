@@ -16,173 +16,146 @@
  *    You should have received a copy of the GNU General Public License
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package de.grobox.transportr.locations
 
-package de.grobox.transportr.locations;
+import android.os.Parcelable
+import androidx.annotation.DrawableRes
+import androidx.room.Ignore
+import com.google.common.base.Preconditions
+import com.google.common.base.Strings
+import de.grobox.transportr.R
+import de.grobox.transportr.utils.TransportrUtils.getCoordName
+import de.schildbach.pte.dto.Location
+import de.schildbach.pte.dto.LocationType
+import de.schildbach.pte.dto.Point
+import de.schildbach.pte.dto.Product
+import kotlinx.parcelize.Parcelize
+import org.maplibre.android.geometry.LatLng
+import java.io.Serializable
 
-import com.google.common.base.Strings;
-import org.maplibre.android.geometry.LatLng;
+@kotlinx.serialization.Serializable
+open class WrapLocation(
+    val type: LocationType,
+    val id: String? = null,
+    val lat: Int,
+    val lon: Int,
+    val place: String? = null,
+    @JvmField val name: String? = null,
+    val products: Set<Product>? = null,
+    @Ignore val wrapType: WrapType = WrapType.NORMAL
+) : Serializable {
+    enum class WrapType {
+        NORMAL, GPS
+    }
 
-import java.io.Serializable;
-import java.util.Set;
+    constructor(l: Location) : this(
+        l.type,
+        l.id,
+        if (l.hasCoord()) l.latAs1E6 else 0,
+        if (l.hasCoord()) l.lonAs1E6 else 0,
+        l.place,
+        l.name,
+        l.products
+    )
 
-import androidx.annotation.DrawableRes;
-import androidx.annotation.Nullable;
-import androidx.room.Ignore;
-import de.grobox.transportr.R;
-import de.grobox.transportr.utils.TransportrUtils;
-import de.schildbach.pte.dto.Location;
-import de.schildbach.pte.dto.LocationType;
-import de.schildbach.pte.dto.Point;
-import de.schildbach.pte.dto.Product;
+    constructor(wrapType: WrapType) : this(
+        type = LocationType.ANY,
+        wrapType = wrapType,
+        lat = 0,
+        lon = 0
+    ) {
+        Preconditions.checkArgument(wrapType != WrapType.NORMAL, "Type can't be normal")
+    }
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static de.grobox.transportr.locations.WrapLocation.WrapType.NORMAL;
-import static de.schildbach.pte.dto.LocationType.ANY;
-import static de.schildbach.pte.dto.LocationType.COORD;
+    constructor(latLng: LatLng) : this(
+        type = LocationType.COORD,
+        lat = (latLng.latitude * 1E6).toInt(),
+        lon = (latLng.longitude * 1E6).toInt()
+    ) {
+        Preconditions.checkArgument(lat != 0 || lon != 0, "Null Island is not a valid location")
+    }
 
-public class WrapLocation implements Serializable {
+    val location: Location
+        get() {
+            val point = Point.from1E6(lat, lon)
+            if (type == LocationType.ANY && id != null) {
+                return Location(type, null, point, place, name, products)
+            }
+            return Location(type, id, point, place, name, products)
+        }
 
-	public enum WrapType {NORMAL, GPS}
+    fun hasId(): Boolean {
+        return !Strings.isNullOrEmpty(id)
+    }
 
-	@Ignore
-	private final WrapType wrapType;
+    fun hasLocation(): Boolean {
+        return lat != 0 || lon != 0
+    }
 
-	public final LocationType type;
-	public @Nullable String id;
-	public int lat, lon;
-	public @Nullable String place;
-	public @Nullable String name;
-	public @Nullable Set<Product> products;
+    override fun equals(o: Any?): Boolean {
+        if (o === this) {
+            return true
+        }
+        if (o is WrapLocation) {
+            return location == o.location
+        }
+        return false
+    }
 
-	public WrapLocation(LocationType type, @Nullable String id, int lat, int lon, @Nullable String place, @Nullable String name, @Nullable Set<Product> products) {
-		this.wrapType = NORMAL;
-		this.type = type;
-		this.id = id;
-		this.lat = lat;
-		this.lon = lon;
-		this.place = place;
-		this.name = name;
-		this.products = products;
-	}
+    override fun hashCode(): Int {
+        return this.location.hashCode()
+    }
 
-	public WrapLocation(Location l) {
-		this(l.type, l.id, l.hasCoord() ? l.getLatAs1E6() : 0, l.hasCoord() ? l.getLonAs1E6() : 0, l.place, l.name, l.products);
-	}
+    @get:DrawableRes
+    open val drawableInt: Int
+        get() {
+            return when (wrapType) {
+                WrapType.GPS -> R.drawable.ic_gps
+                WrapType.NORMAL -> when (type) {
+                    LocationType.ADDRESS -> R.drawable.ic_location_address
+                    LocationType.POI -> R.drawable.ic_action_about
+                    LocationType.STATION -> R.drawable.ic_location_station
+                    LocationType.COORD -> R.drawable.ic_gps
+                    else -> R.drawable.ic_location
+                }
+                else -> R.drawable.ic_location
+            }
+        }
 
-	public WrapLocation(WrapType wrapType) {
-		checkArgument(wrapType != NORMAL, "Type can't be normal");
-		this.wrapType = wrapType;
-		this.type = ANY;
-	}
+    fun getName(): String {
+        // FIXME improve
+        return if (type == LocationType.COORD) {
+            getCoordName(location)
+        } else {
+            location.uniqueShortName().takeIf { !it.isNullOrEmpty() }
+                ?: id.takeIf { !it.isNullOrEmpty() }
+                ?: ""
+        }
+    }
 
-	public WrapLocation(LatLng latLng) {
-		this.wrapType = NORMAL;
-		this.type = COORD;
-		this.lat = (int) (latLng.getLatitude() * 1E6);
-		this.lon = (int) (latLng.getLongitude() * 1E6);
-		checkArgument(lat != 0 || lon != 0, "Null Island is not a valid location");
-	}
+    val fullName: String
+        get() = if (name != null) {
+            if (place == null) name!! else "$name, $place"
+        } else {
+            getName()!!
+        }
 
-	public WrapType getWrapType() {
-		return wrapType;
-	}
+    val latLng: LatLng
+        get() = LatLng(lat / 1E6, lon / 1E6)
 
-	public Location getLocation() {
-		Point point = Point.from1E6(lat, lon);
-		if (type == LocationType.ANY && id != null) {
-			return new Location(type, null, point, place, name, products);
-		}
-		return new Location(type, id, point, place, name, products);
-	}
+    fun isSamePlace(other: WrapLocation?): Boolean {
+        return other != null && isSamePlaceInt(other.lat, other.lon)
+    }
 
-	@Nullable
-	public String getId() {
-		return id;
-	}
+    fun isSamePlace(otherLat: Double, otherLon: Double): Boolean {
+        return isSamePlaceInt((otherLat * 1E6).toInt(), (otherLon * 1E6).toInt())
+    }
 
-	public boolean hasId() {
-		return !Strings.isNullOrEmpty(id);
-	}
+    private fun isSamePlaceInt(otherLat: Int, otherLon: Int): Boolean {
+        return (lat / 1000 == otherLat / 1000) && (lon / 1000 == otherLon / 1000)
+    }
 
-	public final boolean hasLocation() {
-		return lat != 0 || lon != 0;
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		if (o == this) {
-			return true;
-		}
-		if (o instanceof WrapLocation) {
-			WrapLocation wLoc = (WrapLocation) o;
-			if (getLocation() == null) {
-				return wLoc.getLocation() == null;
-			}
-			return getLocation().equals(wLoc.getLocation());
-		}
-		return false;
-	}
-
-	@DrawableRes
-	public int getDrawable() {
-		switch (wrapType) {
-			case GPS:
-				return R.drawable.ic_gps;
-			case NORMAL:
-				switch (type) {
-					case ADDRESS:
-						return R.drawable.ic_location_address;
-					case POI:
-						return R.drawable.ic_action_about;
-					case STATION:
-						return R.drawable.ic_location_station;
-					case COORD:
-						return R.drawable.ic_gps;
-				}
-		}
-		return R.drawable.ic_location;
-	}
-
-	public String getName() {
-		// FIXME improve
-		if (type.equals(LocationType.COORD)) {
-			return TransportrUtils.getCoordName(getLocation());
-		} else if (getLocation().uniqueShortName() != null) {
-			return getLocation().uniqueShortName();
-		} else if (hasId()) {
-			return id;
-		} else {
-			return "";
-		}
-	}
-
-	public String getFullName() {
-		if (name != null) {
-			return place == null ? name : name + ", " + place;
-		} else {
-			return getName();
-		}
-	}
-
-	public LatLng getLatLng() {
-		return new LatLng(lat / 1E6, lon / 1E6);
-	}
-
-	public boolean isSamePlace(@Nullable WrapLocation other) {
-		return other != null && isSamePlaceInt(other.lat, other.lon);
-	}
-
-	public boolean isSamePlace(double otherLat, double otherLon) {
-		return isSamePlaceInt((int) (otherLat * 1E6), (int) (otherLon * 1E6));
-	}
-
-	private boolean isSamePlaceInt(int otherLat, int otherLon) {
-		return (lat / 1000 == otherLat / 1000) && (lon / 1000 == otherLon / 1000);
-	}
-
-	@Override
-	public String toString() {
-		return getFullName();
-	}
-
+    override fun toString(): String {
+        return fullName
+    }
 }

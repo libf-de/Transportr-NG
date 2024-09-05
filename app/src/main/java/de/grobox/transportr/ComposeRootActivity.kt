@@ -1,7 +1,7 @@
 /*
  *    Transportr
  *
- *    Copyright (c) 2013 - 2021 Torsten Grote
+ *    Copyright (c) 2013 - 2024 Torsten Grote
  *
  *    This program is Free Software: you can redistribute it and/or modify
  *    it under the terms of the GNU General Public License as
@@ -16,7 +16,8 @@
  *    You should have received a copy of the GNU General Public License
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.grobox.transportr.map
+
+package de.grobox.transportr
 
 import android.content.Intent
 import android.net.Uri
@@ -67,8 +68,7 @@ import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt
 import javax.annotation.ParametersAreNonnullByDefault
 
 @ParametersAreNonnullByDefault
-class MapComposeActivity : ComponentActivity() /*, LocationViewListener, NavigationView.OnNavigationItemSelectedListener*/ {
-    private val viewModel: MapViewModel by viewModel()
+class ComposeRootActivity : ComponentActivity() /*, LocationViewListener, NavigationView.OnNavigationItemSelectedListener*/ {
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -77,68 +77,8 @@ class MapComposeActivity : ComponentActivity() /*, LocationViewListener, Navigat
 
         setContent {
             BaseComposableCompat {
-                //MapScreen(viewModel)
+                TransportrNavigationController()
             }
         }
-
-        onNewIntent(intent)
     }
-
-    override fun onNewIntent(intent: Intent) {
-        super.onNewIntent(intent)
-        if (intent.action == null) return
-
-        if (intent.action == Intent.ACTION_VIEW && intent.data != null) {
-            viewModel.setGeoUri(intent.data!!)
-        } else if (intent.action == DirectionsActivity.ACTION_SEARCH) {
-            val location = intent.getSerializableExtra(Constants.WRAP_LOCATION) as WrapLocation?
-            viewModel.selectLocation(location)
-            viewModel.findNearbyStations(location!!)
-        }
-    }
-
-//    private fun checkAndShowChangelog() {
-//        val cl = TransportrChangeLog(this, settingsManager)
-//        if (cl.isFirstRun && !cl.isFirstRunEver) {
-//            cl.getMaterialDialog(cl.isFirstRunEver).show()
-//        }
-//    }
-//
-//    private fun enableStrictMode() {
-//        val threadPolicy = ThreadPolicy.Builder()
-//        threadPolicy.detectAll()
-//        threadPolicy.penaltyLog()
-//        StrictMode.setThreadPolicy(threadPolicy.build())
-//
-//        val vmPolicy = VmPolicy.Builder()
-//        vmPolicy.detectAll()
-//        vmPolicy.penaltyLog()
-//        StrictMode.setVmPolicy(vmPolicy.build())
-//    }
-//
-//    override fun onNavigationItemSelected(item: MenuItem): Boolean {
-//        when (item.itemId) {
-//            R.id.settings -> {
-//                startActivity(Intent(this, SettingsActivity::class.java))
-//            }
-//
-//            R.id.changelog -> {
-//                TransportrChangeLog(this, settingsManager).getMaterialDialog(true).show()
-//            }
-//
-//            R.id.about -> {
-//                startActivity(Intent(this, AboutActivity::class.java))
-//            }
-//
-//            R.id.contributors -> {
-//                startActivity(Intent(this, ContributorsActivity::class.java))
-//            }
-//
-//            R.id.bug_report -> {
-//                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.bug_tracker))))
-//            }
-//        }
-//        closeDrawer()
-//        return true
-//    }
 }

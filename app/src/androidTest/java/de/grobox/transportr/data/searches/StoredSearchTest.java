@@ -65,9 +65,9 @@ public class StoredSearchTest extends DbTest {
 		f1 = locations.get(0);
 		f2 = locations.get(1);
 		f3 = locations.get(2);
-		assertEquals(uid1, f1.getUid());
-		assertEquals(uid2, f2.getUid());
-		assertEquals(uid3, f3.getUid());
+		assertEquals(uid1, f1.uid);
+		assertEquals(uid2, f2.uid);
+		assertEquals(uid3, f3.uid);
 	}
 
 	@Test
@@ -116,27 +116,27 @@ public class StoredSearchTest extends DbTest {
 		long uid1 = dao.storeSearch(madeSearch);
 
 		// assert that search was stored and retrieved properly
-		StoredSearch storedSearch = dao.getStoredSearch(DB, f1.getUid(), null, f3.getUid());
+		StoredSearch storedSearch = dao.getStoredSearch(DB, f1.uid, null, f3.uid);
 		assertNotNull(storedSearch);
 		assertEquals(uid1, storedSearch.getUid());
 		assertEquals(DB, storedSearch.getNetworkId());
-		assertEquals(f1.getUid(), storedSearch.fromId);
+		assertEquals(f1.uid, storedSearch.fromId);
 		assertEquals(null, storedSearch.viaId);
-		assertEquals(f3.getUid(), storedSearch.toId);
+		assertEquals(f3.uid, storedSearch.toId);
 
 		// store a search with via
 		madeSearch = new StoredSearch(DB, f1, f2, f3);
 		long uid2 = dao.storeSearch(madeSearch);
 
 		// assert that search was stored and retrieved properly
-		storedSearch = dao.getStoredSearch(DB, f1.getUid(), f2.getUid(), f3.getUid());
+		storedSearch = dao.getStoredSearch(DB, f1.uid, f2.uid, f3.uid);
 		assertNotNull(storedSearch);
 		assertEquals(uid2, storedSearch.getUid());
 		assertEquals(DB, storedSearch.getNetworkId());
-		assertEquals(f1.getUid(), storedSearch.fromId);
+		assertEquals(f1.uid, storedSearch.fromId);
 		assertNotNull(storedSearch.viaId);
-		assertEquals(f2.getUid(), (long) storedSearch.viaId);
-		assertEquals(f3.getUid(), storedSearch.toId);
+		assertEquals(f2.uid, (long) storedSearch.viaId);
+		assertEquals(f3.uid, storedSearch.toId);
 	}
 
 	@Test

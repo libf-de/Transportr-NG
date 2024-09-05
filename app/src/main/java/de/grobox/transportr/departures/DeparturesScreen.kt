@@ -17,30 +17,14 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-plugins {
-    // this is necessary to avoid the plugins to be loaded multiple times
-    // in each subproject's classloader
-    alias(libs.plugins.android.application).apply(false)
-    alias(libs.plugins.kotlin.android).apply(false)
-    alias(libs.plugins.kotlin.parcelize).apply(false)
-    alias(libs.plugins.compose.compiler).apply(false)
-    //alias(libs.plugins.kotlin.serialization).apply(false)
-}
+package de.grobox.transportr.departures
 
-buildscript {
+import androidx.compose.runtime.Composable
+import androidx.navigation.NavController
 
-    repositories {
-        google()
-        jcenter()
-    }
+@Composable
+fun DeparturesScreen(
+    navController: NavController
+) {
 
-    dependencies {
-        //classpath(libs.agp)
-        classpath(libs.kotlin.gradlePlugin)
-        //classpath(files("app/libs/gradle-witness.jar"))
-    }
-}
-
-tasks.register("clean", Delete::class) {
-    delete(rootProject.buildDir)
 }

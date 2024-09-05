@@ -28,9 +28,8 @@ import android.view.View;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.MenuRes;
 import androidx.core.content.pm.ShortcutInfoCompat;
+import de.grobox.transportr.ComposeRootActivity;
 import de.grobox.transportr.R;
-import de.grobox.transportr.trips.search.DirectionsActivity;
-import de.grobox.transportr.trips.search.DirectionsComposeActivity;
 import de.grobox.transportr.ui.BasePopupMenu;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP;
@@ -90,7 +89,7 @@ abstract class AbstractFavoritesPopupMenu extends BasePopupMenu {
 	}
 
 	protected Intent getShortcutIntent() {
-		Intent shortcutIntent = new Intent(context, DirectionsComposeActivity.class);
+		Intent shortcutIntent = new Intent(context, ComposeRootActivity.class);
 		shortcutIntent.setAction(ACTION_SEARCH);
 		shortcutIntent.addFlags(FLAG_ACTIVITY_NEW_TASK);
 		shortcutIntent.addFlags(FLAG_ACTIVITY_CLEAR_TOP);

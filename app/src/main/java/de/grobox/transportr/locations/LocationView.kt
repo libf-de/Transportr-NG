@@ -160,7 +160,7 @@ open class LocationView @JvmOverloads constructor(context: Context, attrs: Attri
         val bundle = Bundle()
         bundle.putParcelable(SUPER_STATE, super.onSaveInstanceState())
         bundle.putInt(TEXT_POSITION, ui.location.selectionStart)
-        bundle.putSerializable(LOCATION, location)
+        //bundle.putSerializable(LOCATION, location)
         if (location == null && ui.location.text.isNotEmpty()) {
             bundle.putString(TEXT, ui.location.text.toString())
         }
@@ -285,7 +285,7 @@ open class LocationView @JvmOverloads constructor(context: Context, attrs: Attri
     }
 
     fun setLocation(loc: WrapLocation?) {
-        setLocation(loc, loc?.drawable ?: R.drawable.ic_location, true)
+        setLocation(loc, loc?.drawableInt ?: R.drawable.ic_location, true)
     }
 
     fun getLocation(): WrapLocation? {

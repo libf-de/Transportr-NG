@@ -16,37 +16,29 @@
  *    You should have received a copy of the GNU General Public License
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package de.grobox.transportr.data
 
-package de.grobox.transportr.data;
-
-import androidx.room.Database;
-import androidx.room.RoomDatabase;
-import androidx.room.TypeConverters;
-
-import de.grobox.transportr.data.locations.FavoriteLocation;
-import de.grobox.transportr.data.locations.HomeLocation;
-import de.grobox.transportr.data.locations.LocationDao;
-import de.grobox.transportr.data.locations.WorkLocation;
-import de.grobox.transportr.data.searches.SearchesDao;
-import de.grobox.transportr.data.searches.StoredSearch;
-
+import androidx.room.Database
+import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
+import de.grobox.transportr.data.locations.FavoriteLocation
+import de.grobox.transportr.data.locations.HomeLocation
+import de.grobox.transportr.data.locations.LocationDao
+import de.grobox.transportr.data.locations.WorkLocation
+import de.grobox.transportr.data.searches.SearchesDao
+import de.grobox.transportr.data.searches.StoredSearch
 
 @Database(
-		version = 1,
-		entities = {
-				FavoriteLocation.class,
-				HomeLocation.class,
-				WorkLocation.class,
-				StoredSearch.class
-		}
+    version = 2, entities = [FavoriteLocation::class, HomeLocation::class, WorkLocation::class, StoredSearch::class
+    ]
 )
-@TypeConverters(Converters.class)
-public abstract class Db extends RoomDatabase {
+@TypeConverters(Converters::class)
+abstract class Db : RoomDatabase() {
+    abstract fun locationDao(): LocationDao
 
-	public static final String DATABASE_NAME = "transportr.db";
+    abstract fun searchesDao(): SearchesDao
 
-	abstract public LocationDao locationDao();
-
-	abstract public SearchesDao searchesDao();
-
+    companion object {
+        const val DATABASE_NAME: String = "transportr.db"
+    }
 }

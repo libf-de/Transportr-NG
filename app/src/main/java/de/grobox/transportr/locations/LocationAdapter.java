@@ -144,7 +144,7 @@ class LocationAdapter extends ArrayAdapter<WrapLocation> implements Filterable {
 			textView.setText(parent.getContext().getString(R.string.location_gps));
 			textView.setTypeface(Typeface.defaultFromStyle(Typeface.ITALIC));
 		}
-		imageView.setImageResource(wrapLocation.getDrawable());
+		imageView.setImageResource(wrapLocation.getDrawableInt());
 
 		return view;
 	}

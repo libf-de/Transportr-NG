@@ -60,8 +60,8 @@ public class WorkLocationTest extends DbTest {
 		// assert that location has been inserted and retrieved properly
 		WorkLocation workLocation = getValue(dao.getWorkLocation(DB));
 		assertNotNull(workLocation);
-		assertEquals(uid1, workLocation.getUid());
-		assertEquals(DB, workLocation.getNetworkId());
+		assertEquals(uid1, workLocation.uid);
+		assertEquals(DB, workLocation.networkId);
 		assertEquals(location.type, workLocation.type);
 		assertEquals(location.id, workLocation.id);
 		assertEquals(location.getLatAs1E6(), workLocation.lat);
@@ -78,7 +78,7 @@ public class WorkLocationTest extends DbTest {
 		assertEquals(1, dao.countWorks(DB));
 		workLocation = getValue(dao.getWorkLocation(DB));
 		assertNotNull(workLocation);
-		assertEquals(DB, workLocation.getNetworkId());
+		assertEquals(DB, workLocation.networkId);
 		assertEquals(location.type, workLocation.type);
 		assertEquals(location.id, workLocation.id);
 		assertEquals(location.getLatAs1E6(), workLocation.lat);

@@ -16,42 +16,32 @@
  *    You should have received a copy of the GNU General Public License
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package de.grobox.transportr.favorites.trips
 
-package de.grobox.transportr.favorites.trips;
+import androidx.lifecycle.LiveData
+import de.grobox.transportr.TransportrApplication
+import de.grobox.transportr.data.locations.LocationRepository
+import de.grobox.transportr.data.searches.SearchesRepository
+import de.grobox.transportr.locations.LocationsViewModel
+import de.grobox.transportr.networks.TransportNetworkManager
 
-import androidx.lifecycle.LiveData;
+abstract class SavedSearchesViewModel protected constructor(
+    val application: TransportrApplication,
+    transportNetworkManager: TransportNetworkManager,
+    locationRepository: LocationRepository,
+    private val searchesRepository: SearchesRepository
+) : LocationsViewModel(application, transportNetworkManager, locationRepository) {
+    val favoriteTrips: LiveData<List<FavoriteTripItem>> = searchesRepository.favoriteTrips
 
-import java.util.List;
+    fun updateFavoriteState(item: FavoriteTripItem?) {
+        searchesRepository.updateFavoriteState(item!!)
+    }
 
-import de.grobox.transportr.TransportrApplication;
-import de.grobox.transportr.data.locations.LocationRepository;
-import de.grobox.transportr.data.searches.SearchesRepository;
-import de.grobox.transportr.locations.LocationsViewModel;
-import de.grobox.transportr.networks.TransportNetworkManager;
-
-public abstract class SavedSearchesViewModel extends LocationsViewModel {
-
-	private final SearchesRepository searchesRepository;
-
-	private final LiveData<List<FavoriteTripItem>> savedSearches;
-
-	protected SavedSearchesViewModel(TransportrApplication application, TransportNetworkManager transportNetworkManager,
-	                              LocationRepository locationRepository, SearchesRepository searchesRepository) {
-		super(application, transportNetworkManager, locationRepository);
-		this.searchesRepository = searchesRepository;
-		this.savedSearches = searchesRepository.getFavoriteTrips();
+    fun setFavoriteTrip(item: FavoriteTripItem, isFavorite: Boolean) {
+		searchesRepository.updateFavoriteState(item.uid, isFavorite)
 	}
 
-	public LiveData<List<FavoriteTripItem>> getFavoriteTrips() {
-		return savedSearches;
-	}
-
-	void updateFavoriteState(FavoriteTripItem item) {
-		searchesRepository.updateFavoriteState(item);
-	}
-
-	void removeFavoriteTrip(FavoriteTripItem item) {
-		searchesRepository.removeSearch(item);
-	}
-
+    fun removeFavoriteTrip(item: FavoriteTripItem?) {
+        searchesRepository.removeSearch(item!!)
+    }
 }

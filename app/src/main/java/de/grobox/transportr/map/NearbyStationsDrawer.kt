@@ -54,7 +54,7 @@ class NearbyStationsDrawer(context: Context) : MapDrawer(context) {
 
     fun getClickedNearbyStation(marker: Marker): WrapLocation? {
         if (nearbyLocations.containsKey(marker)) {
-            return WrapLocation(nearbyLocations[marker])
+            return nearbyLocations[marker]?.let { WrapLocation(it) }
         }
         return null
     }

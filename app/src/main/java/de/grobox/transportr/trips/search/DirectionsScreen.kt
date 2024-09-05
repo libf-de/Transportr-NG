@@ -77,11 +77,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.map
+import androidx.navigation.NavController
 import de.grobox.transportr.R
 import de.grobox.transportr.composables.CompactLocationGpsInput
 import de.grobox.transportr.composables.CustomLargeTopAppBar
 import de.grobox.transportr.favorites.trips.FavoriteTripItem
 import de.grobox.transportr.favorites.trips.FavoriteTripType
+import de.grobox.transportr.locations.WrapLocation
 import de.grobox.transportr.utils.DateUtils.isNow
 import de.grobox.transportr.utils.DateUtils.isToday
 import de.grobox.transportr.utils.DateUtils.millisToMinutes
@@ -106,14 +108,33 @@ fun Int.pxToDp() = with(LocalDensity.current) { this@pxToDp.toDp() }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun DirectionsComposable(
+fun DirectionsScreen(
     viewModel: DirectionsViewModel,
+    navController: NavController,
+    from: WrapLocation?,
+    via: WrapLocation?,
+    to: WrapLocation?,
+    specialLocation: FavoriteTripType?,
+    search: Boolean,
     onSelectDepartureClicked: () -> Unit = {},
     onSelectDepartureLongClicked: () -> Unit = {},
     tripClicked: (Trip) -> Unit = {},
     changeHome: () -> Unit = {},
     changeWork: () -> Unit = {}
 ) {
+    LaunchedEffect(Unit) {
+        if(specialLocation == FavoriteTripType.WORK || specialLocation == FavoriteTripType.HOME) {
+            //TODO: Home/Work location
+        } else {
+            viewModel.setFromLocation(from)
+            viewModel.setViaLocation(via)
+            viewModel.setToLocation(to)
+        }
+
+
+        if(search) viewModel.search()
+    }
+
     val focusManager = LocalFocusManager.current
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
     var viaVisible by remember { mutableStateOf(false) }
@@ -419,7 +440,7 @@ fun LazyListScope.FavoriteList(
     favorites: List<FavoriteTripItem>?,
     onFavoriteClicked: (FavoriteTripItem) -> Unit
 ) {
-    items(favorites!!) {
+    items(favorites ?: emptyList()) {
         Text(
             text = it.from.fullName,
             modifier = Modifier

@@ -19,6 +19,12 @@
 
 package de.grobox.transportr.composables
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -46,12 +52,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
@@ -85,7 +93,7 @@ fun BaseLocationGpsInput(
     onAcceptSuggestion: (WrapLocation) -> Unit,
     onFocusChange: (Boolean) -> Unit = {},
     isLoading: Boolean = false,
-    placeholder: String = "",
+    placeholder: String = ""
 ) {
     var isFocused by remember { mutableStateOf(false) }
     var showSuggestions by remember { mutableStateOf(true) }
@@ -173,7 +181,7 @@ fun BaseLocationGpsInput(
                         },
                         leadingIcon = {
                             Icon(
-                                painter = painterResource(sug.drawable),
+                                painter = painterResource(sug.drawableInt),
                                 contentDescription = null
                             )
                         },
@@ -197,10 +205,25 @@ fun LocationGpsInput(
     onFocusChange: (Boolean) -> Unit,
     label: String = "",
     placeholder: String = label,
+    gpsLoading: Boolean = false
 ) {
     var isFocused by remember { mutableStateOf(false) }
     var showSuggestions by remember { mutableStateOf(true) }
-    var text by remember { mutableStateOf("") }
+    var text by remember { mutableStateOf(location?.getName() ?: "") }
+
+    LaunchedEffect(location) {
+        location?.getName()?.takeIf { it.isNotBlank() }?.let { text = it }
+    }
+
+    var infiniteTransition = rememberInfiniteTransition();
+    val gpsIconAlpha by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 0f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(500, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
 
     Column(
         modifier = Modifier.fillMaxWidth()
@@ -217,10 +240,24 @@ fun LocationGpsInput(
                 showSuggestions = true
             },
             leadingIcon = {
-                Icon(
-                    painterResource(R.drawable.ic_gps),
-                    contentDescription = null
-                )
+                if(location != null) {
+                    Icon(
+                        painterResource(location.drawableInt),
+                        contentDescription = null
+                    )
+                } else if(gpsLoading) {
+                    Icon(
+                        painterResource(R.drawable.ic_gps),
+                        contentDescription = null,
+                        modifier = Modifier.alpha(gpsIconAlpha)
+                    )
+                } else {
+                    Icon(
+                        painterResource(R.drawable.ic_location),
+                        contentDescription = null
+                    )
+                }
+
             },
             trailingIcon = {
                 if (isLoading && isFocused)
@@ -252,7 +289,7 @@ fun LocationGpsInput(
                         },
                         leadingIcon = {
                             Icon(
-                                painter = painterResource(sug.drawable),
+                                painter = painterResource(sug.drawableInt),
                                 contentDescription = null
                             )
                         },
@@ -337,7 +374,7 @@ fun CompactLocationGpsInput(
                     },
                     leadingIcon = {
                         Icon(
-                            painter = painterResource(sug.drawable),
+                            painter = painterResource(sug.drawableInt),
                             contentDescription = null
                         )
                     },
@@ -419,7 +456,7 @@ fun BrokenLocationGpsInput(
                     },
                     leadingIcon = {
                         Icon(
-                            painter = painterResource(sug.drawable),
+                            painter = painterResource(sug.drawableInt),
                             contentDescription = null
                         )
                     },

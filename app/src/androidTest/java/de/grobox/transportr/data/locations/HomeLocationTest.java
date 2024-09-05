@@ -60,8 +60,8 @@ public class HomeLocationTest extends DbTest {
 		// assert that location has been inserted and retrieved properly
 		HomeLocation homeLocation = getValue(dao.getHomeLocation(DB));
 		assertNotNull(homeLocation);
-		assertEquals(uid1, homeLocation.getUid());
-		assertEquals(DB, homeLocation.getNetworkId());
+		assertEquals(uid1, homeLocation.uid);
+		assertEquals(DB, homeLocation.networkId);
 		assertEquals(location.type, homeLocation.type);
 		assertEquals(location.id, homeLocation.id);
 		assertEquals(location.getLatAs1E6(), homeLocation.lat);
@@ -78,7 +78,7 @@ public class HomeLocationTest extends DbTest {
 		assertEquals(1, dao.countHomes(DB));
 		homeLocation = getValue(dao.getHomeLocation(DB));
 		assertNotNull(homeLocation);
-		assertEquals(DB, homeLocation.getNetworkId());
+		assertEquals(DB, homeLocation.networkId);
 		assertEquals(location.type, homeLocation.type);
 		assertEquals(location.id, homeLocation.id);
 		assertEquals(location.getLatAs1E6(), homeLocation.lat);

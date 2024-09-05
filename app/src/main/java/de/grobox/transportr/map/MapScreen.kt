@@ -57,14 +57,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalMinimumInteractiveComponentEnforcement
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberBottomSheetScaffoldState
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -77,40 +73,38 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
-import com.google.common.base.Strings
+import androidx.navigation.NavController
 import de.grobox.transportr.R
+import de.grobox.transportr.Routes
 import de.grobox.transportr.composables.BaseLocationGpsInput
 import de.grobox.transportr.composables.CompassMargins
 import de.grobox.transportr.composables.MapViewComposable
 import de.grobox.transportr.composables.MapViewState
-import de.grobox.transportr.data.searches.StoredSearch
 import de.grobox.transportr.favorites.trips.FavoriteTripItem
+import de.grobox.transportr.favorites.trips.FavoriteTripType
 import de.grobox.transportr.locations.WrapLocation
-import de.grobox.transportr.trips.detail.TripDetailViewModel
 import de.grobox.transportr.trips.search.ProductViewComposable
-import de.grobox.transportr.trips.search.WalkView
+import de.grobox.transportr.utils.IntentUtils.findDirections
 import de.grobox.transportr.utils.TransportrUtils
 import de.grobox.transportr.utils.TransportrUtils.getCoordName
-import de.grobox.transportr.utils.hasLocation
 import de.schildbach.pte.dto.Line
-import de.schildbach.pte.dto.Trip
-import de.schildbach.pte.dto.Trip.Public
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(
-    viewModel: MapViewModel
+    viewModel: MapViewModel,
+    navController: NavController,
+    geoUri: String? = null,
+    location: WrapLocation? = null
 ) {
     val searchSuggestions by viewModel.locationSuggestions.observeAsState()
     val focusManager = LocalFocusManager.current
@@ -129,6 +123,7 @@ fun MapScreen(
     var bottomSheetVisible by remember { mutableStateOf(true) }
 
     val favoriteTrips by viewModel.favoriteTrips.observeAsState(emptyList())
+    val specialTrips by viewModel.specialLocations.observeAsState(emptyList())
 
     Box(Modifier.fillMaxSize()) {
         BottomSheetScaffold(
@@ -146,17 +141,78 @@ fun MapScreen(
                     is BottomSheetContentState.SavedSearches -> {
                         SavedSearchesComponent(
                             items = favoriteTrips,
+                            specialLocations = specialTrips,
                             modifier = Modifier
                                 .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 16.dp)
-                                .padding(bottom = WindowInsets.systemBars.asPaddingValues().calculateBottomPadding())
-                                .heightIn(max = (LocalConfiguration.current.screenHeightDp / 2).dp)
+                                .padding(
+                                    bottom = WindowInsets.systemBars
+                                        .asPaddingValues()
+                                        .calculateBottomPadding()
+                                )
+                                .heightIn(max = (LocalConfiguration.current.screenHeightDp / 2).dp),
+
+                            onFindDirectionsRequested = { from, via, to, search ->
+                                navController.navigate(
+                                    route = Routes.Directions(
+                                        from = from,
+                                        via = via,
+                                        to = to,
+                                        search = search
+                                    )
+                                )
+                            },
+                            onFindDeparturesRequested = {
+                                navController.navigate(
+                                    route = Routes.Departures(
+                                        location = it
+                                    )
+                                )
+                            },
+                            onCreateShortcutRequested = {
+                                //TODO
+                            },
+                            onChangeSpecialLocationRequested = {
+                                //TODO
+                            },
+                            onPresetDirectionsRequested = { from, via, to ->
+                                navController.navigate(
+                                    route = Routes.Directions(
+                                        from = from,
+                                        via = via,
+                                        to = to,
+                                        search = false
+                                    )
+                                )
+                            },
+                            onSetTripFavoriteRequested = viewModel::setFavoriteTrip,
+                            onDeleteRequested = viewModel::removeFavoriteTrip,
+                            onSpecialItemClicked = {
+                                navController.navigate(
+                                    route = Routes.Directions(
+                                        from = WrapLocation(WrapLocation.WrapType.GPS),
+                                        to = it.to,
+                                        search = true
+                                    )
+                                )
+                            },
+                            onItemClicked = {
+                                navController.navigate(
+                                    route = Routes.Directions(
+                                        from = it.from,
+                                        via = it.via,
+                                        to = it.to,
+                                        search = true
+                                    )
+                                )
+                            },
+
                         )
                     }
 
                     else -> {}
                 }
 
-                Spacer(modifier = Modifier.height(200.dp))
+                //Spacer(modifier = Modifier.height(200.dp))
 
                 //            Spacer(modifier = Modifier.weight(1f))
                 // TODO
@@ -176,13 +232,20 @@ fun MapScreen(
             colors = CardDefaults.outlinedCardColors(
                 containerColor = MaterialTheme.colorScheme.primaryContainer
             ),
-            modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp).height(48.dp).fillMaxWidth(),
+            modifier = Modifier
+                .padding(start = 16.dp, top = 16.dp, end = 16.dp)
+                .height(48.dp)
+                .fillMaxWidth(),
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(
-                    onClick = { }
+                    onClick = {
+                        navController.navigate(
+                            route = Routes.Settings
+                        )
+                    }
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.ic_menu_black),
@@ -208,7 +271,11 @@ fun MapScreen(
         }
 
         FloatingActionButton(
-            onClick = {},
+            onClick = {
+                navController.navigate(
+                    route = Routes.Directions()
+                )
+            },
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .offset {
@@ -269,7 +336,7 @@ fun LocationComponent(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Icon(
-                painter = painterResource(location?.drawable ?: R.drawable.ic_location),
+                painter = painterResource(location?.drawableInt ?: R.drawable.ic_location),
                 contentDescription = null
             )
 
@@ -398,16 +465,30 @@ fun LocationComponent(
 @Composable
 fun SavedSearchesComponent(
     items: List<FavoriteTripItem>,
-    modifier: Modifier = Modifier
+    specialLocations: List<FavoriteTripItem>,
+    modifier: Modifier = Modifier,
+    onFindDirectionsRequested: (from: WrapLocation?, via: WrapLocation?, to: WrapLocation?, search: Boolean) -> Unit = { _, _, _, _ -> },
+    onFindDeparturesRequested: (location: WrapLocation) -> Unit = { _ -> },
+    onCreateShortcutRequested: (item: FavoriteTripItem) -> Unit = { _ -> },
+    onChangeSpecialLocationRequested: (item: FavoriteTripItem) -> Unit = { _ -> },
+    onPresetDirectionsRequested: (from: WrapLocation?, via: WrapLocation?, to: WrapLocation?) -> Unit = { _, _, _ -> },
+    onSetTripFavoriteRequested: (item: FavoriteTripItem, isFavorite: Boolean) -> Unit = { _, _ -> },
+    onDeleteRequested: (item: FavoriteTripItem) -> Unit = { _ -> },
+    onItemClicked: (item: FavoriteTripItem) -> Unit = { _ -> },
+    onSpecialItemClicked: (item: FavoriteTripItem) -> Unit = { _ -> }
 ) {
     LazyColumn(
-        modifier = modifier
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(items) {
-            SavedSearchItem(
-                itm = it,
-                onItemClicked = { },
+        items(specialLocations) {
+            SpecialLocationItem(
+                location = it,
+                onItemClicked = {
+                    onSpecialItemClicked(it)
+                },
             ) {
+                // Search return trip
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.action_swap_locations)) },
                     leadingIcon = {
@@ -416,31 +497,28 @@ fun SavedSearchesComponent(
                             contentDescription = null,
                         )
                     },
-                    onClick = { }
+                    onClick = {
+                        onFindDirectionsRequested(it.to, it.via, it.from, true)
+                    }
                 )
 
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.action_set_locations)) },
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_mode_edit),
-                            contentDescription = null,
-                        )
-                    },
-                    onClick = { }
-                )
+                it.to?.let { toLocation ->
+                    // Find departures
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.find_departures)) },
+                        leadingIcon = {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_action_departures),
+                                contentDescription = null,
+                            )
+                        },
+                        onClick = {
+                            onFindDeparturesRequested(toLocation)
+                        }
+                    )
+                }
 
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.action_fav_trip)) },
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_action_star),
-                            contentDescription = null,
-                        )
-                    },
-                    onClick = { }
-                )
-
+                // Add shortcut
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.action_add_shortcut)) },
                     leadingIcon = {
@@ -449,9 +527,92 @@ fun SavedSearchesComponent(
                             contentDescription = null,
                         )
                     },
-                    onClick = { }
+                    onClick = {
+                        onCreateShortcutRequested(it)
+                    }
                 )
 
+                // Edit special location
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.action_change)) },
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_action_settings),
+                            contentDescription = null,
+                        )
+                    },
+                    onClick = {
+                        onChangeSpecialLocationRequested(it)
+                    }
+                )
+            }
+        }
+
+
+        items(items) {
+            SavedSearchItem(
+                itm = it,
+                onItemClicked = {
+                    onItemClicked(it)
+                },
+            ) {
+                // Find return trip
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.action_swap_locations)) },
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_menu_swap_location),
+                            contentDescription = null,
+                        )
+                    },
+                    onClick = {
+                        onFindDirectionsRequested(it.to, it.via, it.from, true)
+                    }
+                )
+
+                // Edit search
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.action_set_locations)) },
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_mode_edit),
+                            contentDescription = null,
+                        )
+                    },
+                    onClick = {
+                        onPresetDirectionsRequested(it.from, it.via, it.to)
+                    }
+                )
+
+                // Mark trip as favorite
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.action_fav_trip)) },
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_action_star),
+                            contentDescription = null,
+                        )
+                    },
+                    onClick = {
+                        onSetTripFavoriteRequested(it, !it.isFavorite)
+                    }
+                )
+
+                // Add shortcut
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.action_add_shortcut)) },
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_add_shortcut),
+                            contentDescription = null,
+                        )
+                    },
+                    onClick = {
+                        onCreateShortcutRequested(it)
+                    }
+                )
+
+                // Delete
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.action_trip_delete)) },
                     leadingIcon = {
@@ -460,9 +621,92 @@ fun SavedSearchesComponent(
                             contentDescription = null,
                         )
                     },
-                    onClick = { }
+                    onClick = {
+                        onDeleteRequested(it)
+                    }
                 )
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SpecialLocationItem(
+    location: FavoriteTripItem,
+    modifier: Modifier = Modifier,
+    onItemClicked: () -> Unit = {},
+    menuContent: @Composable ColumnScope.() -> Unit
+) {
+    var menuOpen by remember { mutableStateOf(false) }
+
+    ElevatedCard(
+        modifier = modifier.clickable {
+            onItemClicked()
+        },
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(8.dp)
+                .height(IntrinsicSize.Min)
+        ) {
+            Icon(
+                painter = when(location.type) {
+                    FavoriteTripType.HOME -> painterResource(R.drawable.ic_action_home)
+                    FavoriteTripType.WORK -> painterResource(R.drawable.ic_work)
+                    else -> painterResource(R.drawable.ic_location)
+                },
+                contentDescription = null,
+                modifier = Modifier.width(21.dp).fillMaxHeight().wrapContentHeight(Alignment.CenterVertically)
+            )
+
+            Column(
+                modifier = Modifier
+                    .padding(start = 8.dp)
+                    .weight(1f)
+            ) {
+
+                Text(
+                    text = when(location.type) {
+                        FavoriteTripType.HOME -> stringResource(R.string.home)
+                        FavoriteTripType.WORK -> stringResource(R.string.work)
+                        else -> location.from?.getName() ?: ""
+                    },
+                    style = MaterialTheme.typography.titleMedium,
+                )
+
+                Text(
+                    text = location.to?.getName() ?: stringResource(R.string.tap_to_set),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
+
+            Box {
+                CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
+                    IconButton(
+                        onClick = { menuOpen = true },
+                        modifier = Modifier
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_more_vert),
+                            contentDescription = stringResource(R.string.more),
+                            modifier = Modifier.size(28.dp)
+                        )
+                    }
+                }
+
+                DropdownMenu(
+                    expanded = menuOpen,
+                    properties = PopupProperties(),
+                    onDismissRequest = { menuOpen = false }
+                ) {
+                    menuContent()
+                }
+            }
+
         }
     }
 }
@@ -476,8 +720,8 @@ fun SavedSearchItem(
     menuContent: @Composable ColumnScope.() -> Unit
 ) {
     val sketchColor = MaterialTheme.colorScheme.onSurfaceVariant
-    val circleRadius = 4.dp
-    val topMargin = 3.dp
+    val circleRadius = 5.dp
+    val topMargin = 4.dp
 
     val hasVia = itm.via != null
     val totalHeight = (topMargin + (topMargin + circleRadius) * 4) + if(hasVia) (topMargin + (topMargin + circleRadius) * 2) else 0.dp
@@ -493,17 +737,24 @@ fun SavedSearchItem(
         )
     ) {
         Row(
-            modifier = Modifier.padding(8.dp).height(IntrinsicSize.Min)
+            modifier = Modifier
+                .padding(8.dp)
+                .height(IntrinsicSize.Min)
         ) {
             Icon(
                 painter = painterResource(if(itm.isFavorite) R.drawable.ic_action_star else R.drawable.ic_time),
 //                painter = painterResource(R.drawable.ic_time),
                 contentDescription = null,
-                modifier = Modifier.width((topMargin + circleRadius) * 3).fillMaxHeight().wrapContentHeight(Alignment.CenterVertically)
+                modifier = Modifier
+                    .width(21.dp)
+                    .fillMaxHeight()
+                    .wrapContentHeight(Alignment.CenterVertically)
             )
 
             Column(
-                modifier = Modifier.padding(start = 3.dp).weight(1f)
+                modifier = Modifier
+                    .padding(start = 3.dp)
+                    .weight(1f)
             ) {
 
                 Row(
@@ -532,7 +783,8 @@ fun SavedSearchItem(
 
                     Text(
                         text = itm.from?.getName() ?: "",
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.bodyMedium,
+                        lineHeight = MaterialTheme.typography.bodyMedium.fontSize,
                         modifier = Modifier
                             .padding(bottom = topMargin / 2)
                             .height((topMargin + circleRadius) * 2)
@@ -567,7 +819,8 @@ fun SavedSearchItem(
 
                         Text(
                             text = itm.via?.getName() ?: "",
-                            style = MaterialTheme.typography.bodySmall,
+                            style = MaterialTheme.typography.bodyMedium,
+                            lineHeight = MaterialTheme.typography.bodyMedium.fontSize,
                             modifier = Modifier
                                 .padding(vertical = topMargin / 2)
                                 .height((topMargin + circleRadius) * 2)
@@ -603,7 +856,8 @@ fun SavedSearchItem(
 
                     Text(
                         text = itm.to?.getName() ?: "",
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.bodyMedium,
+                        lineHeight = MaterialTheme.typography.bodyMedium.fontSize,
                         modifier = Modifier
                             .padding(top = topMargin / 2)
                             .height((topMargin + circleRadius) * 2)
@@ -622,7 +876,7 @@ fun SavedSearchItem(
                         Icon(
                             painter = painterResource(R.drawable.ic_more_vert),
                             contentDescription = stringResource(R.string.more),
-                            modifier = Modifier.size((topMargin + circleRadius) * 4)
+                            modifier = Modifier.size(28.dp)
                         )
                     }
                 }

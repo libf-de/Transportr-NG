@@ -22,10 +22,10 @@ package de.grobox.transportr.locations
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import de.grobox.transportr.data.locations.FavoriteLocation.Companion.FromComparator
+import de.grobox.transportr.data.locations.FavoriteLocation.Companion.ToComparator
+import de.grobox.transportr.data.locations.FavoriteLocation.Companion.ViaComparator
 import de.grobox.transportr.data.locations.FavoriteLocation.FavLocationType
-import de.grobox.transportr.data.locations.FavoriteLocation.FromComparator
-import de.grobox.transportr.data.locations.FavoriteLocation.ToComparator
-import de.grobox.transportr.data.locations.FavoriteLocation.ViaComparator
 import de.grobox.transportr.data.locations.LocationRepository
 import java.util.Locale
 
@@ -58,10 +58,11 @@ class CombinedSuggestionRepository(
                 setOfNotNull(locationRepository.homeLocation.value,
                     locationRepository.workLocation.value),
 
-                locationRepository.favoriteLocations.value?.filter {
+                locationRepository.favoriteLocations.value
+                    /*?.filter {
                     it != locationRepository.homeLocation.value &&
                             it != locationRepository.workLocation.value
-                }?.sortedWith(
+                }*/?.sortedWith(
                     when (_sorting.value) {
                         FavLocationType.TO -> ToComparator
                         FavLocationType.VIA -> ViaComparator

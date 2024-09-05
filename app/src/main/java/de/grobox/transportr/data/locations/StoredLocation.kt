@@ -16,53 +16,55 @@
  *    You should have received a copy of the GNU General Public License
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package de.grobox.transportr.data.locations
 
-package de.grobox.transportr.data.locations;
+import androidx.room.Ignore
+import androidx.room.PrimaryKey
+import de.grobox.transportr.locations.WrapLocation
+import de.schildbach.pte.NetworkId
+import de.schildbach.pte.dto.Location
+import de.schildbach.pte.dto.LocationType
+import de.schildbach.pte.dto.Product
 
-import java.util.Set;
+abstract class StoredLocation internal constructor(
+	@JvmField @field:PrimaryKey(autoGenerate = true) val uid: Long,
+	@JvmField val networkId: NetworkId,
+	type: LocationType?,
+	id: String?,
+	lat: Int,
+	lon: Int,
+	place: String?,
+	name: String?,
+	products: Set<Product>?
+) : WrapLocation(
+    type!!, id, lat, lon, place, name, products
+) {
+    @Ignore
+    internal constructor(uid: Long, networkId: NetworkId, l: WrapLocation) : this(
+        uid,
+        networkId,
+        l.type,
+        l.id,
+        l.lat,
+        l.lon,
+        l.place,
+        l.name,
+        l.products
+    )
 
-import androidx.annotation.Nullable;
-import androidx.room.Ignore;
-import androidx.room.PrimaryKey;
-import de.grobox.transportr.locations.WrapLocation;
-import de.schildbach.pte.NetworkId;
-import de.schildbach.pte.dto.Location;
-import de.schildbach.pte.dto.LocationType;
-import de.schildbach.pte.dto.Product;
+    @Ignore
+    internal constructor(networkId: NetworkId, l: WrapLocation) : this(0, networkId, l)
 
-public abstract class StoredLocation extends WrapLocation {
-
-	@PrimaryKey(autoGenerate = true)
-	private final long uid;
-	private final NetworkId networkId;
-
-	StoredLocation(long uid, NetworkId networkId, LocationType type, @Nullable String id, int lat, int lon, @Nullable String place, @Nullable String name, @Nullable Set<Product> products) {
-		super(type, id, lat, lon, place, name, products);
-		this.uid = uid;
-		this.networkId = networkId;
-	}
-
-	@Ignore
-	StoredLocation(long uid, NetworkId networkId, WrapLocation l) {
-		this(uid, networkId, l.type, l.id, l.lat, l.lon, l.place, l.name, l.products);
-	}
-
-	@Ignore
-	StoredLocation(NetworkId networkId, WrapLocation l) {
-		this(0, networkId, l);
-	}
-
-	@Ignore
-	StoredLocation(NetworkId networkId, Location l) {
-		this(0, networkId, l.type, l.id, l.hasCoord() ? l.getLatAs1E6() : 0, l.hasCoord() ? l.getLonAs1E6() : 0, l.place, l.name, l.products);
-	}
-
-	public long getUid() {
-		return uid;
-	}
-
-	public NetworkId getNetworkId() {
-		return networkId;
-	}
-
+    @Ignore
+    internal constructor(networkId: NetworkId, l: Location) : this(
+        0,
+        networkId,
+        l.type,
+        l.id,
+        if (l.hasCoord()) l.latAs1E6 else 0,
+        if (l.hasCoord()) l.lonAs1E6 else 0,
+        l.place,
+        l.name,
+        l.products
+    )
 }

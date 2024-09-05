@@ -45,29 +45,29 @@ class DirectionsComposeFragment() : Fragment() {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 BaseComposableCompat {
-                    DirectionsComposable(
-                        viewModel = viewModel,
-                        onSelectDepartureClicked = {
-                            if (viewModel.lastQueryCalendar.value == null) throw IllegalStateException()
-                            val fragment = TimeDateFragment.newInstance(viewModel.lastQueryCalendar.value!!, viewModel.isDeparture.value!!)
-                            fragment.setTimeDateListener(viewModel)
-                            fragment.show(requireActivity().supportFragmentManager, TimeDateFragment.TAG)
-                        },
-                        onSelectDepartureLongClicked = {
-                            viewModel.resetCalender()
-                        },
-                        tripClicked = {
-                            startActivity(
-                                Intent(context, TripDetailComposeActivity::class.java).apply {
-                                    putExtra(TripDetailActivity.TRIP, it)
-                                    // unfortunately, PTE does not save these locations reliably in the Trip object
-                                    putExtra(TripDetailActivity.FROM, viewModel.fromLocation.value)
-                                    putExtra(TripDetailActivity.VIA, viewModel.viaLocation.value)
-                                    putExtra(TripDetailActivity.TO, viewModel.toLocation.value)
-                                }
-                            )
-                        }
-                    )
+//                    DirectionsComposable(
+//                        viewModel = viewModel,
+//                        onSelectDepartureClicked = {
+//                            if (viewModel.lastQueryCalendar.value == null) throw IllegalStateException()
+//                            val fragment = TimeDateFragment.newInstance(viewModel.lastQueryCalendar.value!!, viewModel.isDeparture.value!!)
+//                            fragment.setTimeDateListener(viewModel)
+//                            fragment.show(requireActivity().supportFragmentManager, TimeDateFragment.TAG)
+//                        },
+//                        onSelectDepartureLongClicked = {
+//                            viewModel.resetCalender()
+//                        },
+//                        tripClicked = {
+//                            startActivity(
+//                                Intent(context, TripDetailComposeActivity::class.java).apply {
+//                                    putExtra(TripDetailActivity.TRIP, it)
+//                                    // unfortunately, PTE does not save these locations reliably in the Trip object
+//                                    putExtra(TripDetailActivity.FROM, viewModel.fromLocation.value)
+//                                    putExtra(TripDetailActivity.VIA, viewModel.viaLocation.value)
+//                                    putExtra(TripDetailActivity.TO, viewModel.toLocation.value)
+//                                }
+//                            )
+//                        }
+//                    )
                 }
             }
         }

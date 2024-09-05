@@ -16,51 +16,41 @@
  *    You should have received a copy of the GNU General Public License
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package de.grobox.transportr.data.locations
 
-package de.grobox.transportr.data.locations;
+import androidx.annotation.DrawableRes
+import androidx.room.Entity
+import androidx.room.Ignore
+import androidx.room.Index
+import de.grobox.transportr.R
+import de.grobox.transportr.locations.WrapLocation
+import de.schildbach.pte.NetworkId
+import de.schildbach.pte.dto.Location
+import de.schildbach.pte.dto.LocationType
+import de.schildbach.pte.dto.Product
 
-import androidx.room.Entity;
-import androidx.room.Ignore;
-import androidx.room.Index;
-import androidx.annotation.DrawableRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
-import java.util.Set;
+@Entity(tableName = "home_locations", indices = [Index(value = ["networkId"], unique = true)])
+class HomeLocation : StoredLocation {
+    constructor(
+        uid: Long,
+        networkId: NetworkId?,
+        type: LocationType?,
+        id: String?,
+        lat: Int,
+        lon: Int,
+        place: String?,
+        name: String?,
+        products: Set<Product>?
+    ) : super(uid, networkId!!, type, id, lat, lon, place, name, products)
 
-import de.grobox.transportr.R;
-import de.grobox.transportr.locations.WrapLocation;
-import de.schildbach.pte.NetworkId;
-import de.schildbach.pte.dto.Location;
-import de.schildbach.pte.dto.LocationType;
-import de.schildbach.pte.dto.Product;
+    @Ignore
+    constructor(networkId: NetworkId, l: WrapLocation?) : super(networkId, l!!)
 
-@Entity(
-		tableName = "home_locations",
-		indices = {
-				@Index(value = {"networkId"}, unique = true)
-		}
-)
-public class HomeLocation extends StoredLocation {
+    @Ignore
+    constructor(networkId: NetworkId, l: Location?) : super(networkId, l!!)
 
-	public HomeLocation(long uid, @Nullable NetworkId networkId, LocationType type, @Nullable String id, int lat, int lon, @Nullable String place, @Nullable String name, @Nullable Set<Product> products) {
-		super(uid, networkId, type, id, lat, lon, place, name, products);
-	}
-
-	@Ignore
-	public HomeLocation(@NonNull NetworkId networkId, WrapLocation l) {
-		super(networkId, l);
-	}
-
-	@Ignore
-	public HomeLocation(@NonNull NetworkId networkId, Location l) {
-		super(networkId, l);
-	}
-
-	@Override
-	@DrawableRes
-	public int getDrawable() {
-		return R.drawable.ic_action_home;
-	}
-
+    @get:DrawableRes
+    override val drawableInt: Int
+        get() = R.drawable.ic_action_home
 }

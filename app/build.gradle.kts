@@ -23,6 +23,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.kotlin.serialization)
+    kotlin("kapt")
     //id("witness")
 }
 
@@ -146,7 +148,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.livedata)
     //kapt(libs.androidx.lifecycle.compiler)
     implementation(libs.androidx.room.runtime)
-    annotationProcessor(libs.androidx.room.compiler)
+    kapt(libs.androidx.room.compiler)
     implementation(libs.androidx.localbroadcastmanager)
 
     implementation(libs.okhttp)
@@ -165,10 +167,9 @@ dependencies {
     val composeBom = platform(libs.androidx.compose)
     implementation(composeBom)
     androidTestImplementation(composeBom)
-
     implementation(libs.compose.material3)
-
     implementation(libs.compose.preview)
+    implementation(libs.compose.navigation)
     //debugImplementation(libs.compose.preview.debug)
 
     implementation(libs.compose.activities)
@@ -209,4 +210,6 @@ dependencies {
     //kaptAndroidTest(libs.dagger.compiler)
 
     implementation(libs.androidx.core.splashscreen)
+
+    implementation(libs.kotlinx.serialization.json)
 }

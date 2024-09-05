@@ -115,7 +115,7 @@ class LocationFragment : TransportrFragment(), LoaderManager.LoaderCallbacks<Que
         if (location.hasId()) {
             departuresButton.setOnClickListener {
                 val intent = Intent(context, DeparturesActivity::class.java)
-                intent.putExtra(Constants.WRAP_LOCATION, location)
+                //intent.putExtra(Constants.WRAP_LOCATION, location)
                 startActivity(intent)
             }
         } else {
@@ -157,7 +157,7 @@ class LocationFragment : TransportrFragment(), LoaderManager.LoaderCallbacks<Que
 
     private fun showLocation() {
         locationName.text = location.getName()
-        locationIcon.setImageDrawable(ContextCompat.getDrawable(context, location.drawable))
+        locationIcon.setImageDrawable(ContextCompat.getDrawable(context, location.drawableInt))
         val locationInfoStr = StringBuilder()
         if (!Strings.isNullOrEmpty(location.location.place)) {
             locationInfoStr.append(location.location.place)
@@ -176,7 +176,7 @@ class LocationFragment : TransportrFragment(), LoaderManager.LoaderCallbacks<Que
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         if (location.hasId()) {
-            val args = DeparturesLoader.getBundle(location.getId(), Date(), DeparturesActivity.MAX_DEPARTURES)
+            val args = DeparturesLoader.getBundle(location.id, Date(), DeparturesActivity.MAX_DEPARTURES)
             loaderManager.initLoader(Constants.LOADER_DEPARTURES, args, this).forceLoad()
         }
     }
@@ -226,7 +226,7 @@ class LocationFragment : TransportrFragment(), LoaderManager.LoaderCallbacks<Que
             val f = LocationFragment()
 
             val args = Bundle()
-            args.putSerializable(Constants.WRAP_LOCATION, location)
+            //args.putSerializable(Constants.WRAP_LOCATION, location)
             f.arguments = args
 
             return f

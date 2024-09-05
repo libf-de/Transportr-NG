@@ -16,123 +16,103 @@
  *    You should have received a copy of the GNU General Public License
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package de.grobox.transportr.data.locations
 
-package de.grobox.transportr.data.locations;
+import androidx.annotation.DrawableRes
+import androidx.room.Entity
+import androidx.room.Ignore
+import androidx.room.Index
+import de.grobox.transportr.R
+import de.grobox.transportr.locations.WrapLocation
+import de.schildbach.pte.NetworkId
+import de.schildbach.pte.dto.Location
+import de.schildbach.pte.dto.LocationType
+import de.schildbach.pte.dto.Product
 
-import androidx.room.Entity;
-import androidx.room.Ignore;
-import androidx.room.Index;
-import androidx.annotation.DrawableRes;
-import androidx.annotation.Nullable;
+@Entity(tableName = "locations", indices = [Index("networkId"), Index("id"), Index(value = ["networkId", "id"], unique = true)])
+class FavoriteLocation : StoredLocation {
+    enum class FavLocationType {
+        FROM, VIA, TO
+    }
 
-import java.util.Comparator;
-import java.util.Set;
+    var fromCount: Int
+        private set
+    var viaCount: Int
+        private set
+    var toCount: Int
+        private set
 
-import de.grobox.transportr.R;
-import de.grobox.transportr.locations.WrapLocation;
-import de.schildbach.pte.NetworkId;
-import de.schildbach.pte.dto.Location;
-import de.schildbach.pte.dto.LocationType;
-import de.schildbach.pte.dto.Product;
+    constructor(
+        uid: Long, networkId: NetworkId?, type: LocationType?, id: String?, lat: Int, lon: Int,
+        place: String?, name: String?, products: Set<Product>?, fromCount: Int, viaCount: Int,
+        toCount: Int
+    ) : super(uid, networkId!!, type, id, lat, lon, place, name, products) {
+        this.fromCount = fromCount
+        this.viaCount = viaCount
+        this.toCount = toCount
+    }
 
-@Entity(
-		tableName = "locations",
-		indices = {
-				@Index("networkId"),
-				@Index("id"),
-				@Index(value = {"networkId", "id"}, unique = true)
-		}
-)
-public class FavoriteLocation extends StoredLocation {
+    @Ignore
+    constructor(uid: Long, networkId: NetworkId?, l: WrapLocation?) : super(uid, networkId!!, l!!) {
+        this.fromCount = 0
+        this.viaCount = 0
+        this.toCount = 0
+    }
 
-	public enum FavLocationType {FROM, VIA, TO}
+    @Ignore
+    constructor(networkId: NetworkId?, l: WrapLocation?) : super(networkId!!, l!!) {
+        this.fromCount = 0
+        this.viaCount = 0
+        this.toCount = 0
+    }
 
-	private int fromCount;
-	private int viaCount;
-	private int toCount;
+    @Ignore
+    constructor(networkId: NetworkId?, l: Location?) : super(networkId!!, l!!) {
+        this.fromCount = 0
+        this.viaCount = 0
+        this.toCount = 0
+    }
 
-	public FavoriteLocation(long uid, @Nullable NetworkId networkId, LocationType type, @Nullable String id, int lat, int lon,
-	                        @Nullable String place, @Nullable String name, @Nullable Set<Product> products, int fromCount, int viaCount,
-	                        int toCount) {
-		super(uid, networkId, type, id, lat, lon, place, name, products);
-		this.fromCount = fromCount;
-		this.viaCount = viaCount;
-		this.toCount = toCount;
-	}
+    @get:DrawableRes
+    override val drawableInt: Int
+        get() = when (type) {
+            LocationType.ADDRESS -> R.drawable.ic_location_address_fav
+            LocationType.POI -> R.drawable.ic_location_poi_fav
+            LocationType.STATION -> R.drawable.ic_location_station_fav
+            else -> R.drawable.ic_location
+        }
 
-	@Ignore
-	public FavoriteLocation(long uid, NetworkId networkId, WrapLocation l) {
-		super(uid, networkId, l);
-		this.fromCount = 0;
-		this.viaCount = 0;
-		this.toCount = 0;
-	}
+    fun add(type: FavLocationType) {
+        when (type) {
+            FavLocationType.FROM -> {
+                fromCount++
+                return
+            }
 
-	@Ignore
-	public FavoriteLocation(NetworkId networkId, WrapLocation l) {
-		super(networkId, l);
-		this.fromCount = 0;
-		this.viaCount = 0;
-		this.toCount = 0;
-	}
+            FavLocationType.VIA -> {
+                viaCount++
+                return
+            }
 
-	@Ignore
-	public FavoriteLocation(NetworkId networkId, Location l) {
-		super(networkId, l);
-		this.fromCount = 0;
-		this.viaCount = 0;
-		this.toCount = 0;
-	}
+            FavLocationType.TO -> toCount++
+        }
+    }
 
-	@Override
-	@DrawableRes
-	public int getDrawable() {
-		switch (type) {
-			case ADDRESS:
-				return R.drawable.ic_location_address_fav;
-			case POI:
-				return R.drawable.ic_location_poi_fav;
-			case STATION:
-				return R.drawable.ic_location_station_fav;
-			default:
-				return R.drawable.ic_location;
-		}
-	}
+    override fun toString(): String {
+        return super.toString() + "[" + fromCount + "]"
+    }
 
-	int getFromCount() {
-		return fromCount;
-	}
+    companion object {
+        @JvmField
+        val FromComparator: Comparator<FavoriteLocation> =
+            Comparator { loc1: FavoriteLocation, loc2: FavoriteLocation -> loc2.fromCount - loc1.fromCount }
 
-	int getViaCount() {
-		return viaCount;
-	}
+        @JvmField
+        val ViaComparator: Comparator<FavoriteLocation> =
+            Comparator { loc1: FavoriteLocation, loc2: FavoriteLocation -> loc2.viaCount - loc1.viaCount }
 
-	int getToCount() {
-		return toCount;
-	}
-
-	public void add(FavLocationType type) {
-		switch (type) {
-			case FROM:
-				fromCount++;
-				return;
-			case VIA:
-				viaCount++;
-				return;
-			case TO:
-				toCount++;
-		}
-	}
-
-	@Override
-	public String toString() {
-		return super.toString() + "[" + fromCount + "]";
-	}
-
-	public static final Comparator<FavoriteLocation> FromComparator = (loc1, loc2) -> loc2.getFromCount() - loc1.getFromCount();
-
-	public static final Comparator<FavoriteLocation> ViaComparator = (loc1, loc2) -> loc2.getViaCount() - loc1.getViaCount();
-
-	public static final Comparator<FavoriteLocation> ToComparator = (loc1, loc2) -> loc2.getToCount() - loc1.getToCount();
-
+        @JvmField
+        val ToComparator: Comparator<FavoriteLocation> =
+            Comparator { loc1: FavoriteLocation, loc2: FavoriteLocation -> loc2.toCount - loc1.toCount }
+    }
 }
