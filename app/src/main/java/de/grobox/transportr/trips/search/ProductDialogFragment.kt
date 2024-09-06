@@ -38,7 +38,6 @@ import com.mikepenz.fastadapter.items.AbstractItem
 import com.mikepenz.fastadapter.select.SelectExtension
 import de.grobox.transportr.R
 import de.grobox.transportr.databinding.FragmentProductDialogBinding
-import de.grobox.transportr.utils.TransportrUtils.getDrawableForProduct
 import de.schildbach.pte.dto.Product
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import java.util.EnumSet
@@ -68,7 +67,7 @@ class ProductDialogFragment : DialogFragment() {
             val products = getProductsFromItems(
                 adapter!!.selectedItems
             )
-            viewModel.setProducts(products)
+            //viewModel.setProducts(products)
             getDialog()!!.cancel()
         }
         return mb.create()
@@ -91,7 +90,7 @@ class ProductDialogFragment : DialogFragment() {
         // Get view model and observe products
         //viewModel = ViewModelProvider(requireActivity(), viewModelFactory).get<DirectionsViewModel>(DirectionsViewModel::class.java)
         if (savedInstanceState == null) {
-            viewModel.products.observe(requireActivity(), ::onProductsChanged)
+            //viewModel.products.observe(requireActivity(), ::onProductsChanged)
         } else {
             adapter!!.withSavedInstanceState(savedInstanceState)
         }
@@ -160,7 +159,7 @@ class ProductDialogFragment : DialogFragment() {
 
             val selectExt = adapter!!.getExtension(SelectExtension::class.java)
 
-            ui.image.setImageResource(getDrawableForProduct(product))
+            //ui.image.setImageResource(getDrawableForProduct(product))
             ui.name.text = productToString(ui.name.context, product)
             ui.checkBox.isChecked = isSelected
             ui.layout.setOnClickListener { v: View? ->

@@ -81,23 +81,14 @@ import androidx.navigation.NavController
 import de.grobox.transportr.R
 import de.grobox.transportr.composables.CompactLocationGpsInput
 import de.grobox.transportr.composables.CustomLargeTopAppBar
+import de.grobox.transportr.data.dto.KProduct
+import de.grobox.transportr.data.dto.KTrip
 import de.grobox.transportr.favorites.trips.FavoriteTripItem
 import de.grobox.transportr.favorites.trips.FavoriteTripType
 import de.grobox.transportr.locations.WrapLocation
 import de.grobox.transportr.utils.DateUtils.isNow
 import de.grobox.transportr.utils.DateUtils.isToday
 import de.grobox.transportr.utils.DateUtils.millisToMinutes
-import de.schildbach.pte.dto.Product
-import de.schildbach.pte.dto.Product.BUS
-import de.schildbach.pte.dto.Product.CABLECAR
-import de.schildbach.pte.dto.Product.FERRY
-import de.schildbach.pte.dto.Product.HIGH_SPEED_TRAIN
-import de.schildbach.pte.dto.Product.ON_DEMAND
-import de.schildbach.pte.dto.Product.REGIONAL_TRAIN
-import de.schildbach.pte.dto.Product.SUBURBAN_TRAIN
-import de.schildbach.pte.dto.Product.SUBWAY
-import de.schildbach.pte.dto.Product.TRAM
-import de.schildbach.pte.dto.Trip
 import kotlinx.coroutines.delay
 import java.util.Calendar
 import java.util.Date
@@ -118,7 +109,7 @@ fun DirectionsScreen(
     search: Boolean,
     onSelectDepartureClicked: () -> Unit = {},
     onSelectDepartureLongClicked: () -> Unit = {},
-    tripClicked: (Trip) -> Unit = {},
+    tripClicked: (KTrip) -> Unit = {},
     changeHome: () -> Unit = {},
     changeWork: () -> Unit = {}
 ) {
@@ -151,7 +142,7 @@ fun DirectionsScreen(
     val isDeparture by viewModel.isDeparture.observeAsState(true)
 
     var showProductSelector by remember { mutableStateOf(false) }
-    val isProductsChanged by viewModel.products.map { Product.ALL != it }.observeAsState(false)
+    val isProductsChanged by viewModel.products.map { KProduct.ALL != it }.observeAsState(false)
 
     val showTrips by viewModel.displayTrips.observeAsState(false)
     val trips by viewModel.trips.observeAsState()
@@ -375,7 +366,7 @@ fun DirectionsScreen(
         ) {
             if(showTrips) {
                 TripList(
-                    trips = trips,
+                    trips = trips?.toSet(),
                     tripClicked = { tripClicked(it) }
                 )
             } else {
@@ -412,8 +403,8 @@ fun DirectionsScreen(
 }
 
 fun LazyListScope.TripList(
-    trips: Set<Trip>?,
-    tripClicked: (Trip) -> Unit
+    trips: Set<KTrip>?,
+    tripClicked: (KTrip) -> Unit
 ) {
     if(trips == null) {
         item {
@@ -487,12 +478,12 @@ fun ProductSelectorIcon(
 @Composable
 fun ProductSelectorDialog(
     show: Boolean,
-    selectedProducts: List<Product>?,
-    onConfirmation: (EnumSet<Product>) -> Unit,
+    selectedProducts: List<KProduct>?,
+    onConfirmation: (EnumSet<KProduct>) -> Unit,
     onDismissRequest: () -> Unit
 ) {
     if(show) {
-        var selected by remember { mutableStateOf(selectedProducts ?: Product.ALL) }
+        var selected by remember { mutableStateOf(selectedProducts ?: KProduct.ALL) }
 
         AlertDialog(
             icon = {
@@ -505,7 +496,7 @@ fun ProductSelectorDialog(
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    items(Product.ALL.toList()) { product ->
+                    items(KProduct.ALL.toList()) { product ->
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.padding(4.dp).clickable {
@@ -546,7 +537,7 @@ fun ProductSelectorDialog(
             confirmButton = {
                 TextButton(
                     onClick = {
-                        val temp = EnumSet.noneOf(Product::class.java)
+                        val temp = EnumSet.noneOf(KProduct::class.java)
                         temp.addAll(selected)
                         onConfirmation(temp)
                     }
@@ -567,30 +558,31 @@ fun ProductSelectorDialog(
     }
 }
 
-private fun Product?.getNameRes(): Int = when(this) {
-    HIGH_SPEED_TRAIN -> R.string.product_high_speed_train
-    REGIONAL_TRAIN -> R.string.product_regional_train
-    SUBURBAN_TRAIN -> R.string.product_suburban_train
-    SUBWAY -> R.string.product_subway
-    TRAM -> R.string.product_tram
-    BUS -> R.string.product_bus
-    FERRY -> R.string.product_ferry
-    CABLECAR -> R.string.product_cablecar
-    ON_DEMAND -> R.string.product_on_demand
-    null -> R.string.product_bus
+private fun KProduct?.getNameRes(): Int = when(this) {
+    KProduct.HIGH_SPEED_TRAIN -> R.string.product_high_speed_train
+    KProduct.REGIONAL_TRAIN -> R.string.product_regional_train
+    KProduct.SUBURBAN_TRAIN -> R.string.product_suburban_train
+    KProduct.SUBWAY -> R.string.product_subway
+    KProduct.TRAM -> R.string.product_tram
+    KProduct.BUS -> R.string.product_bus
+    KProduct.FERRY -> R.string.product_ferry
+    KProduct.CABLECAR -> R.string.product_cablecar
+    KProduct.ON_DEMAND -> R.string.product_on_demand
+    else -> R.string.product_bus
 }
 
-private fun Product?.getDrawableRes(): Int = when (this) {
-    HIGH_SPEED_TRAIN -> R.drawable.product_high_speed_train
-    REGIONAL_TRAIN -> R.drawable.product_regional_train
-    SUBURBAN_TRAIN -> R.drawable.product_suburban_train
-    SUBWAY -> R.drawable.product_subway
-    TRAM -> R.drawable.product_tram
-    BUS -> R.drawable.product_bus
-    FERRY -> R.drawable.product_ferry
-    CABLECAR -> R.drawable.product_cablecar
-    ON_DEMAND -> R.drawable.product_on_demand
+private fun KProduct?.getDrawableRes(): Int = when (this) {
+    KProduct.HIGH_SPEED_TRAIN -> R.drawable.product_high_speed_train
+    KProduct.REGIONAL_TRAIN -> R.drawable.product_regional_train
+    KProduct.SUBURBAN_TRAIN -> R.drawable.product_suburban_train
+    KProduct.SUBWAY -> R.drawable.product_subway
+    KProduct.TRAM -> R.drawable.product_tram
+    KProduct.BUS -> R.drawable.product_bus
+    KProduct.FERRY -> R.drawable.product_ferry
+    KProduct.CABLECAR -> R.drawable.product_cablecar
+    KProduct.ON_DEMAND -> R.drawable.product_on_demand
     null -> R.drawable.product_bus
+    else -> R.drawable.ic_action_about
 }
 
 @Composable

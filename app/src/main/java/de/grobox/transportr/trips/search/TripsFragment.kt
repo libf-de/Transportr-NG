@@ -97,7 +97,7 @@ class TripsFragment : TransportrFragment(), OnRefreshListener, OnTripClickListen
         list.setHasFixedSize(false)
         viewModel.topSwipeEnabled.observe(viewLifecycleOwner, { enabled -> onSwipeEnabledChanged(enabled) })
         viewModel.queryMoreState.observe(viewLifecycleOwner, { state -> updateSwipeState(state) })
-        viewModel.trips.observe(viewLifecycleOwner) { trips -> onTripsLoaded(trips) }
+        //viewModel.trips.observe(viewLifecycleOwner) { trips -> onTripsLoaded(trips) }
         viewModel.queryError.observe(viewLifecycleOwner, { error -> onError(error) })
         viewModel.queryPTEError.observe(viewLifecycleOwner, { error -> onPTEError(error) })
         viewModel.queryMoreError.observe(viewLifecycleOwner, { error -> onMoreError(error) })

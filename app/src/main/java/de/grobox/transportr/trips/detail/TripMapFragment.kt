@@ -46,7 +46,7 @@ class TripMapFragment : GpsMapFragment<TripDetailViewModel>() {
         // set bottom padding, so everything gets centered in top half of screen
         setPadding(bottom = mapView.height / 2)
 
-        viewModel.getTrip().observe(this) { onTripChanged(it) }
+        //viewModel.getTrip().observe(this) { onTripChanged(it) }
         viewModel.getZoomLocation().observe(this) { this.animateTo(it) }
         viewModel.getZoomLeg().observe(this) { this.animateToBounds(it) }
     }
@@ -56,7 +56,7 @@ class TripMapFragment : GpsMapFragment<TripDetailViewModel>() {
 
         val tripDrawer = TripDrawer(context)
         val zoom = viewModel.isFreshStart.value ?: throw IllegalStateException()
-        tripDrawer.draw(map!!, trip, zoom)
+//        tripDrawer.draw(map!!, trip, zoom)
         if (zoom) {
             // do not zoom again when returning to this Fragment
             viewModel.isFreshStart.value = false

@@ -19,15 +19,15 @@
 
 package de.grobox.transportr.trips.detail
 
-import androidx.annotation.ColorInt
-import androidx.recyclerview.widget.RecyclerView.Adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import de.grobox.transportr.R
+import androidx.annotation.ColorInt
+import androidx.recyclerview.widget.RecyclerView.Adapter
 import de.grobox.transportr.databinding.ListItemStopBinding
 import de.grobox.transportr.trips.detail.LegViewHolder.Companion.DEFAULT_LINE_COLOR
 import de.schildbach.pte.dto.Stop
 
+@Deprecated("Use Composables")
 class StopAdapter internal constructor(private val listener: LegClickListener) : Adapter<StopViewHolder>() {
 
     private var stops: List<Stop>? = null

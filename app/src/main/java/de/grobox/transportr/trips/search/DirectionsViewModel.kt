@@ -22,6 +22,8 @@ import android.util.Pair
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import de.grobox.transportr.TransportrApplication
+import de.grobox.transportr.data.dto.KProduct
+import de.grobox.transportr.data.dto.KTrip
 import de.grobox.transportr.data.locations.FavoriteLocation.FavLocationType
 import de.grobox.transportr.data.locations.LocationRepository
 import de.grobox.transportr.data.searches.SearchesRepository
@@ -41,8 +43,6 @@ import de.grobox.transportr.utils.LiveTrigger
 import de.grobox.transportr.utils.SingleLiveEvent
 import de.schildbach.pte.NetworkId
 import de.schildbach.pte.NetworkProvider
-import de.schildbach.pte.dto.Product
-import de.schildbach.pte.dto.Trip
 import java.util.Calendar
 import java.util.EnumSet
 
@@ -66,7 +66,7 @@ class DirectionsViewModel internal constructor(
     val timeUpdate = LiveTrigger()
     private val _now = MutableLiveData(true)
     private val _calendar = MutableLiveData(Calendar.getInstance())
-    private val _products = MutableLiveData<EnumSet<Product>>(EnumSet.copyOf(settingsManager.getPreferredProducts()))
+    private val _products = MutableLiveData<EnumSet<KProduct>>(EnumSet.copyOf(settingsManager.getPreferredProducts()))
     private val _isDeparture = MutableLiveData(true)
     private val _isExpanded = MutableLiveData(false)
 
@@ -151,9 +151,9 @@ class DirectionsViewModel internal constructor(
         _now.value = DateUtils.isNow(calendar)
     }
 
-    val products: LiveData<EnumSet<Product>> = _products
+    val products: LiveData<EnumSet<KProduct>> = _products
 
-    fun setProducts(newProducts: EnumSet<Product>) {
+    fun setProducts(newProducts: EnumSet<KProduct>) {
         _products.value = newProducts
         search()
         settingsManager.setPreferredProducts(newProducts)
@@ -230,7 +230,7 @@ class DirectionsViewModel internal constructor(
 
     val queryMoreState: LiveData<QueryMoreState>
         get() = _tripsRepository.queryMoreState
-    val trips: LiveData<Set<Trip>>
+    val trips: LiveData<Set<KTrip>>
         get() = _tripsRepository.trips
     val queryError: LiveData<String>
         get() = _tripsRepository.queryError

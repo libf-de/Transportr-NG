@@ -23,11 +23,11 @@ import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.Index
 import de.grobox.transportr.R
+import de.grobox.transportr.data.dto.KLocation
+import de.grobox.transportr.data.dto.KProduct
 import de.grobox.transportr.locations.WrapLocation
 import de.schildbach.pte.NetworkId
-import de.schildbach.pte.dto.Location
-import de.schildbach.pte.dto.LocationType
-import de.schildbach.pte.dto.Product
+
 
 @Entity(tableName = "locations", indices = [Index("networkId"), Index("id"), Index(value = ["networkId", "id"], unique = true)])
 class FavoriteLocation : StoredLocation {
@@ -36,15 +36,12 @@ class FavoriteLocation : StoredLocation {
     }
 
     var fromCount: Int
-        private set
     var viaCount: Int
-        private set
     var toCount: Int
-        private set
 
     constructor(
-        uid: Long, networkId: NetworkId?, type: LocationType?, id: String?, lat: Int, lon: Int,
-        place: String?, name: String?, products: Set<Product>?, fromCount: Int, viaCount: Int,
+        uid: Long, networkId: NetworkId?, type: KLocation.Type?, id: String?, lat: Int, lon: Int,
+        place: String?, name: String?, products: Set<KProduct>?, fromCount: Int, viaCount: Int,
         toCount: Int
     ) : super(uid, networkId!!, type, id, lat, lon, place, name, products) {
         this.fromCount = fromCount
@@ -67,7 +64,7 @@ class FavoriteLocation : StoredLocation {
     }
 
     @Ignore
-    constructor(networkId: NetworkId?, l: Location?) : super(networkId!!, l!!) {
+    constructor(networkId: NetworkId?, l: KLocation?) : super(networkId!!, l!!) {
         this.fromCount = 0
         this.viaCount = 0
         this.toCount = 0
@@ -76,9 +73,9 @@ class FavoriteLocation : StoredLocation {
     @get:DrawableRes
     override val drawableInt: Int
         get() = when (type) {
-            LocationType.ADDRESS -> R.drawable.ic_location_address_fav
-            LocationType.POI -> R.drawable.ic_location_poi_fav
-            LocationType.STATION -> R.drawable.ic_location_station_fav
+            KLocation.Type.ADDRESS -> R.drawable.ic_location_address_fav
+            KLocation.Type.POI -> R.drawable.ic_location_poi_fav
+            KLocation.Type.STATION -> R.drawable.ic_location_station_fav
             else -> R.drawable.ic_location
         }
 

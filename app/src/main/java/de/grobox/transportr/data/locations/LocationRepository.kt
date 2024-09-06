@@ -24,13 +24,12 @@ import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.switchMap
 import de.grobox.transportr.AbstractManager
+import de.grobox.transportr.data.dto.KLocation
 import de.grobox.transportr.data.locations.FavoriteLocation.FavLocationType
 import de.grobox.transportr.locations.WrapLocation
 import de.grobox.transportr.locations.WrapLocation.WrapType.NORMAL
 import de.grobox.transportr.networks.TransportNetworkManager
 import de.schildbach.pte.NetworkId
-import de.schildbach.pte.dto.LocationType.ADDRESS
-import de.schildbach.pte.dto.LocationType.COORD
 
 class LocationRepository
 constructor(private val locationDao: LocationDao, transportNetworkManager: TransportNetworkManager) : AbstractManager() {
@@ -62,7 +61,7 @@ constructor(private val locationDao: LocationDao, transportNetworkManager: Trans
 
     @WorkerThread
     fun addFavoriteLocation(wrapLocation: WrapLocation, type: FavLocationType): FavoriteLocation? {
-        if (wrapLocation.type == COORD || wrapLocation.wrapType != NORMAL) return null
+        if (wrapLocation.type == KLocation.Type.COORD || wrapLocation.wrapType != NORMAL) return null
 
         val favoriteLocation = if (wrapLocation is FavoriteLocation) {
             wrapLocation
@@ -102,7 +101,7 @@ constructor(private val locationDao: LocationDao, transportNetworkManager: Trans
      */
     private fun findExistingLocation(location: WrapLocation): WrapLocation {
         favoriteLocations.value?.filter {
-            it.type == ADDRESS && it.name != null && it.name == location.name && it.isSamePlace(location)
+            it.type == KLocation.Type.ADDRESS && it.name != null && it.name == location.name && it.isSamePlace(location)
         }?.forEach { return it }
         return location
     }

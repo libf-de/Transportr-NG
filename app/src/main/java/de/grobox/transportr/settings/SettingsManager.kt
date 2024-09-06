@@ -32,10 +32,10 @@ import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
 import androidx.core.content.ContextCompat
 import de.grobox.transportr.R
+import de.grobox.transportr.data.dto.KProduct
 import de.schildbach.pte.NetworkId
 import de.schildbach.pte.NetworkProvider.Optimize
 import de.schildbach.pte.NetworkProvider.WalkSpeed
-import de.schildbach.pte.dto.Product
 import java.util.Locale
 
 
@@ -146,23 +146,23 @@ class SettingsManager constructor(private val context: Context) {
         return settings.getBoolean(SHOW_WHEN_LOCKED, true)
     }
 
-    fun setPreferredProducts(selected: Set<Product>) {
+    fun setPreferredProducts(selected: Set<KProduct>) {
         val editor = settings.edit()
-        Product.ALL.toSet().forEach { product ->
+        KProduct.ALL.toSet().forEach { product ->
             editor.putBoolean(LAST_PRODUCT_PREFIX + product.name, product in selected)
         }
         editor.apply()
     }
 
-    fun getPreferredProducts(): Set<Product> {
-        val firstTime = Product.ALL.none { settings.contains(LAST_PRODUCT_PREFIX + it.name) }
+    fun getPreferredProducts(): Set<KProduct> {
+        val firstTime = KProduct.ALL.none { settings.contains(LAST_PRODUCT_PREFIX + it.name) }
         if (firstTime) {
-            setPreferredProducts(Product.ALL)
-            return Product.ALL
+            setPreferredProducts(KProduct.ALL)
+            return KProduct.ALL
         }
 
-        val products = mutableSetOf<Product>()
-        Product.ALL.toSet().forEach { product ->
+        val products = mutableSetOf<KProduct>()
+        KProduct.ALL.toSet().forEach { product ->
             if (settings.getBoolean(LAST_PRODUCT_PREFIX + product.name, false)) {
                 products.add(product)
             }

@@ -24,6 +24,8 @@ import android.content.Intent
 import android.view.MenuItem
 import android.view.View
 import de.grobox.transportr.R
+import de.grobox.transportr.data.dto.toKLeg
+import de.grobox.transportr.data.dto.toKLocation
 import de.grobox.transportr.locations.WrapLocation
 import de.grobox.transportr.trips.detail.TripUtils.legToString
 import de.grobox.transportr.ui.BasePopupMenu
@@ -38,16 +40,17 @@ import de.schildbach.pte.dto.Location
 import de.schildbach.pte.dto.Stop
 import de.schildbach.pte.dto.Trip.Leg
 
+@Deprecated("Use Composables")
 class LegPopupMenu private constructor(context: Context, anchor: View, location: Location, private val text: String) :
     BasePopupMenu(context, anchor) {
 
-    private val loc1: WrapLocation = WrapLocation(location)
+    private val loc1: WrapLocation = WrapLocation(location.toKLocation())
 
     internal constructor(context: Context, anchor: View, leg: Leg, isLast: Boolean) :
-            this(context, anchor, if (isLast) leg.arrival else leg.departure, legToString(context, leg))
+            this(context, anchor, if (isLast) leg.arrival else leg.departure, legToString(context, leg.toKLeg()))
 
     internal constructor(context: Context, anchor: View, stop: Stop) :
-            this(context, anchor, stop.location, "${formatTime(context, stop.arrivalTime)} ${getLocationName(stop.location)}")
+            this(context, anchor, stop.location, "${formatTime(context, stop.arrivalTime)} ${getLocationName(stop.location.toKLocation())}")
 
     init {
         this.menuInflater.inflate(R.menu.leg_location_actions, menu)

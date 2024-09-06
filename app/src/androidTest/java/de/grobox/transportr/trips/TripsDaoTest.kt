@@ -46,7 +46,7 @@ import javax.inject.Inject
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-class TripsTest : ScreengrabTest() {
+class TripsDaoTest : ScreengrabTest() {
 
     @Rule
     @JvmField

@@ -166,7 +166,7 @@ class DirectionsFragment : TransportrFragment() {
         viewModel.timeUpdate.observe(viewLifecycleOwner, { onCalendarUpdated(viewModel.lastQueryCalendar.value) })
         viewModel.findGpsLocation.observe(viewLifecycleOwner, { onFindGpsLocation(it) })
         viewModel.isFavTrip.observe(viewLifecycleOwner, { onFavStatusChanged(it) })
-        viewModel.products.observe(viewLifecycleOwner, { onProductsChanged(it) })
+        //viewModel.products.observe(viewLifecycleOwner, { onProductsChanged(it) })
 
         favIcon.setOnClickListener { viewModel.toggleFavTrip() }
 

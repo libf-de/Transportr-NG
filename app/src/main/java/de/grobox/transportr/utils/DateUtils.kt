@@ -23,8 +23,6 @@ import android.graphics.Color
 import android.text.format.DateFormat
 import android.text.format.DateUtils
 import android.view.View
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.colorResource
 import com.google.android.material.color.MaterialColors
 import de.grobox.transportr.R
 import java.util.Calendar
@@ -41,7 +39,9 @@ object DateUtils {
         }
     }
 
-    fun formatDate(context: Context, date: Date): String {
+    fun formatDate(context: Context, date: Date?): String? {
+        if(date == null) return null
+
         val df = DateFormat.getDateFormat(context)
         return df.format(date)
     }
@@ -59,7 +59,8 @@ object DateUtils {
         return tf.format(date)
     }
 
-    fun formatDuration(duration: Long): String {
+    fun formatDuration(duration: Long?): String? {
+        if(duration == null) return null
         // get duration in minutes
         val durationMinutes = millisToMinutes(duration)
         val m = durationMinutes % 60
@@ -67,7 +68,8 @@ object DateUtils {
         return "$h:${m.toString().padStart(2, '0')}"
     }
 
-    fun formatDuration(start: Date, end: Date): String {
+    fun formatDuration(start: Date?, end: Date?): String? {
+        if(start == null || end == null) return null
         return formatDuration(end.time - start.time)
     }
 
@@ -96,7 +98,7 @@ object DateUtils {
     fun isNow(calendar: Calendar): Boolean = isWithinMinutes(calendar, 1)
 
     fun formatRelativeTime(context: Context, date: Date, max: Int = 99): RelativeTime {
-        val difference = getDifferenceInMinutes(date)
+        val difference = getDifferenceInMinutes(date) ?: 0L
         return RelativeTime(
             relativeTime = when {
                 difference !in -max..max -> ""
@@ -120,7 +122,8 @@ object DateUtils {
         return millisToMinutes(d2.time - d1.time)
     }
 
-    internal fun getDifferenceInMinutes(date: Date): Long {
+    internal fun getDifferenceInMinutes(date: Date?): Long? {
+        if (date == null) return null
         return getDifferenceInMinutes(Date(), date)
     }
 }

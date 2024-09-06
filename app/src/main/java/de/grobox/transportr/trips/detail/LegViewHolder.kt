@@ -32,6 +32,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.common.base.Strings
 import com.google.common.base.Strings.isNullOrEmpty
 import de.grobox.transportr.R
+import de.grobox.transportr.data.dto.toKLocation
 import de.grobox.transportr.databinding.ListItemLegBinding
 import de.grobox.transportr.trips.BaseViewHolder
 import de.grobox.transportr.trips.detail.LegViewHolder.LegType.FIRST
@@ -48,6 +49,7 @@ import de.schildbach.pte.dto.Trip.Individual
 import de.schildbach.pte.dto.Trip.Leg
 import de.schildbach.pte.dto.Trip.Public
 
+@Deprecated("Use composables")
 class LegViewHolder(binding: ListItemLegBinding, private val listener: LegClickListener, private val showLineName: Boolean) : BaseViewHolder(binding.root) {
 
     enum class LegType {
@@ -79,8 +81,8 @@ class LegViewHolder(binding: ListItemLegBinding, private val listener: LegClickL
 
     fun bind(leg: Leg, legType: LegType) {
         // Locations
-        fromLocation.text = getLocationName(leg.departure)
-        toLocation.text = getLocationName(leg.arrival)
+        fromLocation.text = getLocationName(leg.departure.toKLocation())
+        toLocation.text = getLocationName(leg.arrival.toKLocation())
 
         fromLocation.setOnClickListener { listener.onLocationClick(leg.departure) }
         toLocation.setOnClickListener { listener.onLocationClick(leg.arrival) }
@@ -125,11 +127,11 @@ class LegViewHolder(binding: ListItemLegBinding, private val listener: LegClickL
         toLocation.addPlatform(leg.arrivalPosition)
 
         // Line
-        lineView.setLine(leg.line)
+        //lineView.setLine(leg.line)
         if (showLineName && !isNullOrEmpty(leg.line.name)) {
             lineDestination.text = leg.line.name
         } else if (leg.destination != null) {
-            lineDestination.text = getLocationName(leg.destination!!)
+            lineDestination.text = getLocationName(leg.destination!!.toKLocation())
         } else {
             lineDestination.text = null  // don't hide for constraints
         }

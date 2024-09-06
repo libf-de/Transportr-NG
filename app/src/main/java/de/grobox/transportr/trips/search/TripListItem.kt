@@ -54,8 +54,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.google.common.base.Strings.isNullOrEmpty
 import de.grobox.transportr.R
+import de.grobox.transportr.data.dto.KLeg
+import de.grobox.transportr.data.dto.KLine
+import de.grobox.transportr.data.dto.KLocation
+import de.grobox.transportr.data.dto.KProduct
+import de.grobox.transportr.data.dto.KStop
+import de.grobox.transportr.data.dto.KStyle
+import de.grobox.transportr.data.dto.KTrip
 import de.grobox.transportr.trips.detail.TripUtils.getStandardFare
 import de.grobox.transportr.utils.DateUtils.formatDuration
 import de.grobox.transportr.utils.DateUtils.formatTime
@@ -63,19 +69,12 @@ import de.grobox.transportr.utils.DateUtils.getDifferenceInMinutes
 import de.grobox.transportr.utils.DateUtils.millisToMinutes
 import de.grobox.transportr.utils.TransportrUtils
 import de.grobox.transportr.utils.TransportrUtils.getLocationName
-import de.schildbach.pte.dto.Line
-import de.schildbach.pte.dto.Location
-import de.schildbach.pte.dto.LocationType
-import de.schildbach.pte.dto.Product
-import de.schildbach.pte.dto.Stop
-import de.schildbach.pte.dto.Style
-import de.schildbach.pte.dto.Trip
-import de.schildbach.pte.dto.Trip.Public
 import kotlinx.coroutines.delay
 import java.util.Date
+import java.util.Locale
 
 @Composable
-fun FromRelativeTimeText(trip: Trip, max: Int = 99) {
+fun FromRelativeTimeText(trip: KTrip, max: Int = 99) {
     var value by remember { mutableStateOf("") }
 
     val nowSmall = stringResource(R.string.now_small)
@@ -85,7 +84,7 @@ fun FromRelativeTimeText(trip: Trip, max: Int = 99) {
 
     LaunchedEffect(value) {
         if(trip.isTravelable) {
-            val difference = getDifferenceInMinutes(trip.firstDepartureTime)
+            val difference = getDifferenceInMinutes(trip.firstDepartureTime?.let(::Date)) ?: Long.MIN_VALUE
             value = when {
                 difference !in -max..max -> ""
                 difference == 0L -> nowSmall
@@ -108,78 +107,82 @@ fun FromRelativeTimeText(trip: Trip, max: Int = 99) {
     }
 }
 
-fun Stop.getDepartureTimes(context: Context): Pair<String, String> {
-    if (this.departureTime == null) return Pair("", "")
+fun KStop.getDepartureTimes(context: Context): Pair<String, String> {
+    return this.getDepartureTime()?.let { departureTime ->
+        val time = Date(departureTime)
 
-    val time = Date(this.departureTime.time)
+        if (isDepartureTimePredicted() && this.departureDelay != null) {
+            val delay = this.departureDelay ?: 0L
+            time.time -= delay
 
-    if (this.isDepartureTimePredicted && this.departureDelay != null) {
-        val delay = this.departureDelay
-        time.time -= delay
-
-        val delayMinutes = millisToMinutes(delay)
-        val delayStr = when {
-            delayMinutes > 0 -> "+$delayMinutes"
-            delayMinutes < 0 -> "$delayMinutes"
-            else -> ""
+            val delayMinutes = millisToMinutes(delay)
+            val delayStr = when {
+                delayMinutes > 0 -> "+$delayMinutes"
+                delayMinutes < 0 -> "$delayMinutes"
+                else -> ""
+            }
+            Pair(formatTime(context, time), delayStr)
+        } else {
+            Pair(formatTime(context, time), "")
         }
-        return Pair(formatTime(context, time), delayStr)
-    } else {
-        return Pair(formatTime(context, time), "")
-    }
+    } ?: Pair("", "")
 }
 
-fun Stop.getArrivalTimes(context: Context): Pair<String, String> {
-    if (this.arrivalTime == null) return Pair("", "")
+fun KStop.getArrivalTimes(context: Context): Pair<String, String> {
+    return this.getArrivalTime()?.let { arrivalTime ->
+        val time = Date(arrivalTime)
 
-    val time = Date(this.arrivalTime.time)
+        if (isArrivalTimePredicted() && this.arrivalDelay != null) {
+            val delay = this.arrivalDelay ?: 0L
+            time.time -= delay
 
-    if (this.isArrivalTimePredicted && this.arrivalDelay != null) {
-        val delay = this.arrivalDelay
-        time.time -= delay
-
-        val delayMinutes = millisToMinutes(delay)
-        val delayStr = when {
-            delayMinutes > 0 -> "+$delayMinutes"
-            delayMinutes < 0 -> "$delayMinutes"
-            else -> ""
+            val delayMinutes = millisToMinutes(delay)
+            val delayStr = when {
+                delayMinutes > 0 -> "+$delayMinutes"
+                delayMinutes < 0 -> "$delayMinutes"
+                else -> ""
+            }
+            Pair(formatTime(context, time), delayStr)
+        } else {
+            Pair(formatTime(context, time), "")
         }
-        return Pair(formatTime(context, time), delayStr)
-    } else {
-        return Pair(formatTime(context, time), "")
-    }
+    } ?: Pair("", "")
 }
 
-fun getDepartureTimes(trip: Trip, context: Context): Pair<String, String> {
+fun getDepartureTimes(trip: KTrip, context: Context): Pair<String, String> {
     val firstLeg = trip.legs[0]
-    return if (firstLeg is Public) {
-        firstLeg.departureStop.getDepartureTimes(context)
+    return if (firstLeg.isPublicLeg) {
+        firstLeg.departureStop?.getDepartureTimes(context)
     } else {
-        Pair(formatTime(context, firstLeg.departureTime), trip.firstPublicLeg.let {
-            if (it != null && it.departureDelay != null && it.departureDelay != 0L)
-                it.departureStop.getDepartureTimes(context).second
-            else ""
-        })
-    }
+        firstLeg.getDepartureTime()?.let { firstLegDepartureTime ->
+            Pair(formatTime(context, Date(firstLegDepartureTime)), trip.firstPublicLeg.let {
+                if (it?.departureDelay != null && it.departureDelay != 0L)
+                    it.departureStop?.getDepartureTimes(context)?.second ?: ""
+                else ""
+            })
+        }
+    } ?: Pair("", "")
 }
 
-fun getArrivalTimes(trip: Trip, context: Context): Pair<String, String> {
+fun getArrivalTimes(trip: KTrip, context: Context): Pair<String, String> {
     val lastLeg = trip.legs[trip.legs.size - 1]
-    return if (lastLeg is Public) {
-        lastLeg.arrivalStop.getArrivalTimes(context)
+    return if (lastLeg.isPublicLeg) {
+        lastLeg.arrivalStop?.getArrivalTimes(context)
     } else {
-        Pair(formatTime(context, lastLeg.arrivalTime), trip.lastPublicLeg.let {
-            if (it != null && it.arrivalDelay != null && it.arrivalDelay != 0L)
-                it.arrivalStop.getArrivalTimes(context).second
-            else ""
-        })
-    }
+        lastLeg.getArrivalTime()?.let { lastLegArrivalTime ->
+            Pair(formatTime(context, Date(lastLegArrivalTime)), trip.lastPublicLeg.let {
+                if (it?.arrivalDelay != null && it.arrivalDelay != 0L)
+                    it.arrivalStop?.getArrivalTimes(context)?.second ?: ""
+                else ""
+            })
+        }
+    } ?: Pair("", "")
 }
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun TripListItem(
-    trip: Trip,
+    trip: KTrip,
     context: Context = LocalContext.current,
     onClick: () -> Unit,
 ) {
@@ -199,7 +202,7 @@ fun TripListItem(
         departureDelay = departureData.second
         departureName = getLocationName(trip.from) ?: "???"
 
-        duration = formatDuration(trip.duration)
+        duration = formatDuration(trip.duration) ?: ""
         price = trip.getStandardFare() ?: ""
         warning = trip.hasProblem()
 
@@ -266,13 +269,13 @@ fun TripListItem(
                             modifier = Modifier.padding(vertical = 4.dp)
                         ) {
                             trip.legs.forEach {
-                                when(it) {
-                                    is Public -> ProductViewComposable(
-                                        line = it.line,
+                                if(it.isPublicLeg) {
+                                    ProductViewComposable(
+                                        line = it.line!!,
                                         drawableForProductGetter = TransportrUtils::getDrawableForProduct
                                     )
-                                    is Trip.Individual -> WalkView()
-                                    else -> Text("???")
+                                } else {
+                                    WalkView()
                                 }
                             }
                         }
@@ -321,8 +324,8 @@ fun WalkView() {
 
 @Composable
 fun ProductViewComposable(
-    line: Line,
-    drawableForProductGetter: (p: Product?) -> Int
+    line: KLine,
+    drawableForProductGetter: (p: KProduct?) -> Int
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -333,7 +336,7 @@ fun ProductViewComposable(
     ) {
         Icon(
             painter = painterResource(drawableForProductGetter(line.product)),
-            contentDescription = line.product?.name?.capitalize() ?: "",
+            contentDescription = line.product.name.capitalize(Locale.getDefault()),
             tint = line.style?.foregroundColor?.let { Color(it) } ?: LocalContentColor.current,
             modifier = Modifier.padding(end = 4.dp)
         )
@@ -347,12 +350,12 @@ fun ProductViewComposable(
     }
 }
 
-private fun Trip.hasProblem(): Boolean {
+private fun KTrip.hasProblem(): Boolean {
     if (!isTravelable) return true
     for (leg in legs) {
-        if (leg !is Public) continue
-        if (!isNullOrEmpty(leg.message)) return true
-        if (!isNullOrEmpty(leg.line?.message)) return true
+        if (!leg.isPublicLeg) continue
+        if (!leg.message.isNullOrEmpty()) return true
+        if (!leg.line?.message.isNullOrEmpty()) return true
     }
     return false
 }
@@ -363,44 +366,75 @@ private fun Trip.hasProblem(): Boolean {
 //        this(type, id, (Point)null, place, name);
 //    }
 
-//public Style(Shape shape, int backgroundColor, int backgroundColor2, int foregroundColor, int borderColor) {
+//id: String? = null,
+//        from: KLocation,
+//        to: KLocation,
+//        legs: List<KLeg>,
+//        fares: List<KFare>? = null,
+//        capacity: List<Int>? = null,
+//        changes: Int? = null
 @Composable
 @Preview
 fun TripListItemPreview() {
     TripListItem(
         onClick = {},
-        trip = Trip(
-            "FOOBAR",
-            Location(LocationType.STATION, "St_A", "StPlace A", "Station A"),
-            Location(LocationType.STATION, "St_B", "StPlace B", "Station B"),
-            listOf(
-                Trip.Public(
-                    Line("3_800755_28", "DB Regio AG Bayern", Product.REGIONAL_TRAIN, "RE 4950", Style(
-                        Style.Shape.RECT, -7829368, 0, -1, 0)
+        trip = KTrip(
+            id = "FOOBAR",
+            from = KLocation("", KLocation.Type.STATION, null, "StPlace A", "Station A"),
+            to = KLocation("", KLocation.Type.STATION, null, "StPlace B", "Station B"),
+            legs = listOf(
+                KLeg(
+                    line = KLine(
+                        "3_800755_28",
+                        "DB Regio AG Bayern",
+                        KProduct.REGIONAL_TRAIN,
+                        "RE 4950",
+                        "FooBar",
+                        KStyle(
+                            KStyle.Shape.RECT,
+                            -7829368,
+                            0,
+                            -1,
+                            0)
                     ),
-                    Location(LocationType.STATION, "Coburg"),
-                    Stop(
-                        Location(LocationType.STATION, "St_B", "StPlace B", "Lichtenfels"),
-                        Date(),
-                        null,
-                        Date(),
-                        null
+                    destination = KLocation(
+                        type = KLocation.Type.STATION,
+                        name = "Coburg"
                     ),
-                    Stop(
-                        Location(LocationType.STATION, "St_B", "StPlace B", "Lichtenfels"),
-                        Date(),
-                        null,
-                        Date(),
-                        null
+                    departureStop = KStop(
+                        location = KLocation(
+                            "",
+                            KLocation.Type.STATION,
+                            null,
+                            "StPlace B",
+                            "Lichtenfels"
+                        ),
+                        plannedArrivalTime = Date().time,
+                        predictedArrivalTime = null,
+                        plannedDepartureTime = Date().time,
+                        predictedDepartureTime = null
                     ),
-                    emptyList(),
+                    arrivalStop = KStop(
+                        location = KLocation(
+                            "",
+                            KLocation.Type.STATION,
+                            null,
+                            "StPlace B",
+                            "Lichtenfels"
+                        ),
+                        plannedArrivalTime = Date().time,
+                        predictedArrivalTime = null,
+                        plannedDepartureTime = Date().time,
+                        predictedDepartureTime = null
+                    ),
+                    intermediateStops = emptyList(),
                     null,
                     "hi"
                 )
             ),
-            emptyList(),
-            intArrayOf(1, 2),
-            0
+            fares = emptyList(),
+            capacity = listOf(1, 2),
+            changes = 0
         ),
     )
 }

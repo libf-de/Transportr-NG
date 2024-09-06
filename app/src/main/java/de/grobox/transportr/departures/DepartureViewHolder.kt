@@ -24,6 +24,7 @@ import android.view.View.VISIBLE
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.card.MaterialCardView
+import de.grobox.transportr.data.dto.toKLocation
 import de.grobox.transportr.databinding.ListItemDepartureBinding
 import de.grobox.transportr.ui.LineView
 import de.grobox.transportr.utils.DateUtils.formatDelay
@@ -75,12 +76,12 @@ class DepartureViewHolder(binding: ListItemDepartureBinding) : RecyclerView.View
         } ?: run { delay.visibility = GONE }
 
         // line icon and name
-        line.setLine(dep.line)
+        //line.setLine(dep.line)
         lineName.text = dep.line.name
 
         // line destination
         dep.destination?.let {
-            destination.text = getLocationName(it)
+            destination.text = getLocationName(it.toKLocation())
         } ?: run { destination.text = null }
 
         // platform/position

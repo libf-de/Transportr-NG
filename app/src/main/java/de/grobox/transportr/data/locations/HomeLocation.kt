@@ -23,11 +23,10 @@ import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.Index
 import de.grobox.transportr.R
+import de.grobox.transportr.data.dto.KLocation
+import de.grobox.transportr.data.dto.KProduct
 import de.grobox.transportr.locations.WrapLocation
 import de.schildbach.pte.NetworkId
-import de.schildbach.pte.dto.Location
-import de.schildbach.pte.dto.LocationType
-import de.schildbach.pte.dto.Product
 
 
 @Entity(tableName = "home_locations", indices = [Index(value = ["networkId"], unique = true)])
@@ -35,20 +34,20 @@ class HomeLocation : StoredLocation {
     constructor(
         uid: Long,
         networkId: NetworkId?,
-        type: LocationType?,
+        type: KLocation.Type?,
         id: String?,
         lat: Int,
         lon: Int,
         place: String?,
         name: String?,
-        products: Set<Product>?
+        products: Set<KProduct>?
     ) : super(uid, networkId!!, type, id, lat, lon, place, name, products)
 
     @Ignore
     constructor(networkId: NetworkId, l: WrapLocation?) : super(networkId, l!!)
 
     @Ignore
-    constructor(networkId: NetworkId, l: Location?) : super(networkId, l!!)
+    constructor(networkId: NetworkId, l: KLocation?) : super(networkId, l!!)
 
     @get:DrawableRes
     override val drawableInt: Int

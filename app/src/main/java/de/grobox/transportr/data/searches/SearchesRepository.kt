@@ -24,12 +24,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.switchMap
 import de.grobox.transportr.AbstractManager
+import de.grobox.transportr.data.dto.KLocation
 import de.grobox.transportr.data.locations.FavoriteLocation
 import de.grobox.transportr.data.locations.LocationDao
 import de.grobox.transportr.favorites.trips.FavoriteTripItem
 import de.grobox.transportr.networks.TransportNetworkManager
 import de.schildbach.pte.NetworkId
-import de.schildbach.pte.dto.LocationType.COORD
 
 class SearchesRepository constructor(
         private val searchesDao: SearchesDao,
@@ -66,7 +66,7 @@ class SearchesRepository constructor(
     @WorkerThread
     fun storeSearch(from: FavoriteLocation?, via: FavoriteLocation?, to: FavoriteLocation?): Long {
         if (from == null || to == null) return 0L
-        if (from.type == COORD || via != null && via.type == COORD || to.type == COORD) throw IllegalStateException("COORD made it through")
+        if (from.type == KLocation.Type.COORD || via != null && via.type == KLocation.Type.COORD || to.type == KLocation.Type.COORD) throw IllegalStateException("COORD made it through")
         if (from.uid == 0L || to.uid == 0L) throw IllegalStateException("From or To wasn't saved properly :(")
 
         // try to find existing stored search

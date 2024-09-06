@@ -37,6 +37,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.common.base.Strings
 import de.grobox.transportr.R
 import de.grobox.transportr.TransportrFragment
+import de.grobox.transportr.data.dto.KLocation
 import de.grobox.transportr.databinding.FragmentLocationBinding
 import de.grobox.transportr.departures.DeparturesActivity
 import de.grobox.transportr.departures.DeparturesLoader
@@ -47,7 +48,6 @@ import de.grobox.transportr.utils.IntentUtils.findNearbyStations
 import de.grobox.transportr.utils.IntentUtils.startGeoIntent
 import de.grobox.transportr.utils.TransportrUtils.getCoordName
 import de.schildbach.pte.dto.Line
-import de.schildbach.pte.dto.LocationType
 import de.schildbach.pte.dto.QueryDeparturesResult
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import java.util.Date
@@ -105,7 +105,7 @@ class LocationFragment : TransportrFragment(), LoaderManager.LoaderCallbacks<Que
         locationInfo = binding.locationInfo
         showLocation()
 
-        if (location.location.type == LocationType.COORD) {
+        if (location.location.type == KLocation.Type.COORD) {
             val geocoder = ReverseGeocoder(requireActivity(), this)
             geocoder.findLocation(location.location)
         }
@@ -162,7 +162,7 @@ class LocationFragment : TransportrFragment(), LoaderManager.LoaderCallbacks<Que
         if (!Strings.isNullOrEmpty(location.location.place)) {
             locationInfoStr.append(location.location.place)
         }
-        if (location.location.hasCoord()) {
+        if (location.location.hasCoords) {
             if (locationInfoStr.isNotEmpty()) locationInfoStr.append(", ")
             locationInfoStr.append(getCoordName(location.location))
         }

@@ -30,29 +30,3 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-@Serializable
-sealed class Routes {
-    @Serializable
-    data class Map(
-        val geoUri: String? = null,
-        val location: WrapLocation? = null
-    )
-
-    @Serializable
-    data class Directions(
-        val specialLocation: FavoriteTripType? = null,
-        val from: WrapLocation? = null,
-        val via: WrapLocation? = null,
-        val to: WrapLocation? = null,
-        val search: Boolean = true
-    )
-
-
-    @Serializable
-    data class Departures(
-        val location: WrapLocation
-    )
-
-    @Serializable
-    object Settings
-}

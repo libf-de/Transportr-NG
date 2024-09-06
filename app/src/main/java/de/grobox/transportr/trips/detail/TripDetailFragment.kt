@@ -38,6 +38,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import de.grobox.transportr.R
 import de.grobox.transportr.TransportrFragment
+import de.grobox.transportr.data.dto.toKTrip
 import de.grobox.transportr.databinding.FragmentTripDetailBinding
 import de.grobox.transportr.trips.detail.TripDetailViewModel.SheetState
 import de.grobox.transportr.trips.detail.TripDetailViewModel.SheetState.BOTTOM
@@ -53,7 +54,9 @@ import de.grobox.transportr.utils.DateUtils.formatTime
 import de.grobox.transportr.utils.FullScreenUtil
 import de.schildbach.pte.dto.Trip
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
+import java.util.Date
 
+@Deprecated("USe composables")
 class TripDetailFragment : TransportrFragment(), Toolbar.OnMenuItemClickListener {
 
     companion object {
@@ -83,7 +86,7 @@ class TripDetailFragment : TransportrFragment(), Toolbar.OnMenuItemClickListener
     private val timeUpdater: CountDownTimer = object : CountDownTimer(Long.MAX_VALUE, 1000 * 30) {
         override fun onTick(millisUntilFinished: Long) {
             viewModel.getTrip().value?.let {
-                formatRelativeTime(fromTimeRel.context, it.firstDepartureTime).let {
+                formatRelativeTime(fromTimeRel.context, it.firstDepartureTime?.let(::Date)!!).let {
                     fromTimeRel.apply {
                         text = it.relativeTime
                         visibility = it.visibility
@@ -128,7 +131,7 @@ class TripDetailFragment : TransportrFragment(), Toolbar.OnMenuItemClickListener
         bottomBar.setOnClickListener { _ -> onBottomBarClick() }
 
 
-        viewModel.getTrip().observe(viewLifecycleOwner, Observer<Trip> { this.onTripChanged(it) })
+        //viewModel.getTrip().observe(viewLifecycleOwner, Observer<Trip> { this.onTripChanged(it) })
         viewModel.sheetState.observe(viewLifecycleOwner, Observer<SheetState> { this.onSheetStateChanged(it) })
     }
 
@@ -176,8 +179,8 @@ class TripDetailFragment : TransportrFragment(), Toolbar.OnMenuItemClickListener
 
         val network = viewModel.transportNetwork.value
         val showLineName = network != null && network.hasGoodLineNames()
-        val adapter = LegAdapter(trip.legs, viewModel, showLineName)
-        list.adapter = adapter
+        //val adapter = LegAdapter(trip.legs, viewModel, showLineName)
+        //list.adapter = adapter
 
         fromTime.text = formatTime(context, trip.firstDepartureTime)
         formatRelativeTime(fromTimeRel.context, trip.firstDepartureTime).let {
@@ -191,10 +194,10 @@ class TripDetailFragment : TransportrFragment(), Toolbar.OnMenuItemClickListener
         to.text = trip.to.uniqueShortName()
         duration.text = formatDuration(trip.duration)
         durationTop.text = getString(R.string.total_time, formatDuration(trip.duration))
-        price.visibility = if (trip.hasFare()) VISIBLE else GONE
-        price.text = trip.getStandardFare()
-        priceTop.visibility = if (trip.hasFare()) VISIBLE else GONE
-        priceTop.text = trip.getStandardFare()
+        price.visibility = if (trip.toKTrip().hasFare()) VISIBLE else GONE
+        price.text = trip.toKTrip().getStandardFare()
+        priceTop.visibility = if (trip.toKTrip().hasFare()) VISIBLE else GONE
+        priceTop.text = trip.toKTrip().getStandardFare()
     }
 
     private fun onToolbarClose() {

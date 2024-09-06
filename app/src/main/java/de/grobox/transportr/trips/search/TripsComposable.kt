@@ -32,12 +32,12 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import de.schildbach.pte.dto.Trip
+import de.grobox.transportr.data.dto.KTrip
 
 @Composable
 fun TripsComposable(
     viewModel: DirectionsViewModel,
-    tripClicked: (trip: Trip) -> Unit
+    tripClicked: (trip: KTrip) -> Unit
 ) {
     val topSwipeEnabled by viewModel.topSwipeEnabled.observeAsState(false)
     val queryMoreState by viewModel.queryMoreState.observeAsState()

@@ -28,20 +28,23 @@ import android.provider.CalendarContract.Events
 import android.widget.Toast
 import android.widget.Toast.LENGTH_LONG
 import de.grobox.transportr.R
+import de.grobox.transportr.data.dto.KFare
+import de.grobox.transportr.data.dto.KLeg
+import de.grobox.transportr.data.dto.KProduct
+import de.grobox.transportr.data.dto.KTrip
 import de.grobox.transportr.utils.DateUtils.formatDate
 import de.grobox.transportr.utils.DateUtils.formatTime
 import de.grobox.transportr.utils.DateUtils.isToday
 import de.grobox.transportr.utils.TransportrUtils.getLocationName
-import de.schildbach.pte.dto.Fare
-import de.schildbach.pte.dto.Product
-import de.schildbach.pte.dto.Trip
 import java.text.NumberFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Currency
+import java.util.Date
 
 internal object TripUtils {
 
     @JvmStatic
-    fun share(context: Context, trip: Trip?) {
+    fun share(context: Context, trip: KTrip?) {
         if (trip == null) throw IllegalStateException()
         val sendIntent = Intent()
                 .setAction(Intent.ACTION_SEND)
@@ -53,12 +56,12 @@ internal object TripUtils {
     }
 
     @JvmStatic
-    fun intoCalendar(context: Context, trip: Trip?) {
+    fun intoCalendar(context: Context, trip: KTrip?) {
         if (trip == null) throw IllegalStateException()
         val intent = Intent(Intent.ACTION_INSERT).apply {
             type = "vnd.android.cursor.item/event"
-            putExtra(EXTRA_EVENT_BEGIN_TIME, trip.firstDepartureTime.time)
-            putExtra(EXTRA_EVENT_END_TIME, trip.lastArrivalTime.time)
+            putExtra(EXTRA_EVENT_BEGIN_TIME, trip.firstDepartureTime)
+            putExtra(EXTRA_EVENT_END_TIME, trip.lastArrivalTime)
             putExtra(Events.TITLE, trip.from.name + " → " + trip.to.name)
             putExtra(Events.DESCRIPTION, tripToString(context, trip))
             if (trip.from.place != null) putExtra(Events.EVENT_LOCATION, trip.from.place)
@@ -70,26 +73,29 @@ internal object TripUtils {
         }
     }
 
-    private fun tripToSubject(context: Context, trip: Trip): String {
+    private fun tripToSubject(context: Context, trip: KTrip): String {
         var str = "[${context.resources.getString(R.string.app_name)}] "
 
-        str += "${formatTime(context, trip.firstDepartureTime)} "
+        str += "${formatTime(context, trip.firstDepartureTime?.let(::Date))} "
         str += "${getLocationName(trip.from)} → ${getLocationName(trip.to)} "
-        str += formatTime(context, trip.lastArrivalTime)
-        str += " (${formatDate(context, trip.firstDepartureTime)})"
+        str += formatTime(context, trip.lastArrivalTime?.let(::Date))
+        str += " (${formatDate(context, trip.firstDepartureTime?.let(::Date))})"
 
         return str
     }
 
-    private fun tripToString(context: Context, trip: Trip): String {
+    private fun tripToString(context: Context, trip: KTrip): String {
         val sb = StringBuilder()
 
         // show date first, if trip doesn't start today
         val calendar = Calendar.getInstance()
-        calendar.time = trip.firstDepartureTime
+        calendar.time = trip.firstDepartureTime?.let { Date(it) } ?: Date()
         val isToday = isToday(calendar)
         if (!isToday) {
-            sb.append(context.getString(R.string.trip_share_date, formatDate(context, trip.firstDepartureTime))).append("\n\n")
+            sb.append(context.getString(
+                R.string.trip_share_date,
+                formatDate(context, trip.firstDepartureTime?.let(::Date)) ?: ""
+            )).append("\n\n")
         }
 
         for (leg in trip.legs) {
@@ -102,10 +108,10 @@ internal object TripUtils {
     }
 
     @JvmStatic
-    fun legToString(context: Context, leg: Trip.Leg): String {
-        var str = "${formatTime(context, leg.departureTime)} ${getLocationName(leg.departure)}"
+    fun legToString(context: Context, leg: KLeg): String {
+        var str = "${formatTime(context, leg.departureTime?.let(::Date))} ${getLocationName(leg.departure)}"
 
-        if (leg is Trip.Public) {
+        if (leg.isPublicLeg) {
             // show departure position if existing
             if (leg.departurePosition != null) {
                 str += " " + context.getString(R.string.platform, leg.departurePosition.toString())
@@ -117,42 +123,42 @@ internal object TripUtils {
                     str += " → ${getLocationName(it)}"
                 }
             }
-        } else if (leg is Trip.Individual) {
+        } else {
             str += "\n  \uD83D\uDEB6 ${context.getString(R.string.walk)} "
-            if (leg.distance > 0) str += context.resources.getString(R.string.meter, leg.distance)
-            if (leg.min > 0) str += " ${context.resources.getString(R.string.for_x_min, leg.min)}"
+            leg.distance?.takeIf { it > 0 }?.let { str += context.resources.getString(R.string.meter, it) }
+            leg.min?.takeIf { it > 0 }?.let { str += " ${context.resources.getString(R.string.for_x_min, it)}" }
         }
-        str += "\n${formatTime(context, leg.arrivalTime)} ${getLocationName(leg.arrival)}"
+        str += "\n${formatTime(context, leg.arrivalTime?.let(::Date))} ${getLocationName(leg.arrival)}"
 
         // add arrival position if existing
-        if (leg is Trip.Public && leg.arrivalPosition != null) {
+        if (leg.isPublicLeg && leg.arrivalPosition != null) {
             str += " ${context.getString(R.string.platform, leg.arrivalPosition.toString())}"
         }
         return str
     }
 
-    private fun getEmojiForProduct(p: Product?): String = when (p) {
-        Product.HIGH_SPEED_TRAIN -> "🚄"
-        Product.REGIONAL_TRAIN -> "🚆"
-        Product.SUBURBAN_TRAIN -> "🚈"
-        Product.SUBWAY -> "🚇"
-        Product.TRAM -> "🚊"
-        Product.BUS -> "🚌"
-        Product.FERRY -> "⛴️"
-        Product.CABLECAR -> "🚡"
-        Product.ON_DEMAND -> "🚖"
-        null -> ""
+    private fun getEmojiForProduct(p: KProduct?): String = when (p) {
+        KProduct.HIGH_SPEED_TRAIN -> "🚄"
+        KProduct.REGIONAL_TRAIN -> "🚆"
+        KProduct.SUBURBAN_TRAIN -> "🚈"
+        KProduct.SUBWAY -> "🚇"
+        KProduct.TRAM -> "🚊"
+        KProduct.BUS -> "🚌"
+        KProduct.FERRY -> "⛴️"
+        KProduct.CABLECAR -> "🚡"
+        KProduct.ON_DEMAND -> "🚖"
+        else -> ""
     }
 
 
-    fun Trip.hasFare(): Boolean {
+    fun KTrip.hasFare(): Boolean {
         return fares?.isNotEmpty() ?: false
     }
 
-    fun Trip.getStandardFare(): String? {
-        fares?.find { fare -> fare.type == Fare.Type.ADULT }?.let {
+    fun KTrip.getStandardFare(): String? {
+        fares?.find { fare -> fare.type == KFare.Type.ADULT }?.let {
             val format = NumberFormat.getCurrencyInstance()
-            format.currency = it.currency
+            format.currency = Currency.getInstance(it.currency)
             return format.format(it.fare)
         }
         return null

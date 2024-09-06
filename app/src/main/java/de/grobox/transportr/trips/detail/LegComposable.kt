@@ -71,6 +71,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import de.grobox.transportr.R
 import de.grobox.transportr.composables.ProductComposable
+import de.grobox.transportr.data.dto.KLeg
+import de.grobox.transportr.data.dto.KLine
+import de.grobox.transportr.data.dto.KLocation
+import de.grobox.transportr.data.dto.KStop
 import de.grobox.transportr.trips.detail.LegViewHolder.Companion.DEFAULT_LINE_COLOR
 import de.grobox.transportr.trips.search.getArrivalTimes
 import de.grobox.transportr.trips.search.getDepartureTimes
@@ -78,11 +82,7 @@ import de.grobox.transportr.utils.DateUtils.formatDuration
 import de.grobox.transportr.utils.DateUtils.formatTime
 import de.grobox.transportr.utils.TransportrUtils.getDrawableForProduct
 import de.grobox.transportr.utils.TransportrUtils.getLocationName
-import de.schildbach.pte.dto.Line
-import de.schildbach.pte.dto.Location
-import de.schildbach.pte.dto.Stop
-import de.schildbach.pte.dto.Trip.Leg
-import de.schildbach.pte.dto.Trip.Public
+import java.util.Date
 
 
 fun <T> List<T>.forEachWithNeighbors(action: (prev: T?, current: T, next: T?) -> Unit) {
@@ -94,28 +94,28 @@ fun <T> List<T>.forEachWithNeighbors(action: (prev: T?, current: T, next: T?) ->
 }
 
 @ColorInt
-private fun Line.getColorInt(): Int {
+private fun KLine.getColorInt(): Int {
     if (this.style == null) return DEFAULT_LINE_COLOR
-    if (this.style!!.backgroundColor != 0) return this.style!!.backgroundColor
-    if (this.style!!.backgroundColor2 != 0) return this.style!!.backgroundColor2
-    if (this.style!!.foregroundColor != 0) return this.style!!.foregroundColor
-    return if (this.style!!.borderColor != 0) this.style!!.borderColor else DEFAULT_LINE_COLOR
+    if (this.style.backgroundColor != 0) return this.style.backgroundColor
+    if (this.style.backgroundColor2 != 0) return this.style.backgroundColor2
+    if (this.style.foregroundColor != 0) return this.style.foregroundColor
+    return if (this.style.borderColor != 0) this.style.borderColor else DEFAULT_LINE_COLOR
 }
 
 
 @Composable
 fun LegListComposable(
-    legs: List<Leg>,
+    legs: List<KLeg>,
     showLineNames: Boolean,
     modifier: Modifier = Modifier
 ) {
-    var expandedLegs: List<Leg> by remember { mutableStateOf(emptyList()) }
+    var expandedLegs: List<KLeg> by remember { mutableStateOf(emptyList()) }
 
     LazyColumn(
         modifier = Modifier
     ) {
         legs.forEachWithNeighbors { prev, current, next ->
-            if(current is Public) {
+            if(current.isPublicLeg) {
                 val lineName = if(showLineNames) null else getLocationName(current.destination)
                 val collapsed = !expandedLegs.contains(current)
                 item {
@@ -157,7 +157,7 @@ fun LegListComposable(
                     item {
                         IntermediateComponent(
                             leg = current,
-                            duration = formatDuration(prev.arrivalTime, next.departureTime)
+                            duration = formatDuration(prev.arrivalTime?.let(::Date), next.departureTime?.let(::Date))
                         )
                     }
                 }
@@ -169,9 +169,9 @@ fun LegListComposable(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FirstLegComponent(
-    leg: Leg,
+    leg: KLeg,
     dispTime: Pair<String, String>,
-    location: Location,
+    location: KLocation,
     customLineName: String? = null,
     stopCountClicked: () -> Unit,
     thisLegColor: Color = leg.getColor(),
@@ -218,7 +218,7 @@ fun FirstLegComponent(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = formatDuration(leg.departureTime, leg.arrivalTime),
+                    text = formatDuration(leg.departureTime?.let(::Date), leg.arrivalTime?.let(::Date)) ?: "",
                     style = MaterialTheme.typography.bodySmall,
                 )
                 Spacer(modifier.weight(1f))
@@ -250,20 +250,20 @@ fun FirstLegComponent(
                 modifier = Modifier.padding(top = textPad).height(22.dp).wrapContentHeight(align = Alignment.CenterVertically)
             )
 
-            if(leg is Public) {
+            if(leg.isPublicLeg) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.padding(top = 4.dp)
                 ) {
                     ProductComposable(
-                        drawableId = getDrawableForProduct(leg.line.product),
-                        backgroundColor = leg.line.style?.backgroundColor?.let { Color(it) },
-                        foregroundColor = leg.line.style?.foregroundColor?.let { Color(it) },
-                        label = leg.line.label,
+                        drawableId = getDrawableForProduct(leg.line?.product),
+                        backgroundColor = leg.line?.style?.backgroundColor?.let { Color(it) },
+                        foregroundColor = leg.line?.style?.foregroundColor?.let { Color(it) },
+                        label = leg.line?.label,
                     )
 
-                    val displayedLine = customLineName ?: (leg.line.name.takeIf { !it.isNullOrEmpty() } ?: "")
+                    val displayedLine = customLineName ?: (leg.line?.name.takeIf { !it.isNullOrEmpty() } ?: "")
                     Text(
                         text = displayedLine
                     )
@@ -322,7 +322,7 @@ fun FirstLegComponent(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MiddleStopComponent(
-    stop: Stop,
+    stop: KStop,
     type: LegType,
     thisLegColor: Color,
     modifier: Modifier = Modifier
@@ -394,7 +394,7 @@ fun MiddleStopComponent(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LastLegComponent(
-    leg: Leg,
+    leg: KLeg,
     dispTime: Pair<String, String>,
     thisLegColor: Color = leg.getColor(),
     otherLegColor: Color? = null,
@@ -427,7 +427,7 @@ fun LastLegComponent(
                 .fillMaxHeight()
         ) {
             if(otherLegColor == null)
-                drawLastLeg(thisLegColor, leg !is Public)
+                drawLastLeg(thisLegColor, !leg.isPublicLeg)
             else
                 drawIntermediaryLastLeg(thisLegColor, false, otherLegColor ?: thisLegColor, true)
         }
@@ -441,7 +441,7 @@ fun LastLegComponent(
             )
         }
 
-        if(leg is Public) {
+        if(leg.isPublicLeg) {
             CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
                 IconButton(
                     onClick = { /* TODO */ },
@@ -459,7 +459,7 @@ fun LastLegComponent(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IntermediateComponent(
-    leg: Leg,
+    leg: KLeg,
     thisLegColor: Color = leg.getColor(),
     duration: String? = null,
     modifier: Modifier = Modifier
@@ -499,9 +499,9 @@ fun IntermediateComponent(
 }
 
 @Composable
-private fun Leg.getColor(): Color {
+private fun KLeg.getColor(): Color {
     //TODO: Harmonize colors
-    return if(this is Public) Color(this.line.getColorInt()) else colorResource(R.color.walking)
+    return if(isPublicLeg) Color(this.line?.getColorInt() ?: -0x1000000) else colorResource(R.color.walking)
 }
 
 
@@ -509,8 +509,8 @@ private fun Leg.getColor(): Color {
 @Composable
 fun LegComponent(
     dispTime: Pair<String, String>,
-    location: Location,
-    line: Line?,
+    location: KLocation,
+    line: KLine?,
     lineName: String? = null,
     type: LegType,
     thisLegColor: Color,
@@ -926,18 +926,18 @@ fun DrawScope.drawLastLeg(
 }
 
 
-fun Leg.getDepartureTimes(context: Context): Pair<String, String> {
-    return if(this is Public)
-        this.departureStop.getDepartureTimes(context)
+fun KLeg.getDepartureTimes(context: Context): Pair<String, String> {
+    return if(isPublicLeg)
+        this.departureStop?.getDepartureTimes(context) ?: Pair("", "")
     else
-        Pair(formatTime(context, this.departureTime), "")
+        Pair(formatTime(context, departureTime?.let(::Date)), "")
 }
 
-fun Leg.getArrivalTimes(context: Context): Pair<String, String> {
-    return if(this is Public)
-        this.arrivalStop.getArrivalTimes(context)
+fun KLeg.getArrivalTimes(context: Context): Pair<String, String> {
+    return if(isPublicLeg)
+        this.arrivalStop?.getArrivalTimes(context) ?: Pair("", "")
     else
-        Pair(formatTime(context, this.arrivalTime), "")
+        Pair(formatTime(context, arrivalTime?.let(::Date)), "")
 }
 
 

@@ -19,15 +19,18 @@
 
 package de.grobox.transportr.trips.detail
 
-import androidx.recyclerview.widget.RecyclerView.Adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import de.grobox.transportr.R
+import androidx.recyclerview.widget.RecyclerView.Adapter
 import de.grobox.transportr.databinding.ListItemLegBinding
 import de.grobox.transportr.trips.detail.LegViewHolder.LegType
-import de.grobox.transportr.trips.detail.LegViewHolder.LegType.*
+import de.grobox.transportr.trips.detail.LegViewHolder.LegType.FIRST
+import de.grobox.transportr.trips.detail.LegViewHolder.LegType.FIRST_LAST
+import de.grobox.transportr.trips.detail.LegViewHolder.LegType.LAST
+import de.grobox.transportr.trips.detail.LegViewHolder.LegType.MIDDLE
 import de.schildbach.pte.dto.Trip.Leg
 
+@Deprecated("Use composables")
 class LegAdapter internal constructor(
         private val legs: List<Leg>,
         private val listener: LegClickListener,

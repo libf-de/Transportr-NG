@@ -28,16 +28,12 @@ import android.widget.TextView
 import com.google.common.base.Strings.isNullOrEmpty
 import de.grobox.transportr.R
 import de.grobox.transportr.trips.BaseViewHolder
-import de.grobox.transportr.trips.detail.TripUtils.getStandardFare
-import de.grobox.transportr.trips.detail.TripUtils.hasFare
 import de.grobox.transportr.trips.search.TripAdapter.OnTripClickListener
 import de.grobox.transportr.ui.LineView
 import de.grobox.transportr.utils.DateUtils.formatDuration
 import de.grobox.transportr.utils.DateUtils.formatRelativeTime
 import de.grobox.transportr.utils.DateUtils.formatTime
-import de.grobox.transportr.utils.TransportrUtils.getLocationName
 import de.schildbach.pte.dto.Trip
-import de.schildbach.pte.dto.Trip.Individual
 import de.schildbach.pte.dto.Trip.Public
 
 class TripViewHolder(private val v: View) : BaseViewHolder(v) {
@@ -74,25 +70,25 @@ class TripViewHolder(private val v: View) : BaseViewHolder(v) {
                 setDepartureTimes(null, toDelay, firstPublicLeg.departureStop)
             }
         }
-        fromLocation.text = getLocationName(trip.from)
+        //fromLocation.text = getLocationName(trip.from)
 
         // Lines
         lines.removeAllViews()
         for (leg in trip.legs) {
             val lineView = LayoutInflater.from(context).inflate(R.layout.list_item_line, lines, false) as LineView
-            when (leg) {
-                is Public -> lineView.setLine(leg.line)
-                is Individual -> lineView.setWalk()
-                else -> throw RuntimeException()
-            }
+//            when (leg) {
+//                is Public -> lineView.setLine(leg.line)
+//                is Individual -> lineView.setWalk()
+//                else -> throw RuntimeException()
+//            }
             lines.addView(lineView)
         }
 
         // Warning and Duration
         warning.visibility = if (trip.hasProblem()) VISIBLE else GONE
         duration.text = formatDuration(trip.duration)
-        price.visibility = if (trip.hasFare()) VISIBLE else GONE
-        price.text = trip.getStandardFare()
+        //price.visibility = if (trip.hasFare()) VISIBLE else GONE
+        //price.text = trip.getStandardFare()
 
         // Arrival Time and Delay
         val lastLeg = trip.legs[trip.legs.size - 1]
@@ -105,7 +101,7 @@ class TripViewHolder(private val v: View) : BaseViewHolder(v) {
                 setArrivalTimes(null, toDelay, lastPublicLeg.arrivalStop)
             }
         }
-        toLocation.text = getLocationName(trip.to)
+//        toLocation.text = getLocationName(trip.to)
 
         // Click Listener
         v.setOnClickListener { listener.onClick(trip) }

@@ -19,9 +19,10 @@
 package de.grobox.transportr.data
 
 import androidx.room.TypeConverter
+import de.grobox.transportr.data.dto.KLocation
+import de.grobox.transportr.data.dto.KProduct
+import de.grobox.transportr.data.dto.KProduct.Companion.toCodes
 import de.schildbach.pte.NetworkId
-import de.schildbach.pte.dto.LocationType
-import de.schildbach.pte.dto.Product
 import java.util.Date
 
 
@@ -45,31 +46,31 @@ object Converters {
 
     @JvmStatic
     @TypeConverter
-    fun fromLocationType(locationType: LocationType): String {
+    fun fromLocationType(locationType: KLocation.Type): String {
         return locationType.name
     }
 
     @JvmStatic
     @TypeConverter
-    fun toLocationType(type: String?): LocationType {
+    fun toLocationType(type: String?): KLocation.Type {
         return try {
-            LocationType.valueOf(type!!)
+            KLocation.Type.valueOf(type!!)
         } catch (e: IllegalArgumentException) {
-            LocationType.ANY
+            KLocation.Type.ANY
         }
     }
 
     @TypeConverter
-    fun fromProducts(products: Set<Product>?): String? {
+    fun fromProducts(products: Set<KProduct>?): String? {
         if (products == null) return null
-        return String(Product.toCodes(products))
+        return String(products.toCodes())
     }
 
     @JvmStatic
     @TypeConverter
-    fun toProducts(codes: String?): Set<Product>? {
+    fun toProducts(codes: String?): Set<KProduct>? {
         if (codes == null) return null
-        return Product.fromCodes(codes.toCharArray())
+        return KProduct.fromCodes(codes.toCharArray())
     }
 
     @JvmStatic

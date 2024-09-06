@@ -29,6 +29,10 @@ import android.util.Pair
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.MutableLiveData
 import de.grobox.transportr.R
+import de.grobox.transportr.data.dto.KTrip
+import de.grobox.transportr.data.dto.toKTrip
+import de.grobox.transportr.data.dto.toLocation
+import de.grobox.transportr.data.dto.toProduct
 import de.grobox.transportr.data.locations.FavoriteLocation.FavLocationType.FROM
 import de.grobox.transportr.data.locations.FavoriteLocation.FavLocationType.TO
 import de.grobox.transportr.data.locations.FavoriteLocation.FavLocationType.VIA
@@ -52,7 +56,6 @@ import de.schildbach.pte.dto.QueryTripsResult.Status.UNKNOWN_LOCATION
 import de.schildbach.pte.dto.QueryTripsResult.Status.UNKNOWN_TO
 import de.schildbach.pte.dto.QueryTripsResult.Status.UNKNOWN_VIA
 import de.schildbach.pte.dto.QueryTripsResult.Status.UNRESOLVABLE_ADDRESS
-import de.schildbach.pte.dto.Trip
 import de.schildbach.pte.dto.TripOptions
 import java.io.InterruptedIOException
 import java.net.SocketTimeoutException
@@ -72,7 +75,7 @@ class TripsRepository(
 
     enum class QueryMoreState { EARLIER, LATER, BOTH, NONE }
 
-    val trips = MutableLiveData<Set<Trip>>()
+    val trips = MutableLiveData<Set<KTrip>>()
     val queryMoreState = MutableLiveData<QueryMoreState>()
     val queryError = SingleLiveEvent<String>()
     val queryPTEError = SingleLiveEvent<Pair<String, String>>()
@@ -118,9 +121,9 @@ class TripsRepository(
     private fun queryTrips(query: TripQuery) {
         try {
             val queryTripsResult = networkProvider.queryTrips(
-                query.from.location, if (query.via == null) null else query.via.location, query.to.location,
+                query.from.location.toLocation(), if (query.via == null) null else query.via.location.toLocation(), query.to.location.toLocation(),
                 query.date, query.departure,
-                TripOptions(query.products, settingsManager.optimize, settingsManager.walkSpeed, null, null)
+                TripOptions(query.products.mapNotNull { it.toProduct() }.toSet(), settingsManager.optimize, settingsManager.walkSpeed, null, null)
             )
             if (queryTripsResult.status == OK && queryTripsResult.trips.size > 0) {
                 // deliver result first, so UI can get updated
@@ -181,7 +184,7 @@ class TripsRepository(
             queryMoreState.value = getQueryMoreStateFromContext(queryTripsContext)
 
             val oldTrips = trips.value?.let { HashSet(it) } ?: HashSet()
-            oldTrips.addAll(queryTripsResult.trips)
+            oldTrips.addAll(queryTripsResult.trips.map { it.toKTrip() })
             trips.value = oldTrips
         }
     }

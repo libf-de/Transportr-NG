@@ -22,6 +22,7 @@ package de.grobox.transportr.locations
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import de.grobox.transportr.data.dto.toKLocation
 import de.grobox.transportr.networks.TransportNetwork
 import de.grobox.transportr.networks.TransportNetworkManager
 import kotlinx.coroutines.CoroutineDispatcher
@@ -86,7 +87,7 @@ class SuggestLocationsRepository(
             suggestLocationsTask = SuggestLocationsTask(it) { suggestLocationsResult ->
                 _suggestedLocations.postValue(
                     suggestLocationsResult?.suggestedLocations?.map { sl ->
-                        WrapLocation(sl.location)
+                        WrapLocation(sl.location.toKLocation())
                     }?.toSet() ?: emptySet()
                 )
             }

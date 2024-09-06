@@ -27,6 +27,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import de.grobox.transportr.TransportrApplication
+import de.grobox.transportr.data.dto.KLine
+import de.grobox.transportr.data.dto.toKLine
+import de.grobox.transportr.data.dto.toLocation
 import de.grobox.transportr.data.locations.FavoriteLocation
 import de.grobox.transportr.data.locations.LocationRepository
 import de.grobox.transportr.data.searches.SearchesRepository
@@ -39,7 +42,6 @@ import de.grobox.transportr.networks.TransportNetworkManager
 import de.grobox.transportr.utils.IntentUtils
 import de.grobox.transportr.utils.IntentUtils.presetDirections
 import de.grobox.transportr.utils.SingleLiveEvent
-import de.schildbach.pte.dto.Line
 import de.schildbach.pte.dto.LocationType
 import de.schildbach.pte.dto.NearbyLocationsResult
 import de.schildbach.pte.dto.QueryDeparturesResult
@@ -156,7 +158,10 @@ class MapViewModel internal constructor(
                         .map { it.line }
                 }
 
-            _sheetContentState.value = BottomSheetContentState.Location(location, deps)
+            _sheetContentState.value = BottomSheetContentState.Location(
+                loc = location,
+                lines = deps?.map { it.toKLine() }
+            )
         }
 
         // do not reset the selected location right away, will break incoming geo intent
@@ -187,7 +192,7 @@ class MapViewModel internal constructor(
                 val result = withContext(Dispatchers.IO) {
                     transportNetwork.value?.networkProvider?.queryNearbyLocations(
                         EnumSet.of(LocationType.STATION),
-                        location.location,
+                        location.location.toLocation(),
                         1000,
                         0
                     )
@@ -274,6 +279,6 @@ sealed class BottomSheetContentState {
     object Initial : BottomSheetContentState()
     object Empty : BottomSheetContentState()
     object Loading : BottomSheetContentState()
-    data class Location(val loc: WrapLocation?, val lines: List<Line>?) : BottomSheetContentState()
+    data class Location(val loc: WrapLocation?, val lines: List<KLine>?) : BottomSheetContentState()
     object SavedSearches : BottomSheetContentState()
 }

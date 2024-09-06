@@ -20,34 +20,32 @@
 package de.grobox.transportr
 
 import android.content.Intent
-import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.os.Parcelable
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
-import androidx.core.app.ActivityOptionsCompat
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import de.grobox.transportr.data.dto.KTrip
+import de.grobox.transportr.data.serializers.TripSerializer
 import de.grobox.transportr.favorites.trips.FavoriteTripType
 import de.grobox.transportr.locations.WrapLocation
 import de.grobox.transportr.map.MapScreen
-import de.grobox.transportr.map.MapViewModel
 import de.grobox.transportr.networks.PickTransportNetworkActivity
-import de.grobox.transportr.settings.SettingsComposeFragment
 import de.grobox.transportr.settings.SettingsScreen
+import de.grobox.transportr.trips.detail.TripDetailComposable
 import de.grobox.transportr.trips.search.DirectionsScreen
-import kotlinx.parcelize.Parcelize
+import de.schildbach.pte.dto.Trip
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.serializer
 import org.koin.androidx.compose.koinViewModel
 import kotlin.reflect.typeOf
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 val WrapLocationNavType = object : NavType<WrapLocation?>(
     isNullableAllowed = true
@@ -69,13 +67,65 @@ val WrapLocationNavType = object : NavType<WrapLocation?>(
     }
 }
 
+class SerializableNavType<T>(
+    private val serializer: KSerializer<T>
+) : NavType<T>(isNullableAllowed = false) {
+    override fun get(bundle: Bundle, key: String): T? {
+        return bundle.getString(key)?.let { Json.decodeFromString(serializer, it) }
+    }
+
+    override fun parseValue(value: String): T {
+        return Json.decodeFromString(serializer, value)
+    }
+
+    override fun put(bundle: Bundle, key: String, value: T) {
+        bundle.putString(key, Json.encodeToString(serializer, value))
+    }
+}
+
+inline fun <reified T> serializableNavType(): NavType<T> {
+    return SerializableNavType(serializer())
+}
+
+@Serializable
+sealed class Routes {
+    @Serializable
+    data class Map(
+        val geoUri: String? = null,
+        val location: WrapLocation? = null
+    )
+
+    @Serializable
+    data class Directions(
+        val specialLocation: FavoriteTripType? = null,
+        val from: WrapLocation? = null,
+        val via: WrapLocation? = null,
+        val to: WrapLocation? = null,
+        val search: Boolean = true
+    )
+
+
+    @Serializable
+    data class Departures(
+        val location: WrapLocation
+    )
+
+    @Serializable
+    object Settings
+
+    @Serializable
+    data class TripDetail(
+        val trip: KTrip
+    )
+}
+
 @Composable
 fun TransportrNavigationController() {
     val navController = rememberNavController()
 
     NavHost(
         navController = navController,
-        startDestination = Routes.Map
+        startDestination = Routes.Map()
     ) {
         composable<Routes.Map>(
             typeMap = mapOf(typeOf<WrapLocation?>() to WrapLocationNavType)
@@ -102,7 +152,14 @@ fun TransportrNavigationController() {
                 via = params.via,
                 to = params.to,
                 specialLocation = params.specialLocation,
-                search = params.search
+                search = params.search,
+                tripClicked = { trip ->
+                    navController.navigate(
+                        Routes.TripDetail(
+                            trip = trip
+                        )
+                    )
+                }
             )
         }
 
@@ -115,5 +172,24 @@ fun TransportrNavigationController() {
                 }
             )
         }
+
+        composable<Routes.TripDetail>(
+            typeMap = mapOf(typeOf<KTrip>() to serializableNavType<KTrip>())
+        ) {
+            val params = it.toRoute<Routes.TripDetail>()
+            TripDetailComposable(
+                viewModel = koinViewModel(),
+                trip = params.trip,
+                setBarColor = { _, _ -> }
+            ) { }
+        }
     }
+}
+
+private fun Trip.serialize(): String {
+    return Json.encodeToString(TripSerializer, this)
+}
+
+private fun deserializeTrip(json: String): Trip {
+    return Json.decodeFromString(TripSerializer, json)
 }

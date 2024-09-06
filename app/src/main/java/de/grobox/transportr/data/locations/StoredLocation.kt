@@ -20,22 +20,21 @@ package de.grobox.transportr.data.locations
 
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
+import de.grobox.transportr.data.dto.KLocation
+import de.grobox.transportr.data.dto.KProduct
 import de.grobox.transportr.locations.WrapLocation
 import de.schildbach.pte.NetworkId
-import de.schildbach.pte.dto.Location
-import de.schildbach.pte.dto.LocationType
-import de.schildbach.pte.dto.Product
 
 abstract class StoredLocation internal constructor(
-	@JvmField @field:PrimaryKey(autoGenerate = true) val uid: Long,
-	@JvmField val networkId: NetworkId,
-	type: LocationType?,
-	id: String?,
-	lat: Int,
-	lon: Int,
-	place: String?,
-	name: String?,
-	products: Set<Product>?
+    @JvmField @field:PrimaryKey(autoGenerate = true) val uid: Long,
+    @JvmField val networkId: NetworkId,
+    type: KLocation.Type?,
+    id: String?,
+    lat: Int,
+    lon: Int,
+    place: String?,
+    name: String?,
+    products: Set<KProduct>?
 ) : WrapLocation(
     type!!, id, lat, lon, place, name, products
 ) {
@@ -56,13 +55,13 @@ abstract class StoredLocation internal constructor(
     internal constructor(networkId: NetworkId, l: WrapLocation) : this(0, networkId, l)
 
     @Ignore
-    internal constructor(networkId: NetworkId, l: Location) : this(
+    internal constructor(networkId: NetworkId, l: KLocation) : this(
         0,
         networkId,
         l.type,
         l.id,
-        if (l.hasCoord()) l.latAs1E6 else 0,
-        if (l.hasCoord()) l.lonAs1E6 else 0,
+        if (l.hasCoords) l.latAs1E6 else 0,
+        if (l.hasCoords) l.lonAs1E6 else 0,
         l.place,
         l.name,
         l.products

@@ -29,10 +29,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import de.grobox.transportr.R
+import de.grobox.transportr.data.dto.KTrip
 import de.grobox.transportr.map.BaseMapFragment.MapPadding
 import de.grobox.transportr.map.NearbyStationsDrawer
 import de.grobox.transportr.trips.detail.TripDrawer
-import de.schildbach.pte.dto.Trip
 import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.geometry.LatLngBounds
@@ -172,7 +172,7 @@ class MapViewState {
         }
     }
 
-    fun drawTrip(trip: Trip?, shouldZoom: Boolean) {
+    fun drawTrip(trip: KTrip?, shouldZoom: Boolean) {
         if (trip == null) return
 
         context?.let { ctx ->

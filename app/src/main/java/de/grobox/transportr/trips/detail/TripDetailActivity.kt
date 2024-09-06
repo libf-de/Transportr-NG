@@ -39,6 +39,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt
 import javax.annotation.ParametersAreNonnullByDefault
 
+@Deprecated("USe composables")
 @ParametersAreNonnullByDefault
 class TripDetailActivity : TransportrActivity() {
     private val viewModel: TripDetailViewModel by viewModel()
@@ -59,7 +60,7 @@ class TripDetailActivity : TransportrActivity() {
         val from = intent.getSerializableExtra(FROM) as WrapLocation?
         val via = intent.getSerializableExtra(VIA) as WrapLocation?
         val to = intent.getSerializableExtra(TO) as WrapLocation?
-        viewModel.setTrip(trip!!)
+        //viewModel.setTrip(trip)
         viewModel.from = from
         viewModel.via = via
         viewModel.to = to

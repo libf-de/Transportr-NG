@@ -20,10 +20,13 @@
 package de.grobox.transportr.trips.detail
 
 
-import android.view.View.*
+import android.view.View.GONE
+import android.view.View.INVISIBLE
+import android.view.View.VISIBLE
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import de.grobox.transportr.data.dto.toKLocation
 import de.grobox.transportr.databinding.ListItemStopBinding
 import de.grobox.transportr.trips.BaseViewHolder
 import de.grobox.transportr.utils.DateUtils.formatTime
@@ -31,7 +34,7 @@ import de.grobox.transportr.utils.TransportrUtils.getLocationName
 import de.schildbach.pte.dto.Stop
 import java.util.Date
 
-
+@Deprecated("USe Composables")
 class StopViewHolder(binding: ListItemStopBinding, private val listener : LegClickListener) : BaseViewHolder(binding.root) {
 
     private val circle: ImageView = binding.circle
@@ -68,7 +71,7 @@ class StopViewHolder(binding: ListItemStopBinding, private val listener : LegCli
 
         circle.setColorFilter(color)
 
-        stopLocation.text = getLocationName(stop.location)
+        stopLocation.text = getLocationName(stop.location.toKLocation())
         stopLocation.setOnClickListener { listener.onLocationClick(stop.location) }
         stopLocation.addPlatform(stop.arrivalPosition)
 

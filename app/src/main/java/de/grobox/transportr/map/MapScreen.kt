@@ -74,7 +74,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -88,14 +87,13 @@ import de.grobox.transportr.composables.BaseLocationGpsInput
 import de.grobox.transportr.composables.CompassMargins
 import de.grobox.transportr.composables.MapViewComposable
 import de.grobox.transportr.composables.MapViewState
+import de.grobox.transportr.data.dto.KLine
 import de.grobox.transportr.favorites.trips.FavoriteTripItem
 import de.grobox.transportr.favorites.trips.FavoriteTripType
 import de.grobox.transportr.locations.WrapLocation
 import de.grobox.transportr.trips.search.ProductViewComposable
-import de.grobox.transportr.utils.IntentUtils.findDirections
 import de.grobox.transportr.utils.TransportrUtils
 import de.grobox.transportr.utils.TransportrUtils.getCoordName
-import de.schildbach.pte.dto.Line
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -302,7 +300,7 @@ fun MapScreen(
 @Composable
 fun LocationComponent(
     location: WrapLocation?,
-    lines: List<Line>?,
+    lines: List<KLine>?,
     modifier: Modifier = Modifier,
     fromHereClicked: () -> Unit = {},
     copyClicked: () -> Unit = {},
@@ -319,7 +317,7 @@ fun LocationComponent(
         location?.location?.place.takeIf { !it.isNullOrEmpty() }.let {
             locationInfoStr.append(it)
         }
-        location?.location.takeIf { it?.hasCoord() == true }?.let {
+        location?.location.takeIf { it?.hasCoords == true }?.let {
             if (locationInfoStr.isNotEmpty()) locationInfoStr.append(", ")
             locationInfoStr.append(getCoordName(it))
         }

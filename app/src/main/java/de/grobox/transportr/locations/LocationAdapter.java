@@ -159,31 +159,6 @@ class LocationAdapter extends ArrayAdapter<WrapLocation> implements Filterable {
 		}
 	}
 
-	@NonNull
-	@Override
-	public Filter getFilter() {
-		if (filter == null) {
-			filter = new SuggestLocationsFilter() {
-				@Override
-				protected FilterResults performFiltering(CharSequence charSequence) {
-					return super.performFiltering(charSequence, locations, suggestedLocations);
-				}
-
-				@Override
-				protected void publishResults(CharSequence charSequence, FilterResults results) {
-					if (results.count > 0) {
-						clear();
-						//noinspection unchecked
-						addAll((List<WrapLocation>) results.values);
-						notifyDataSetChanged();
-					} else {
-						notifyDataSetInvalidated();
-					}
-				}
-			};
-		}
-		return filter;
-	}
 
 	void swapSuggestedLocations(List<SuggestedLocation> suggestedLocations, String search) {
 		this.suggestedLocations = suggestedLocations;
