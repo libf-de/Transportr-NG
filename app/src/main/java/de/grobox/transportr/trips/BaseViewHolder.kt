@@ -17,7 +17,7 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.grobox.transportr.trips
+package de.grobox.transportr.ui.trips
 
 import android.annotation.SuppressLint
 import android.content.Context

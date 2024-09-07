@@ -27,7 +27,7 @@ import android.view.View;
 
 import de.grobox.transportr.R;
 
-import static de.grobox.transportr.trips.search.DirectionsActivity.INTENT_URI_WORK;
+import static de.grobox.transportr.ui.trips.search.DirectionsActivity.INTENT_URI_WORK;
 
 class WorkPopupMenu extends SpecialLocationPopupMenu {
 

@@ -17,9 +17,8 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.grobox.transportr.trips.search
+package de.grobox.transportr.ui.trips.search
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -28,9 +27,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import de.grobox.transportr.composables.BaseComposableCompat
-import de.grobox.transportr.trips.detail.TripDetailActivity
-import de.grobox.transportr.trips.detail.TripDetailComposeActivity
-import de.grobox.transportr.ui.TimeDateFragment
+import de.grobox.transportr.ui.directions.DirectionsViewModel
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
 class DirectionsComposeFragment() : Fragment() {

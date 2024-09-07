@@ -16,7 +16,7 @@
  *    You should have received a copy of the GNU General Public License
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.grobox.transportr.trips.search
+package de.grobox.transportr.ui.trips.search
 
 import android.app.Dialog
 import android.content.Context
@@ -38,6 +38,7 @@ import com.mikepenz.fastadapter.items.AbstractItem
 import com.mikepenz.fastadapter.select.SelectExtension
 import de.grobox.transportr.R
 import de.grobox.transportr.databinding.FragmentProductDialogBinding
+import de.grobox.transportr.ui.directions.DirectionsViewModel
 import de.schildbach.pte.dto.Product
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import java.util.EnumSet

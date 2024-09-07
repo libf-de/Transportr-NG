@@ -148,6 +148,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.livedata)
     //kapt(libs.androidx.lifecycle.compiler)
     implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
     kapt(libs.androidx.room.compiler)
     implementation(libs.androidx.localbroadcastmanager)
 
@@ -210,6 +211,7 @@ dependencies {
     //kaptAndroidTest(libs.dagger.compiler)
 
     implementation(libs.androidx.core.splashscreen)
-
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.kotlinx.datetime)
+    //api(libs.moko.geo)
 }

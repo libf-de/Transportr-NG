@@ -22,14 +22,33 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import de.grobox.transportr.data.locations.FavoriteLocation
+import de.grobox.transportr.data.locations.GenericLocation
 import de.grobox.transportr.data.locations.HomeLocation
 import de.grobox.transportr.data.locations.LocationDao
 import de.grobox.transportr.data.locations.WorkLocation
 import de.grobox.transportr.data.searches.SearchesDao
 import de.grobox.transportr.data.searches.StoredSearch
+import de.grobox.transportr.data.trips.LineEntity
+import de.grobox.transportr.data.trips.StopEntity
+import de.grobox.transportr.data.trips.TripEntity
+import de.grobox.transportr.data.trips.TripLegEntity
+import de.grobox.transportr.data.trips.TripLegToStopsCrossRef
+import de.grobox.transportr.data.trips.TripsDao
 
 @Database(
-    version = 2, entities = [FavoriteLocation::class, HomeLocation::class, WorkLocation::class, StoredSearch::class
+    version = 2,
+    entities = [
+        FavoriteLocation::class,
+        HomeLocation::class,
+        WorkLocation::class,
+        StoredSearch::class,
+
+        GenericLocation::class,
+        TripEntity::class,
+        LineEntity::class,
+        StopEntity::class,
+        TripLegToStopsCrossRef::class,
+        TripLegEntity::class
     ]
 )
 @TypeConverters(Converters::class)
@@ -37,6 +56,8 @@ abstract class Db : RoomDatabase() {
     abstract fun locationDao(): LocationDao
 
     abstract fun searchesDao(): SearchesDao
+
+    abstract fun tripsDao(): TripsDao
 
     companion object {
         const val DATABASE_NAME: String = "transportr.db"

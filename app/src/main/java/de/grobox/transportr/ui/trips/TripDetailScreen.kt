@@ -1,0 +1,281 @@
+/*
+ *    Transportr
+ *
+ *    Copyright (c) 2013 - 2024 Torsten Grote
+ *
+ *    This program is Free Software: you can redistribute it and/or modify
+ *    it under the terms of the GNU General Public License as
+ *    published by the Free Software Foundation, either version 3 of the
+ *    License, or (at your option) any later version.
+ *
+ *    This program is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU General Public License for more details.
+ *
+ *    You should have received a copy of the GNU General Public License
+ *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package de.grobox.transportr.ui.trips
+
+import android.annotation.SuppressLint
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.KeyboardArrowDown
+import androidx.compose.material.icons.rounded.KeyboardArrowUp
+import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalMinimumInteractiveComponentEnforcement
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SheetValue
+import androidx.compose.material3.SmallFloatingActionButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.rememberStandardBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.map
+import androidx.navigation.NavController
+import de.grobox.transportr.R
+import de.grobox.transportr.composables.CustomSmallTopAppBar
+import de.grobox.transportr.ui.map.CompassMargins
+import de.grobox.transportr.ui.map.MapViewComposable
+import de.grobox.transportr.ui.map.MapViewState
+import de.grobox.transportr.ui.trips.composables.LegListComposable
+import de.grobox.transportr.utils.DateUtils.formatDuration
+import kotlinx.coroutines.launch
+
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TripDetailScreen(
+    viewModel: TripDetailViewModel,
+    tripId: String,
+    navController: NavController,
+    setBarColor: (statusBar: Color, navBar: Color) -> Unit,
+) {
+    val scope = rememberCoroutineScope()
+
+    val scaffoldState = rememberBottomSheetScaffoldState(
+        bottomSheetState = rememberStandardBottomSheetState(
+            skipHiddenState = false
+        )
+    )
+
+    val mapState = remember { MapViewState() }
+
+    val expanding by animateFloatAsState(
+        animationSpec = tween(300),
+        targetValue = if(scaffoldState.bottomSheetState.targetValue == SheetValue.PartiallyExpanded) 0f else 1f
+    )
+
+    val fabScale by animateFloatAsState(
+        animationSpec = tween(300),
+        targetValue = if(scaffoldState.bottomSheetState.isVisible) 0f else 1f
+    )
+
+    val appBarColor by animateColorAsState(
+        animationSpec = tween(300),
+        targetValue = MaterialTheme.colorScheme.let {
+            if(scaffoldState.bottomSheetState.targetValue == SheetValue.PartiallyExpanded)
+                it.surface
+            else
+                it.primaryContainer
+        }
+    )
+
+    var primaryColor = MaterialTheme.colorScheme.primaryContainer
+    var surfaceColor = MaterialTheme.colorScheme.surface
+    LaunchedEffect(scaffoldState.bottomSheetState.targetValue) {
+        if(scaffoldState.bottomSheetState.targetValue == SheetValue.Expanded) {
+            setBarColor(primaryColor, surfaceColor)
+        } else {
+            setBarColor(Color.Transparent, Color.Transparent)
+        }
+    }
+
+    val trip by viewModel.getTrip().observeAsState()
+    val zoomLocation by viewModel.getZoomLocation().observeAsState()
+    val zoomLeg by viewModel.getZoomLeg().observeAsState()
+    val showLineNames by viewModel.transportNetwork.map { it?.hasGoodLineNames() ?: false }.observeAsState(false)
+
+    LaunchedEffect(tripId) {
+        viewModel.getTripById(tripId)
+    }
+
+    LaunchedEffect(trip) {
+        mapState.drawTrip(trip, viewModel.isFreshStart.value ?: true)
+        viewModel.isFreshStart.value = false
+    }
+
+    LaunchedEffect(zoomLocation) {
+        mapState.animateTo(zoomLocation, 16)
+    }
+
+    LaunchedEffect(zoomLeg) {
+        mapState.animateToBounds(zoomLeg)
+    }
+
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+
+        SmallFloatingActionButton(
+            onClick = { navController.popBackStack() },
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            modifier = Modifier
+                .windowInsetsPadding(WindowInsets.systemBars)
+                .padding(start = 12.dp)
+        ) {
+            Icon(
+                Icons.AutoMirrored.Rounded.ArrowBack,
+                null
+            )
+        }
+
+        if(!scaffoldState.bottomSheetState.isVisible || fabScale != 0f) {
+            FloatingActionButton(
+                onClick = {
+                    scope.launch {
+                        scaffoldState.bottomSheetState.partialExpand()
+                    }
+                },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .scale(fabScale)
+            ) {
+                Icon(
+                    Icons.Rounded.KeyboardArrowUp,
+                    null
+                )
+            }
+        }
+
+        BottomSheetScaffold(
+            scaffoldState = scaffoldState,
+            sheetContent = {
+                Column(Modifier.fillMaxSize().padding(vertical = 8.dp)) {
+                    LegListComposable(
+                        legs = trip?.legs ?: emptyList(),
+                        showLineNames = showLineNames,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                    Spacer(Modifier.weight(1f))
+                }
+            },
+            sheetShape = RoundedCornerShape(
+                expanding.invert().mapRange(0f, 28f).dp
+            ),
+            sheetDragHandle = {
+                CustomSmallTopAppBar(
+                    navigationIcon = {
+                        CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
+                            IconButton(
+                                onClick = { scope.launch { scaffoldState.bottomSheetState.partialExpand() } },
+                                modifier = Modifier.size(expanding.mapRange(0f, 40f).dp).scale(expanding)
+                            ) {
+                                Icon(
+                                    Icons.Rounded.KeyboardArrowDown,
+                                    null
+                                )
+                            }
+                        }
+                    },
+                    title = {
+                        Text(
+                            text = trip?.duration?.let { stringResource(R.string.total_time, formatDuration(it) ?: "??:??") } ?: "",
+                            style = MaterialTheme.typography.bodyLarge,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth().alpha(expanding.invert())
+                        )
+                    },
+                    height = expanding.mapRange(48f, 64f).dp,
+                    scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(canScroll = { false }),
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = appBarColor,
+                        titleContentColor = MaterialTheme.colorScheme.primary,
+                    ),
+                    actions = {
+                        CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
+                            IconButton(
+                                onClick = { viewModel.reloadTrip() },
+                                modifier = Modifier.size(expanding.mapRange(0f, 40f).dp).scale(expanding)
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_action_navigation_refresh),
+                                    contentDescription = stringResource(R.string.action_refresh)
+                                )
+                            }
+
+                            IconButton(
+                                onClick = { /* TODO */ },
+                                modifier = Modifier.size(expanding.mapRange(0f, 40f).dp).scale(expanding)
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_action_social_share),
+                                    contentDescription = stringResource(R.string.action_share)
+                                )
+                            }
+
+                            IconButton(
+                                onClick = { /* TODO */ },
+                                modifier = Modifier.size(expanding.mapRange(0f, 40f).dp).scale(expanding)
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_action_calendar),
+                                    contentDescription = stringResource(R.string.action_trip_calendar)
+                                )
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                )
+            },
+            sheetPeekHeight = (LocalConfiguration.current.screenHeightDp / 2).dp
+        ) {
+            MapViewComposable(
+                mapViewState = mapState,
+                compassMargins = CompassMargins(top = 24.dp),
+                isHalfHeight = true
+            )
+        }
+    }
+}
+
+private fun Float.invert(): Float = 1 - this
+
+private fun Float.mapRange(min: Float, max: Float): Float = (this * (max - min)) + min

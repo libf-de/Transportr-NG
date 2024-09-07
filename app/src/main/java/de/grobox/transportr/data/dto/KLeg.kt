@@ -19,10 +19,8 @@
 
 package de.grobox.transportr.data.dto
 
-import androidx.room.Entity
 import kotlinx.serialization.Serializable
 
-@Entity
 @Serializable
 data class KLeg private constructor(
     val isPublicLeg: Boolean,

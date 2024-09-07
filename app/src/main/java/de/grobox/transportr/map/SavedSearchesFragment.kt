@@ -24,6 +24,7 @@ import de.grobox.transportr.favorites.locations.WorkPickerDialogFragment
 import de.grobox.transportr.favorites.trips.FavoriteTripsFragment
 import de.grobox.transportr.locations.WrapLocation
 import de.grobox.transportr.locations.WrapLocation.WrapType.GPS
+import de.grobox.transportr.ui.map.MapViewModel
 import de.grobox.transportr.utils.IntentUtils.findDirections
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel

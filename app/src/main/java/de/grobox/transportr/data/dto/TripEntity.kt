@@ -29,8 +29,8 @@ import de.schildbach.pte.NetworkId
 @Entity(
     tableName = "trips",
     foreignKeys = [
-        ForeignKey(entity = KLocation::class, parentColumns = ["id"], childColumns = ["fromId"]),
-        ForeignKey(entity = KLocation::class, parentColumns = ["id"], childColumns = ["toId"])
+        ForeignKey(entity = KLocation::class, parentColumns = ["id"], childColumns = ["fromId"], onDelete = ForeignKey.CASCADE),
+        ForeignKey(entity = KLocation::class, parentColumns = ["id"], childColumns = ["toId"], onDelete = ForeignKey.CASCADE)
     ],
     indices = [
         Index("id", unique = true),

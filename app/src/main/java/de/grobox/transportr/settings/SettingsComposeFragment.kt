@@ -32,6 +32,7 @@ import androidx.fragment.app.Fragment
 import de.grobox.transportr.composables.BaseComposableCompat
 import de.grobox.transportr.networks.PickTransportNetworkActivity
 import de.grobox.transportr.networks.TransportNetworkManager
+import de.grobox.transportr.ui.settings.SettingsScreen
 import org.koin.android.ext.android.inject
 
 class SettingsComposeFragment : Fragment() {

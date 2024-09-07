@@ -17,7 +17,7 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.grobox.transportr.trips.search
+package de.grobox.transportr.ui.trips.search
 
 import android.content.Intent
 import android.os.Bundle
@@ -32,8 +32,8 @@ import de.grobox.transportr.data.locations.FavoriteLocation.FavLocationType
 import de.grobox.transportr.databinding.ActivityDirectionsBinding
 import de.grobox.transportr.locations.WrapLocation
 import de.grobox.transportr.locations.WrapLocation.WrapType.GPS
-import de.grobox.transportr.trips.search.SavedSearchesFragment.HomePickerFragment
-import de.grobox.transportr.trips.search.SavedSearchesFragment.WorkPickerFragment
+import de.grobox.transportr.ui.directions.DirectionsViewModel
+import de.grobox.transportr.ui.trips.search.SavedSearchesFragment.WorkPickerFragment
 import de.grobox.transportr.utils.Constants.FAV_TRIP_UID
 import de.grobox.transportr.utils.Constants.FROM
 import de.grobox.transportr.utils.Constants.TO
@@ -125,11 +125,11 @@ class DirectionsActivity : TransportrActivity(), OnOffsetChangedListener {
     }
 
     private fun showTrips() {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragmentContainer, TripsComposeFragment(), TripsFragment.TAG)
-            .addToBackStack(null)
-            .commit()
-        binding.fragmentContainer.requestFocus()
+//        supportFragmentManager.beginTransaction()
+//            .replace(R.id.fragmentContainer, TripsComposeFragment(), TripsFragment.TAG)
+//            .addToBackStack(null)
+//            .commit()
+//        binding.fragmentContainer.requestFocus()
     }
 
     private fun processIntent(intent: Intent?) {
@@ -158,7 +158,7 @@ class DirectionsActivity : TransportrActivity(), OnOffsetChangedListener {
                 val liveData = viewModel.home
                 liveData.observe(this, Observer { home ->
                     if (home == null) {
-                        HomePickerFragment().show(supportFragmentManager, HomePickerFragment::class.java.simpleName)
+                        SavedSearchesFragment.HomePickerFragment().show(supportFragmentManager, SavedSearchesFragment.HomePickerFragment::class.java.simpleName)
                     } else {
                         searchFromTo(WrapLocation(GPS), via, home)
                     }

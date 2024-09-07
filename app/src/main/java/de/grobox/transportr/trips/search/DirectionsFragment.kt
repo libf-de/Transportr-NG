@@ -17,7 +17,7 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.grobox.transportr.trips.search
+package de.grobox.transportr.ui.trips.search
 
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.content.pm.PackageManager.PERMISSION_GRANTED
@@ -47,6 +47,7 @@ import de.grobox.transportr.locations.LocationGpsView
 import de.grobox.transportr.locations.LocationView
 import de.grobox.transportr.settings.SettingsManager
 import de.grobox.transportr.ui.TimeDateFragment
+import de.grobox.transportr.ui.directions.DirectionsViewModel
 import de.grobox.transportr.utils.Constants.DATE
 import de.grobox.transportr.utils.Constants.DEPARTURE
 import de.grobox.transportr.utils.Constants.EXPANDED

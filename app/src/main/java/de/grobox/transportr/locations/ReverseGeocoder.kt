@@ -45,7 +45,7 @@ class ReverseGeocoder(private val context: Context, private val callback: Revers
         findLocation(location.latitude, location.longitude)
     }
 
-    private fun findLocation(lat: Double, lon: Double) {
+    fun findLocation(lat: Double, lon: Double) {
         if (Geocoder.isPresent()) {
             findLocationWithGeocoder(lat, lon)
         } else {

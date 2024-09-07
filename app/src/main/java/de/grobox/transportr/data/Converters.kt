@@ -19,14 +19,92 @@
 package de.grobox.transportr.data
 
 import androidx.room.TypeConverter
+import de.grobox.transportr.data.dto.KLine
 import de.grobox.transportr.data.dto.KLocation
+import de.grobox.transportr.data.dto.KPoint
+import de.grobox.transportr.data.dto.KPosition
 import de.grobox.transportr.data.dto.KProduct
 import de.grobox.transportr.data.dto.KProduct.Companion.toCodes
+import de.grobox.transportr.data.dto.KStyle
 import de.schildbach.pte.NetworkId
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import java.util.Date
 
 
 object Converters {
+    @JvmStatic
+    @TypeConverter
+    fun fromIntList(list: List<Int>?): String {
+        return Json.encodeToString(list)
+    }
+
+    @JvmStatic
+    @TypeConverter
+    fun toIntList(json: String): List<Int> {
+        return Json.decodeFromString(json)
+    }
+
+    @JvmStatic
+    @TypeConverter
+    fun fromKStyle(value: KStyle?): String {
+        return Json.encodeToString(value)
+    }
+
+    @JvmStatic
+    @TypeConverter
+    fun toKStyle(json: String): KStyle? {
+        return Json.decodeFromString(json)
+    }
+
+    @JvmStatic
+    @TypeConverter
+    fun fromAttrSet(value: Set<KLine.Attr>?): String {
+        return Json.encodeToString(value)
+    }
+
+    @JvmStatic
+    @TypeConverter
+    fun toAttrSet(json: String): Set<KLine.Attr>? {
+        return Json.decodeFromString(json)
+    }
+
+    @JvmStatic
+    @TypeConverter
+    fun fromKPosition(lineType: KPosition?): String {
+        return Json.encodeToString(lineType)
+    }
+
+    @JvmStatic
+    @TypeConverter
+    fun toKPosition(type: String): KPosition? {
+        return Json.decodeFromString(type)
+    }
+
+    @JvmStatic
+    @TypeConverter
+    fun fromKPointList(type: List<KPoint>?): String {
+        return Json.encodeToString(type)
+    }
+
+    @JvmStatic
+    @TypeConverter
+    fun toKPointList(type: String): List<KPoint>? {
+        return Json.decodeFromString(type)
+    }
+
+    @JvmStatic
+    @TypeConverter
+    fun fromLongList(list: List<Long>?): String {
+        return Json.encodeToString(list)
+    }
+
+    @JvmStatic
+    @TypeConverter
+    fun toLongList(json: String): List<Long> {
+        return Json.decodeFromString(json)
+    }
+
     @JvmStatic
     @TypeConverter
     fun fromNetworkId(networkId: NetworkId?): String? {

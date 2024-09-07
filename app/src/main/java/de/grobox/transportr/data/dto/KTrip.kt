@@ -19,23 +19,13 @@
 
 package de.grobox.transportr.data.dto
 
-import androidx.room.Entity
-import androidx.room.ForeignKey
 import androidx.room.Ignore
-import androidx.room.PrimaryKey
 import kotlinx.serialization.Serializable
 
 
 @Serializable
-@Entity(
-    tableName = "trips",
-    foreignKeys = [
-        ForeignKey(entity = KLocation::class, parentColumns = ["id"], childColumns = ["from"])
-
-    ]
-)
 data class KTrip private constructor(
-    @PrimaryKey val id: String,
+    val id: String,
     val from: KLocation,
     val to: KLocation,
     val legs: List<KLeg>,

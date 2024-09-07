@@ -17,7 +17,7 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.grobox.transportr.trips.detail
+package de.grobox.transportr.ui.trips.detail
 
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -40,14 +40,11 @@ import de.grobox.transportr.R
 import de.grobox.transportr.TransportrFragment
 import de.grobox.transportr.data.dto.toKTrip
 import de.grobox.transportr.databinding.FragmentTripDetailBinding
-import de.grobox.transportr.trips.detail.TripDetailViewModel.SheetState
-import de.grobox.transportr.trips.detail.TripDetailViewModel.SheetState.BOTTOM
-import de.grobox.transportr.trips.detail.TripDetailViewModel.SheetState.EXPANDED
-import de.grobox.transportr.trips.detail.TripDetailViewModel.SheetState.MIDDLE
-import de.grobox.transportr.trips.detail.TripUtils.getStandardFare
-import de.grobox.transportr.trips.detail.TripUtils.hasFare
-import de.grobox.transportr.trips.detail.TripUtils.intoCalendar
-import de.grobox.transportr.trips.detail.TripUtils.share
+import de.grobox.transportr.ui.trips.TripDetailViewModel
+import de.grobox.transportr.ui.trips.detail.TripUtils.getStandardFare
+import de.grobox.transportr.ui.trips.detail.TripUtils.hasFare
+import de.grobox.transportr.ui.trips.detail.TripUtils.intoCalendar
+import de.grobox.transportr.ui.trips.detail.TripUtils.share
 import de.grobox.transportr.utils.DateUtils.formatDuration
 import de.grobox.transportr.utils.DateUtils.formatRelativeTime
 import de.grobox.transportr.utils.DateUtils.formatTime
@@ -132,7 +129,7 @@ class TripDetailFragment : TransportrFragment(), Toolbar.OnMenuItemClickListener
 
 
         //viewModel.getTrip().observe(viewLifecycleOwner, Observer<Trip> { this.onTripChanged(it) })
-        viewModel.sheetState.observe(viewLifecycleOwner, Observer<SheetState> { this.onSheetStateChanged(it) })
+        viewModel.sheetState.observe(viewLifecycleOwner, Observer<TripDetailViewModel.SheetState> { this.onSheetStateChanged(it) })
     }
 
     override fun onStart() {
@@ -201,29 +198,29 @@ class TripDetailFragment : TransportrFragment(), Toolbar.OnMenuItemClickListener
     }
 
     private fun onToolbarClose() {
-        viewModel.sheetState.value = BOTTOM
+        viewModel.sheetState.value = TripDetailViewModel.SheetState.BOTTOM
     }
 
     private fun onBottomBarClick() {
-        viewModel.sheetState.value = MIDDLE
+        viewModel.sheetState.value = TripDetailViewModel.SheetState.MIDDLE
     }
 
-    private fun onSheetStateChanged(sheetState: SheetState?) {
+    private fun onSheetStateChanged(sheetState: TripDetailViewModel.SheetState?) {
         FullScreenUtil.applyImageViewTopInset(closeButton)
         when (sheetState) {
             null -> return
-            BOTTOM -> {
+            TripDetailViewModel.SheetState.BOTTOM -> {
                 closeButton.visibility = GONE
                 topBar.visibility = GONE
                 bottomBar.visibility = VISIBLE
             }
-            MIDDLE -> {
+            TripDetailViewModel.SheetState.MIDDLE -> {
 
                 closeButton.visibility = GONE
                 topBar.visibility = VISIBLE
                 bottomBar.visibility = GONE
             }
-            EXPANDED -> {
+            TripDetailViewModel.SheetState.EXPANDED -> {
                 closeButton.visibility = VISIBLE
                 topBar.visibility = VISIBLE
                 bottomBar.visibility = GONE

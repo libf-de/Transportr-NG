@@ -19,6 +19,7 @@
 package de.grobox.transportr.favorites.trips
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import de.grobox.transportr.TransportrApplication
 import de.grobox.transportr.data.locations.LocationRepository
 import de.grobox.transportr.data.searches.SearchesRepository
@@ -32,6 +33,18 @@ abstract class SavedSearchesViewModel protected constructor(
     private val searchesRepository: SearchesRepository
 ) : LocationsViewModel(application, transportNetworkManager, locationRepository) {
     val favoriteTrips: LiveData<List<FavoriteTripItem>> = searchesRepository.favoriteTrips
+    private val _specialLocations = MediatorLiveData<List<FavoriteTripItem>>(listOf())
+    val specialLocations: LiveData<List<FavoriteTripItem>> = _specialLocations
+
+    init {
+        _specialLocations.addSource(home) {
+            _specialLocations.value = listOf(FavoriteTripItem(home.value), FavoriteTripItem(work.value))
+        }
+
+        _specialLocations.addSource(work) {
+            _specialLocations.value = listOf(FavoriteTripItem(home.value), FavoriteTripItem(work.value))
+        }
+    }
 
     fun updateFavoriteState(item: FavoriteTripItem?) {
         searchesRepository.updateFavoriteState(item!!)

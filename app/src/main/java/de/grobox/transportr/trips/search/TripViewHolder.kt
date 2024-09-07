@@ -17,7 +17,7 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.grobox.transportr.trips.search
+package de.grobox.transportr.ui.trips.search
 
 import android.view.LayoutInflater
 import android.view.View
@@ -27,9 +27,8 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.google.common.base.Strings.isNullOrEmpty
 import de.grobox.transportr.R
-import de.grobox.transportr.trips.BaseViewHolder
-import de.grobox.transportr.trips.search.TripAdapter.OnTripClickListener
 import de.grobox.transportr.ui.LineView
+import de.grobox.transportr.ui.trips.BaseViewHolder
 import de.grobox.transportr.utils.DateUtils.formatDuration
 import de.grobox.transportr.utils.DateUtils.formatRelativeTime
 import de.grobox.transportr.utils.DateUtils.formatTime
@@ -46,7 +45,7 @@ class TripViewHolder(private val v: View) : BaseViewHolder(v) {
     private val duration: TextView = v.findViewById(R.id.duration)
     private val price: TextView = v.findViewById(R.id.price)
 
-    fun bind(trip: Trip, listener: OnTripClickListener) {
+    fun bind(trip: Trip) {
         if (trip.isTravelable) {
             formatRelativeTime(fromTimeRel.context, trip.firstDepartureTime).let {
                 fromTimeRel.apply {
@@ -104,7 +103,7 @@ class TripViewHolder(private val v: View) : BaseViewHolder(v) {
 //        toLocation.text = getLocationName(trip.to)
 
         // Click Listener
-        v.setOnClickListener { listener.onClick(trip) }
+//        v.setOnClickListener { listener.onClick(trip) }
     }
 
     private fun Trip.hasProblem(): Boolean {

@@ -38,6 +38,7 @@ constructor(private val locationDao: LocationDao, transportNetworkManager: Trans
     val homeLocation: LiveData<HomeLocation> = networkId.switchMap(locationDao::getHomeLocation)
     val workLocation: LiveData<WorkLocation> = networkId.switchMap(locationDao::getWorkLocation)
     val favoriteLocations: LiveData<List<FavoriteLocation>> = networkId.switchMap(locationDao::getFavoriteLocations)
+    val allLocations: LiveData<List<GenericLocation>> = networkId.switchMap(locationDao::getAllLocations)
 
     fun setHomeLocation(location: WrapLocation) {
         runOnBackgroundThread {

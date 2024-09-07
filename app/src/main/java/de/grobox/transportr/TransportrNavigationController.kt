@@ -19,11 +19,8 @@
 
 package de.grobox.transportr
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
-import androidx.core.app.ActivityCompat
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -33,11 +30,12 @@ import de.grobox.transportr.data.dto.KTrip
 import de.grobox.transportr.data.serializers.TripSerializer
 import de.grobox.transportr.favorites.trips.FavoriteTripType
 import de.grobox.transportr.locations.WrapLocation
-import de.grobox.transportr.map.MapScreen
-import de.grobox.transportr.networks.PickTransportNetworkActivity
-import de.grobox.transportr.settings.SettingsScreen
-import de.grobox.transportr.trips.detail.TripDetailComposable
-import de.grobox.transportr.trips.search.DirectionsScreen
+import de.grobox.transportr.ui.directions.DirectionsScreen
+import de.grobox.transportr.ui.map.MapScreen
+import de.grobox.transportr.ui.settings.SettingsScreen
+import de.grobox.transportr.ui.settings.SettingsViewModel
+import de.grobox.transportr.ui.transportnetworkselector.TransportNetworkSelectorScreen
+import de.grobox.transportr.ui.trips.TripDetailScreen
 import de.schildbach.pte.dto.Trip
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
@@ -114,9 +112,10 @@ sealed class Routes {
     object Settings
 
     @Serializable
-    data class TripDetail(
-        val trip: KTrip
-    )
+    object TransportNetworkSelector
+
+    @Serializable
+    data class TripDetail(val tripId: String)
 }
 
 @Composable
@@ -156,7 +155,7 @@ fun TransportrNavigationController() {
                 tripClicked = { trip ->
                     navController.navigate(
                         Routes.TripDetail(
-                            trip = trip
+                            tripId = trip.id
                         )
                     )
                 }
@@ -164,11 +163,11 @@ fun TransportrNavigationController() {
         }
 
         composable<Routes.Settings> {
-            val context = LocalContext.current
             SettingsScreen(
                 onSelectNetworkClicked = {
-                    val intent = Intent(context, PickTransportNetworkActivity::class.java)
-                    ActivityCompat.startActivity(context, intent, null)
+//                    val intent = Intent(context, PickTransportNetworkActivity::class.java)
+//                    ActivityCompat.startActivity(context, intent, null)
+                    navController.navigate(route = Routes.TransportNetworkSelector)
                 }
             )
         }
@@ -177,11 +176,20 @@ fun TransportrNavigationController() {
             typeMap = mapOf(typeOf<KTrip>() to serializableNavType<KTrip>())
         ) {
             val params = it.toRoute<Routes.TripDetail>()
-            TripDetailComposable(
+            TripDetailScreen(
                 viewModel = koinViewModel(),
-                trip = params.trip,
+                navController = navController,
+                tripId = params.tripId,
                 setBarColor = { _, _ -> }
-            ) { }
+            )
+        }
+
+        composable<Routes.TransportNetworkSelector> {
+            val viewModel = koinViewModel<SettingsViewModel>()
+            TransportNetworkSelectorScreen(
+                viewModel = viewModel,
+                navController = navController
+            )
         }
     }
 }

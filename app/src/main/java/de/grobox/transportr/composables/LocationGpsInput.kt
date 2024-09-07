@@ -40,7 +40,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Cancel
-import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -71,6 +70,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
 import de.grobox.transportr.R
 import de.grobox.transportr.locations.WrapLocation
+import de.grobox.transportr.ui.directions.composables.CompactTextField
 import java.util.regex.Pattern
 
 private fun getHighlightedText(l: WrapLocation, search: String?): AnnotatedString {
@@ -302,6 +302,120 @@ fun LocationGpsInput(
 }
 
 @Composable
+fun LocationInputField(
+    modifier: Modifier = Modifier,
+    location: WrapLocation?,
+    suggestions: Set<WrapLocation>?,
+    isLoading: Boolean,
+    onValueChange: (String) -> Unit,
+    onAcceptSuggestion: (WrapLocation) -> Unit,
+    onFocusChange: (Boolean) -> Unit,
+    isGpsLoading: Boolean = false,
+    placeholder: String = "",
+    textField: @Composable (
+        modifier: Modifier,
+        value: String,
+        onValueChange: (String) -> Unit,
+        leadingIcon: @Composable () -> Unit,
+        trailingIcon: @Composable () -> Unit,
+        placeholder: @Composable () -> Unit,
+    ) -> Unit
+) {
+    var isFocused by remember { mutableStateOf(false) }
+    var showSuggestions by remember { mutableStateOf(true) }
+    var text by remember { mutableStateOf(location?.fullName ?: "") }
+
+    val infiniteTransition = rememberInfiniteTransition(label = "gpsInfiniteTransition")
+    val gpsIconAlpha by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 0f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(500, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "gpsIconAlpha"
+    )
+
+    LaunchedEffect(location) {
+        location?.getName()?.takeIf { it.isNotBlank() }?.let { text = it }
+    }
+
+    textField(
+        modifier.onFocusChanged { isFocused = it.isFocused; onFocusChange(it.isFocused) }, // Modifier
+        text, // value
+        { onValueChange(it); text = it; showSuggestions = true }, // onValueChange
+        { // LeadingIcon
+            if(isGpsLoading) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_gps),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(16.dp)
+                        .alpha(gpsIconAlpha),
+                )
+            } else {
+                Icon(
+                    painter = painterResource(location?.drawableInt ?: R.drawable.ic_location),
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp),
+                )
+            }
+
+        },
+        { // TrailingIcon
+            if (isLoading && isFocused)
+                CircularProgressIndicator(
+                    modifier = Modifier.size(16.dp)
+                )
+        },
+        { // Placeholder
+            Text(
+                text = if(isGpsLoading)
+                            stringResource(R.string.stations_searching_position)
+                        else
+                            placeholder
+            )
+        },
+    )
+
+    if(isFocused && showSuggestions) {
+        DropdownMenu(
+            expanded = !suggestions.isNullOrEmpty(),
+            onDismissRequest = { showSuggestions = false },
+            modifier = Modifier.fillMaxWidth(),
+            // This line here will accomplish what you want
+            properties = PopupProperties(focusable = false)
+        ) {
+            suggestions?.forEach { sug ->
+                DropdownMenuItem(
+                    onClick = {
+                        onAcceptSuggestion(sug)
+                        text = sug.fullName
+                    },
+                    text = {
+                        if (sug.wrapType == WrapLocation.WrapType.GPS)
+                            Text(
+                                text = stringResource(R.string.location_gps),
+                                fontStyle = FontStyle.Italic
+                            )
+                        else
+                            Text(text = getHighlightedText(sug, text))
+                    },
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(sug.drawableInt),
+                            contentDescription = null
+                        )
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
+    }
+
+}
+
+@Composable
 fun CompactLocationGpsInput(
     modifier: Modifier = Modifier,
     location: WrapLocation?,
@@ -312,11 +426,64 @@ fun CompactLocationGpsInput(
     onFocusChange: (Boolean) -> Unit,
     label: String = "",
     placeholder: String = label,
+    isGpsLoading: Boolean = false,
+    padding: PaddingValues = PaddingValues(8.dp, 8.dp, 8.dp, 8.dp)
+)
+{
+    LocationInputField(
+        modifier = modifier,
+        location = location,
+        suggestions = suggestions,
+        isLoading = isLoading,
+        onValueChange = onValueChange,
+        onAcceptSuggestion = onAcceptSuggestion,
+        onFocusChange = onFocusChange,
+        isGpsLoading = isGpsLoading,
+        placeholder = placeholder
+    ) { iModifier, iValue, iOnValueChange, iLeadingIcon, iTrailingIcon, iPlaceholder ->
+        CompactTextField(
+            modifier = iModifier.height(48.dp),
+            value = iValue,
+            onValueChange = { iOnValueChange(it) },
+            leadingIcon = { iLeadingIcon() },
+            trailingIcon = { iTrailingIcon() },
+            label = { Text(if(isGpsLoading) stringResource(R.string.stations_searching_position) else label) },
+            placeholder = { iPlaceholder() },
+            singleLine = true,
+            padding = padding,
+            textStyle = MaterialTheme.typography.bodyLarge
+        )
+    }
+}
+
+@Composable
+fun CompactLocationInput(
+    modifier: Modifier = Modifier,
+    location: WrapLocation?,
+    suggestions: Set<WrapLocation>?,
+    isLoading: Boolean,
+    onValueChange: (String) -> Unit,
+    onAcceptSuggestion: (WrapLocation) -> Unit,
+    onFocusChange: (Boolean) -> Unit,
+    label: String = "",
+    placeholder: String = label,
+    isGpsLoading: Boolean = false,
     padding: PaddingValues = PaddingValues(8.dp, 8.dp, 8.dp, 8.dp)
 ) {
     var isFocused by remember { mutableStateOf(false) }
     var showSuggestions by remember { mutableStateOf(true) }
     var text by remember { mutableStateOf(location?.fullName ?: "") }
+
+    val infiniteTransition = rememberInfiniteTransition(label = "gpsInfiniteTransition")
+    val gpsIconAlpha by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 0f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(500, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "gpsIconAlpha"
+    )
 
     CompactTextField(
         modifier = modifier.onFocusChanged {
@@ -330,11 +497,22 @@ fun CompactLocationGpsInput(
             showSuggestions = true
         },
         leadingIcon = {
-            Icon(
-                modifier = Modifier.size(16.dp),
-                painter = painterResource(R.drawable.ic_gps),
-                contentDescription = null
-            )
+            if(isGpsLoading) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_gps),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(16.dp)
+                        .alpha(gpsIconAlpha),
+                )
+            } else {
+                Icon(
+                    painter = painterResource(location?.drawableInt ?: R.drawable.ic_location),
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp),
+                )
+            }
+
         },
         trailingIcon = {
             if (isLoading && isFocused)
@@ -343,7 +521,9 @@ fun CompactLocationGpsInput(
                 )
         },
         label = { Text(label) },
-        placeholder = { Text(placeholder) },
+        placeholder = {
+            Text(if(isGpsLoading) stringResource(R.string.location_gps) else placeholder)
+        },
         singleLine = true,
         padding = padding,
         textStyle = MaterialTheme.typography.bodyLarge

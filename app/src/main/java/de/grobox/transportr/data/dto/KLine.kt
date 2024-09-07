@@ -19,6 +19,8 @@
 
 package de.grobox.transportr.data.dto
 
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.common.collect.ComparisonChain
@@ -45,6 +47,8 @@ data class KLine(
         val TRANSFER = KLine(id = "TRANSFER", product = KProduct.TRANSFER)
         val SECURE_CONNECTION = KLine(id = "SECURE_CONNECTION", product = KProduct.SECURE_CONNECTION)
         val DO_NOT_CHANGE = KLine(id = "DO_NOT_CHANGE", product = KProduct.DO_NOT_CHANGE)
+
+        val DEFAULT_LINE_COLOR = KStyle.RED
     }
 
     val productCode: Char

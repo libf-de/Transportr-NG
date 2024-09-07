@@ -28,7 +28,7 @@ import androidx.annotation.DrawableRes;
 import androidx.core.graphics.drawable.DrawableCompat;
 import de.grobox.transportr.R;
 
-import static de.grobox.transportr.trips.search.DirectionsActivity.INTENT_URI_FAVORITE;
+import static de.grobox.transportr.ui.trips.search.DirectionsActivity.INTENT_URI_FAVORITE;
 import static de.grobox.transportr.utils.Constants.FAV_TRIP_UID;
 
 public class FavoriteTripPopupMenu extends AbstractFavoritesPopupMenu {

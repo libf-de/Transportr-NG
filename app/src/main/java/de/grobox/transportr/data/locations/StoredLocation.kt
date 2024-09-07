@@ -26,7 +26,7 @@ import de.grobox.transportr.locations.WrapLocation
 import de.schildbach.pte.NetworkId
 
 abstract class StoredLocation internal constructor(
-    @JvmField @field:PrimaryKey(autoGenerate = true) val uid: Long,
+    @JvmField @PrimaryKey(autoGenerate = true) val uid: Long,
     @JvmField val networkId: NetworkId,
     type: KLocation.Type?,
     id: String?,

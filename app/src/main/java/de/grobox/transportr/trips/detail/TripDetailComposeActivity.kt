@@ -16,7 +16,7 @@
  *    You should have received a copy of the GNU General Public License
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.grobox.transportr.trips.detail
+package de.grobox.transportr.ui.trips.detail
 
 import android.os.Build
 import android.os.Bundle
@@ -29,6 +29,7 @@ import de.grobox.transportr.R
 import de.grobox.transportr.composables.BaseComposableCompat
 import de.grobox.transportr.locations.WrapLocation
 import de.grobox.transportr.ui.ThreeStateBottomSheetBehavior
+import de.grobox.transportr.ui.trips.TripDetailViewModel
 import de.grobox.transportr.utils.FullScreenUtil.Companion.applyTopInset
 import de.grobox.transportr.utils.FullScreenUtil.Companion.drawBehindStatusbar
 import de.schildbach.pte.dto.Trip

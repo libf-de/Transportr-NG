@@ -17,7 +17,7 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.grobox.transportr.trips.detail
+package de.grobox.transportr.ui.trips.detail
 
 import android.content.Context
 import android.content.Intent
@@ -27,8 +27,8 @@ import de.grobox.transportr.R
 import de.grobox.transportr.data.dto.toKLeg
 import de.grobox.transportr.data.dto.toKLocation
 import de.grobox.transportr.locations.WrapLocation
-import de.grobox.transportr.trips.detail.TripUtils.legToString
 import de.grobox.transportr.ui.BasePopupMenu
+import de.grobox.transportr.ui.trips.detail.TripUtils.legToString
 import de.grobox.transportr.utils.DateUtils.formatTime
 import de.grobox.transportr.utils.IntentUtils.findDepartures
 import de.grobox.transportr.utils.IntentUtils.findNearbyStations

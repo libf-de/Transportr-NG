@@ -27,7 +27,7 @@ import androidx.annotation.StringRes
 import de.grobox.transportr.R
 import de.grobox.transportr.utils.IntentUtils
 
-internal abstract class SpecialLocationPopupMenu(context: Context, anchor: View, trip: FavoriteTripItem, listener: FavoriteTripListener) :
+private abstract class SpecialLocationPopupMenu(context: Context, anchor: View, trip: FavoriteTripItem, listener: FavoriteTripListener) :
     AbstractFavoritesPopupMenu(context, anchor, trip, listener) {
 
     @get:StringRes

@@ -17,7 +17,7 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.grobox.transportr.trips.detail
+package de.grobox.transportr.ui.trips.detail
 
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.MutableLiveData
@@ -26,7 +26,7 @@ import de.grobox.transportr.data.dto.toKTrip
 import de.grobox.transportr.data.dto.toLocation
 import de.grobox.transportr.data.dto.toProduct
 import de.grobox.transportr.settings.SettingsManager
-import de.grobox.transportr.trips.TripQuery
+import de.grobox.transportr.ui.trips.TripQuery
 import de.grobox.transportr.utils.SingleLiveEvent
 import de.schildbach.pte.NetworkProvider
 import de.schildbach.pte.dto.QueryTripsResult

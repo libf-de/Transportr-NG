@@ -19,12 +19,387 @@
 
 package de.grobox.transportr.data.trips
 
-import androidx.lifecycle.LiveData
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Embedded
+import androidx.room.Insert
+import androidx.room.Junction
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Relation
+import androidx.room.Transaction
+import de.grobox.transportr.data.dto.KLeg
+import de.grobox.transportr.data.dto.KLine
+import de.grobox.transportr.data.dto.KLocation
+import de.grobox.transportr.data.dto.KStop
 import de.grobox.transportr.data.dto.KTrip
+import de.grobox.transportr.data.locations.GenericLocation
+import de.schildbach.pte.NetworkId
 
+private fun KStop.toStopEntity(locationId: Long): StopEntity {
+    return StopEntity(
+        uid = 0,
+        locationId = locationId,
+        plannedArrivalTime = this.plannedArrivalTime,
+        predictedArrivalTime = this.predictedArrivalTime,
+        plannedArrivalPosition = this.plannedArrivalPosition,
+        predictedArrivalPosition = this.predictedArrivalPosition,
+        arrivalCancelled = this.arrivalCancelled,
+        plannedDepartureTime = this.plannedDepartureTime,
+        predictedDepartureTime = this.predictedDepartureTime,
+        plannedDeparturePosition = this.plannedDeparturePosition,
+        predictedDeparturePosition = this.predictedDeparturePosition,
+        departureCancelled = this.departureCancelled,
+    )
+}
+
+@Dao
 interface TripsDao {
 
-    @Query("SELECT * FROM trips WHERE tripId = :tripId LIMIT 1")
-    fun getTrip(tripId: String): LiveData<KTrip>
+    data class StopWithLocation(
+        @Embedded
+        val stop: StopEntity,
+
+        @Relation(parentColumn = "locationId", entityColumn = "uid")
+        val location: GenericLocation
+    ) {
+        fun toKStop(): KStop {
+            return KStop(
+                location = location.toKLocation(),
+                plannedArrivalTime = stop.plannedArrivalTime,
+                predictedArrivalTime = stop.predictedArrivalTime,
+                plannedArrivalPosition = stop.plannedArrivalPosition,
+                predictedArrivalPosition = stop.predictedArrivalPosition,
+                arrivalCancelled = stop.arrivalCancelled,
+                plannedDepartureTime = stop.plannedDepartureTime,
+                predictedDepartureTime = stop.predictedDepartureTime,
+                plannedDeparturePosition = stop.plannedDeparturePosition,
+                predictedDeparturePosition = stop.predictedDeparturePosition,
+                departureCancelled = stop.departureCancelled
+            )
+        }
+    }
+
+
+    data class TripLegWithStops(
+        @Embedded
+        val tripLeg: TripLegEntity,
+
+        @Relation(
+            entity = StopEntity::class,
+            associateBy = Junction(
+                TripLegToStopsCrossRef::class,
+                parentColumn = "tripLegId",
+                entityColumn = "stopId"
+            ),
+            parentColumn = "uid",
+            entityColumn = "uid"
+        )
+        val intermediateStops: List<StopWithLocation>,
+
+        @Relation(
+            entity = StopEntity::class,
+            parentColumn = "departureStopId",
+            entityColumn = "uid"
+        )
+        val departureStop: StopWithLocation,
+
+        @Relation(
+            entity = StopEntity::class,
+            parentColumn = "arrivalStopId",
+            entityColumn = "uid"
+        )
+        val arrivalStop: StopWithLocation,
+
+        @Relation(
+            parentColumn = "lineId",
+            entityColumn = "id"
+        )
+        val line: LineEntity,
+
+        @Relation(
+            parentColumn = "destinationId",
+            entityColumn = "uid"
+        )
+        val destination: GenericLocation
+    )
+
+    data class TripWithLegs(
+        @Embedded
+        val trip: TripEntity,
+
+        @Relation(
+            entity = TripLegEntity::class,
+            parentColumn = "id",
+            entityColumn = "tripId"
+        )
+        val legs: List<TripLegWithStops>,
+
+        @Relation(
+            parentColumn = "fromId",
+            entityColumn = "id"
+        )
+        val from: GenericLocation,
+
+        @Relation(
+            parentColumn = "toId",
+            entityColumn = "id"
+        )
+        val to: GenericLocation
+    ) {
+        fun toKTrip(): KTrip {
+            return KTrip(
+                id = trip.id,
+                from = from.toKLocation(),
+                to = to.toKLocation(),
+                legs = legs.map {
+                    if(it.tripLeg.isPublicLeg) {
+                        KLeg(
+                            line = it.line.toKLine(),
+                            destination = it.destination.toKLocation(),
+                            departureStop = it.departureStop.toKStop(),
+                            arrivalStop = it.arrivalStop.toKStop(),
+                            intermediateStops = it.intermediateStops.map { intStop ->
+                                intStop.toKStop()
+                            },
+                            path = it.tripLeg.path,
+                            message = it.tripLeg.message,
+                        )
+                    } else {
+                        KLeg(
+                            type = it.tripLeg.individualType ?: KLeg.IndividualType.WALK,
+                            departure = it.departureStop.location.toKLocation(),
+                            departureTime = it.tripLeg.departureTime ?: 0L,
+                            arrival = it.arrivalStop.location.toKLocation(),
+                            arrivalTime = it.tripLeg.arrivalTime ?: 0L,
+                            path = it.tripLeg.path,
+                            distance = it.tripLeg.distance
+                        )
+                    }
+                },
+                fares = null,
+                capacity = trip.capacity,
+                changes = trip.changes,
+            )
+        }
+    }
+
+    @Transaction
+    @Query("SELECT * FROM trips WHERE id = :tripId LIMIT 1")
+    fun getTripByIdWithLegs(tripId: String): TripWithLegs
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun _addLocation(location: GenericLocation): Long
+
+    @Query("SELECT uid FROM genericLocations WHERE networkId = :networkId AND id = :id")
+    fun getLocationId(networkId: NetworkId, id: String): Long
+
+    @Transaction
+    fun addLocation(location: GenericLocation): Long {
+        val rslt = _addLocation(location)
+        val result = if(rslt == -1L)
+            getLocationId(location.networkId, location.id!!)
+        else
+            rslt
+
+        return result
+    }
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun addStop(stop: StopEntity): Long
+
+    @Query("SELECT uid FROM lines WHERE id = :id")
+    fun findLineIdByNameAndLabel(id: String): Long
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun _addLine(line: LineEntity): Long
+
+    @Transaction
+    fun addLine(line: LineEntity): Long {
+        val rslt = _addLine(line)
+        val result = if (rslt == -1L)
+            findLineIdByNameAndLabel(line.id)
+        else
+            rslt
+
+        return result
+    }
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun addTripLeg(tripLeg: TripLegEntity): Long
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun addTripEntity(location: TripEntity): Long
+
+    @Transaction
+    suspend fun addTrip(trip: KTrip, network: NetworkId) {
+
+
+        val fromId = addLocation(trip.from.toGenericLocation(network))
+        val toId = addLocation(trip.to.toGenericLocation(network))
+
+        val tripId = addTripEntity(
+            TripEntity(
+                uid = 0,
+                id = trip.id,
+                fromId = fromId,
+                toId = toId,
+                capacity = trip.capacity ?: listOf(),
+                changes = trip.numChanges,
+                networkId = network
+            )
+        )
+
+        trip.legs.forEachIndexed { index, leg ->
+            if(leg.isPublicLeg) {
+                val stops: MutableList<Long> = mutableListOf()
+
+                val departureStopId = leg.departureStop?.let {
+                    val stLoc = it.location.toGenericLocation(network)
+
+                    val stopLoc = addLocation(
+                        stLoc
+                    )
+
+                    addStop(it.toStopEntity(
+                            locationId = stopLoc
+                    ))
+                }
+
+                val intermediateStops = leg.intermediateStops?.map {
+                    val stopLocId = addLocation(it.location.toGenericLocation(network))
+
+                    addStop(it.toStopEntity(
+                            locationId = stopLocId
+                    ))
+                }
+
+
+                val arrivalStopId = leg.arrivalStop?.let {
+                    val arrivalLocId = addLocation(it.location.toGenericLocation(network))
+
+                    addStop(it.toStopEntity(
+                            locationId = arrivalLocId
+                    ))
+                }
+
+                val lineId = leg.line?.let { addLine(it.toLineEntity(network)) }
+                val destinationId = leg.destination?.let { addLocation(it.toGenericLocation(network)) }
+
+                val departureId = addLocation(leg.departure.toGenericLocation(network))
+                val arrivalId = addLocation(leg.arrival.toGenericLocation(network))
+
+
+                addTripLeg(TripLegEntity(
+                    uid = 0,
+                    tripId = tripId,
+                    lineId = lineId,
+                    destinationId = destinationId,
+                    departureStopId = departureStopId,
+                    arrivalStopId = arrivalStopId,
+                    intermediateStops = intermediateStops,
+                    message = leg.message,
+                    isPublicLeg = true,
+//                    departureId = addLocation(leg.departure.toGenericLocation(network)),
+//                    arrivalId = addLocation(leg.arrival.toGenericLocation(network)),
+                    departureId = departureId,
+                    arrivalId = arrivalId,
+                    path = leg.path,
+                    departureTime = leg.departureTime,
+                    arrivalTime = leg.arrivalTime,
+                    legNumber = index
+                ))
+            }
+            else {
+                addTripLeg(
+                    TripLegEntity(
+                        uid = 0,
+                        isPublicLeg = false,
+                        tripId = tripId,
+
+                        individualType = leg.individualType!!,
+                        departureId = addLocation(leg.departure.toGenericLocation(network)),
+                        departureTime = leg.departureTime,
+                        arrivalId = addLocation(leg.arrival.toGenericLocation(network)),
+                        arrivalTime = leg.arrivalTime,
+                        path = leg.path,
+                        min = leg.min,
+                        distance = leg.distance,
+
+                        legNumber = index
+                    )
+                )
+            }
+        }
+    }
+
+    @Delete
+    fun deleteTrip(trip: TripEntity)
+
+    @Query("DELETE FROM trips WHERE id = :tripId")
+    fun deleteTripById(tripId: String)
+
+    @Query("DELETE FROM tripLegs WHERE tripId = :tripId")
+    fun deleteTripLegsByTripId(tripId: String)
+
+    @Query("DELETE FROM tripLegToStopsCrossRef WHERE tripLegId = :tripLegId")
+    fun deleteTripLegToStopsCrossRefByTripLegId(tripLegId: Long)
+
+    @Query("DELETE FROM stops WHERE uid NOT IN (SELECT stopId FROM tripLegToStopsCrossRef) AND uid NOT IN (SELECT departureStopId FROM tripLegs) AND uid NOT IN (SELECT arrivalStopId FROM tripLegs)")
+    fun cleanupStops()
+
+    @Query("DELETE FROM lines WHERE id NOT IN (SELECT lineId FROM tripLegs)")
+    fun cleanupLines()
+
+    @Query("DELETE FROM genericLocations WHERE uid NOT IN (SELECT fromId FROM trips) AND uid NOT IN (SELECT toId FROM trips) AND uid NOT IN (SELECT departureId FROM tripLegs) AND uid NOT IN (SELECT arrivalId FROM tripLegs) AND uid NOT IN (SELECT locationId FROM stops)")
+    fun cleanupLocations()
+
+    @Query("DELETE FROM tripLegs WHERE tripId NOT IN (SELECT id FROM trips)")
+    fun cleanupTripLegs()
+
+    @Query("DELETE FROM trips WHERE id IN (SELECT tripId FROM tripLegs WHERE arrivalTime < :limitTime)")
+    fun deleteTripsArrivingBefore(limitTime: Long)
+
+    @Transaction
+    suspend fun deleteTripsArrivingBeforeAndCleanup(limitTime: Long) {
+        deleteTripsArrivingBefore(limitTime)
+        cleanup()
+    }
+
+    @Transaction
+    fun cleanup() {
+        cleanupStops()
+        cleanupLines()
+        cleanupLocations()
+        cleanupTripLegs()
+    }
+
+    @Transaction
+    fun deleteTripAndCleanup(tripId: String) {
+        deleteTripById(tripId)
+        cleanup()
+    }
+}
+
+private fun KLine.toLineEntity(network: NetworkId): LineEntity {
+    return LineEntity(
+        id = this.id,
+        networkId = network,
+        product = product,
+        label = label,
+        name = name,
+        style = style,
+        attributes = attributes,
+        message = message,
+        altName = altName,
+        uid = 0
+    )
+}
+
+private fun KLocation.toGenericLocation(network: NetworkId): GenericLocation {
+    return GenericLocation(
+        networkId = network,
+        l = this
+    )
+
 }

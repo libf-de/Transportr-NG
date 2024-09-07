@@ -42,7 +42,7 @@ import de.grobox.transportr.databinding.FragmentLocationBinding
 import de.grobox.transportr.departures.DeparturesActivity
 import de.grobox.transportr.departures.DeparturesLoader
 import de.grobox.transportr.locations.ReverseGeocoder.ReverseGeocoderCallback
-import de.grobox.transportr.map.MapViewModel
+import de.grobox.transportr.ui.map.MapViewModel
 import de.grobox.transportr.utils.Constants
 import de.grobox.transportr.utils.IntentUtils.findNearbyStations
 import de.grobox.transportr.utils.IntentUtils.startGeoIntent

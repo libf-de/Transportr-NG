@@ -37,7 +37,7 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 import static androidx.core.content.pm.ShortcutManagerCompat.isRequestPinShortcutSupported;
 import static androidx.core.content.pm.ShortcutManagerCompat.requestPinShortcut;
 import static androidx.core.graphics.drawable.IconCompat.createWithResource;
-import static de.grobox.transportr.trips.search.DirectionsActivity.ACTION_SEARCH;
+import static de.grobox.transportr.ui.trips.search.DirectionsActivity.ACTION_SEARCH;
 import static de.grobox.transportr.utils.IntentUtils.findDirections;
 import static de.grobox.transportr.utils.IntentUtils.presetDirections;
 

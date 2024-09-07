@@ -21,14 +21,24 @@ package de.grobox.transportr.networks
 
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-
+import androidx.lifecycle.MediatorLiveData
 import de.grobox.transportr.TransportrApplication
 
 abstract class TransportNetworkViewModel protected constructor(
     application: TransportrApplication,
     manager: TransportNetworkManager
 ) : AndroidViewModel(application) {
-
     val transportNetwork: LiveData<TransportNetwork?> = manager.transportNetwork
+    val transportNetworks = MediatorLiveData<List<TransportNetwork>>()
+
+    init {
+        transportNetworks.addSource(manager.transportNetwork) {
+            transportNetworks.value = listOfNotNull(
+                manager.getTransportNetwork(1),
+                manager.getTransportNetwork(2),
+                manager.getTransportNetwork(3)
+            )
+        }
+    }
 
 }

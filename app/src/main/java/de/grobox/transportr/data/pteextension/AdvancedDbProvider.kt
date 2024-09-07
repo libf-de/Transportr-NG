@@ -72,7 +72,8 @@ class AdvancedDbProvider(apiClient: String?, apiAuthorization: String?, salt: By
         for (iProd in 0 until prodListLen) {
             val prod = prodList.getJSONObject(iProd)
             val name = Strings.emptyToNull(prod.getString("name"))
-            val nameS = prod.optString("nameS", null)
+            val realNameS = prod.optString("nameS", null)
+            val nameS = prod.optString("addName", realNameS)
             val number = prod.optString("number", null)
             val icoIndex = prod.getInt("icoX")
             val style = styles!![icoIndex]
@@ -81,12 +82,57 @@ class AdvancedDbProvider(apiClient: String?, apiAuthorization: String?, salt: By
             val cls = prod.optInt("cls", -1)
             val prodCtx = prod.optJSONObject("prodCtx")
             val id = prodCtx?.optString("lineId", null)
-            val product = if (cls != -1) intToProduct(cls) else null
+            val product = if (cls != -1) intToProduct(cls) else continue
             lines.add(newLine(id, operator, product, name, nameS, number, style))
         }
 
         return lines
     }
+
+    override fun newLine(
+        id: String?,
+        operator: String?,
+        product: Product?,
+        name: String?,
+        shortName: String?,
+        number: String?,
+        style: Style?
+    ): Line {
+        val longName = if (name != null) name + (if (number != null && !name.endsWith(number)) " ($number)" else "")
+        else if (shortName != null) shortName + (if (number != null && !shortName.endsWith(number)) " ($number)" else "")
+        else number
+
+        if (product == Product.BUS || product == Product.TRAM) {
+            // For bus and tram, prefer a slightly shorter label without the product prefix
+            val label = shortName ?: if (number != null && name != null && name.endsWith(number)) number
+            else name
+            return Line(id, operator, product, label, longName, lineStyle(operator, product, label))
+        } else if(product == Product.REGIONAL_TRAIN) {
+            return Line(id, operator, product, shortName, longName, lineStyle(operator, product, name))
+        } else {
+            // Otherwise the longer label is fine
+            return Line(id, operator, product, name, longName, lineStyle(operator, product, name))
+        }
+    }
+
+//    override fun newLine(
+//        id: String?, operator: String?, product: Product, name: String?,
+//        shortName: String?, number: String?, style: Style?
+//    ): Line {
+//        val longName = if (name != null) name + (if (number != null && !name.endsWith(number)) " ($number)" else "")
+//        else if (shortName != null) shortName + (if (number != null && !shortName.endsWith(number)) " ($number)" else "")
+//        else number
+//
+//        if (product == Product.BUS || product == Product.TRAM) {
+//            // For bus and tram, prefer a slightly shorter label without the product prefix
+//            val label = shortName ?: if (number != null && name != null && name.endsWith(number)) number
+//            else name
+//            return Line(id, operator, product, label, longName, lineStyle(operator, product, label))
+//        } else {
+//            // Otherwise the longer label is fine
+//            return Line(id, operator, product, shortName ?: name, longName, lineStyle(operator, product, name))
+//        }
+//    }
 
     companion object {
         private val API_BASE: HttpUrl = "https://reiseauskunft.bahn.de/bin/".toHttpUrl()

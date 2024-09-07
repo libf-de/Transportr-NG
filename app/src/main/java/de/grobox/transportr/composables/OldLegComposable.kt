@@ -47,6 +47,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import de.grobox.transportr.R
+import de.grobox.transportr.ui.transport.composables.ProductComposable
 
 //@Composable
 //fun LegComposable(

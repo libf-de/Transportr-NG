@@ -34,6 +34,9 @@ import static androidx.room.OnConflictStrategy.REPLACE;
 @Dao
 public interface LocationDao {
 
+	@Query("SELECT * FROM locations WHERE networkId = :networkId")
+	LiveData<List<GenericLocation>> getAllLocations(NetworkId networkId);
+
 	// FavoriteLocation
 
 	@Query("SELECT * FROM locations WHERE networkId = :networkId")
@@ -51,7 +54,6 @@ public interface LocationDao {
 	FavoriteLocation getFavoriteLocation(NetworkId networkId, KLocation.Type type, @Nullable String id, int lat, int lon, @Nullable String place, @Nullable String name);
 
 	// HomeLocation
-
 	@Query("SELECT * FROM home_locations WHERE networkId = :networkId")
 	LiveData<HomeLocation> getHomeLocation(NetworkId networkId);
 
