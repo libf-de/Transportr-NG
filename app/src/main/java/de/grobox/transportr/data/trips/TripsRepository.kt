@@ -26,8 +26,6 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.util.Pair
-import androidx.annotation.WorkerThread
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import de.grobox.transportr.R
 import de.grobox.transportr.data.dto.KTrip
@@ -91,7 +89,8 @@ class TripsRepository(
     val queryPTEError = SingleLiveEvent<Pair<String, String>>()
     val queryMoreError = SingleLiveEvent<String>()
     val isFavTrip = MutableLiveData<Boolean>()
-    private val networkProvider = MediatorLiveData<NetworkProvider>(getTransportNetwork(NetworkId.DB)!!.networkProvider)
+    private val networkProvider: NetworkProvider
+    //private val networkProvider = MediatorLiveData<NetworkProvider>(getTransportNetwork(NetworkId.DB)!!.networkProvider)
 
     private var uid: Long = 0L
     private var queryTripsContext: QueryTripsContext? = null
@@ -100,11 +99,10 @@ class TripsRepository(
     init {
         queryMoreState.value = QueryMoreState.NONE
 
-        networkProvider.addSource(networkManager.transportNetwork) {
-            it?.let {
-                networkProvider.value = it.networkProvider
-            }
-        }
+        var network = networkManager.transportNetwork.value
+        if (network == null) network = getTransportNetwork(NetworkId.DB)!!
+
+        networkProvider = network.networkProvider
 
         // Delete trips that arrived more than 2 days ago
         CoroutineScope(Dispatchers.IO).launch {
@@ -145,10 +143,10 @@ class TripsRepository(
         queryTripsTask = thread(true) { queryTrips(query) }
     }
 
-    @WorkerThread
+//    @WorkerThread
     private fun queryTrips(query: TripQuery) {
-        try {
-            val queryTripsResult = networkProvider.value!!.queryTrips(
+         try {
+            val queryTripsResult = networkProvider.queryTrips(
                 query.from.location.toLocation(), if (query.via == null) null else query.via.location.toLocation(), query.to.location.toLocation(),
                 query.date, query.departure,
                 TripOptions(query.products.mapNotNull { it.toProduct() }.toSet(), settingsManager.optimize, settingsManager.walkSpeed, null, null)
@@ -194,7 +192,7 @@ class TripsRepository(
 
         thread(true) {
             try {
-                val queryTripsResult = networkProvider.value!!.queryMoreTrips(queryTripsContext, later)
+                val queryTripsResult = networkProvider.queryMoreTrips(queryTripsContext, later)
                 if (queryTripsResult.status == OK && queryTripsResult.trips.size > 0) {
                     onQueryTripsResultReceived(queryTripsResult)
                 } else {
@@ -216,7 +214,7 @@ class TripsRepository(
             oldTrips.addAll(newTrips)
 
             CoroutineScope(Dispatchers.IO).launch {
-                newTrips.forEach { tripsDao.addTrip(it, networkProvider.value!!.id()) }
+                newTrips.forEach { tripsDao.addTrip(it, networkProvider.id()) }
             }
 
             trips.value = oldTrips
@@ -252,12 +250,12 @@ class TripsRepository(
 
     private fun PTEError(errorShort: String, error: String, query: TripQuery) {
         val title = StringBuilder()
-            .append(networkProvider.value!!.id().name)
+            .append(networkProvider.id().name)
             .append(": ")
             .append(errorShort)
         val body = StringBuilder()
             .appendLine("### Query")
-            .appendLine("- NetworkId: `${networkProvider.value!!.id().name}`")
+            .appendLine("- NetworkId: `${networkProvider.id().name}`")
             .appendLine("- From: `${query.from.location}`")
             .appendLine("- Via: `${if (query.via == null) "null" else query.via.location}`")
             .appendLine("- To: `${query.to.location}`")

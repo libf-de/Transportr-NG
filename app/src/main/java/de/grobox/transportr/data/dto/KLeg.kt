@@ -39,7 +39,6 @@ data class KLeg private constructor(
     val individualType: IndividualType? = null,
     val departureTime: Long?,
     val arrivalTime: Long?,
-    val min: Long? = null,
     val distance: Int? = null
 ) {
     companion object {
@@ -109,7 +108,6 @@ data class KLeg private constructor(
         individualType = type,
         departureTime = departureTime,
         arrivalTime = arrivalTime,
-        min = ((arrivalTime - departureTime) / 1000 / 60),
         distance = distance
     )
 
@@ -173,4 +171,11 @@ data class KLeg private constructor(
             arrivalTime = newDepartureTime
         )
     }
+
+    val min: Long
+        get() = arrivalTime?.let { arr ->
+            departureTime?.let { dep ->
+                ((arr - dep) / 1000 / 60)
+            }
+        } ?: Long.MIN_VALUE
 }

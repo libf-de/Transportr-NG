@@ -72,7 +72,6 @@ import de.grobox.transportr.ui.favorites.SavedSearchesActions
 import de.grobox.transportr.ui.favorites.SavedSearchesComponent
 import de.grobox.transportr.ui.map.composables.LocationComponent
 import de.grobox.transportr.ui.map.composables.MapNavDrawerContent
-import de.grobox.transportr.ui.transport.composables.FontTest
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -150,8 +149,6 @@ fun MapScreen(
         Box(Modifier.fillMaxSize()) {
             BottomSheetScaffold(
                 sheetContent = {
-                    FontTest()
-
                     when(val state = sheetContentState) {
                         is BottomSheetContentState.Location -> {
                             LocationComponent(

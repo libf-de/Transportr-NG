@@ -31,7 +31,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import de.grobox.transportr.data.dto.KTrip
-import de.grobox.transportr.ui.trips.search.TripPreviewComposable
 
 @Composable
 fun SearchResultComponent(
@@ -57,7 +56,7 @@ fun SearchResultComponent(
             }
         } else {
             items(trips.toList()) {
-                TripPreviewComposable(
+                NewTripPreviewComposable(
                     trip = it,
                 ) {
                     tripClicked(it)

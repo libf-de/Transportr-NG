@@ -53,6 +53,8 @@ fun ProductComposable(
 ) = ProductComposable(
     drawableId = line.product.getDrawableRes(),
     drawableDescription = line.product.getNameRes().let { stringResource(it) },
+    backgroundColor = line.style?.backgroundColor?.let { Color(it) },
+    foregroundColor = line.style?.foregroundColor?.let { Color(it) },
     label = line.label,
     modifier = modifier
 )

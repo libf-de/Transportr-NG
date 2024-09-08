@@ -47,7 +47,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import de.grobox.transportr.R
 import de.grobox.transportr.data.dto.KLeg
@@ -174,6 +173,12 @@ fun getArrivalTimes(trip: KTrip, context: Context): Pair<String, String> {
     } ?: Pair("", "")
 }
 
+
+
+
+
+
+
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun TripPreviewComposable(
@@ -256,7 +261,11 @@ fun TripPreviewComposable(
                         modifier = Modifier.weight(1f).fillMaxHeight(),
                         verticalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(text = departureName)
+                        Text(
+                            text = departureName,
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Bold
+                        )
 
                         FlowRow(
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -273,7 +282,11 @@ fun TripPreviewComposable(
                         }
 
                         Column {
-                            Text(text = arrivalName)
+                            Text(
+                                text = arrivalName,
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.Bold
+                            )
                             if(arrivalDelay.isNotBlank()) Text(text = "")
                         }
 
@@ -301,7 +314,7 @@ private fun Long?.largerThan(i: Int): Boolean {
     return this?.let { it > i } ?: false
 }
 
-private fun KTrip.hasProblem(): Boolean {
+fun KTrip.hasProblem(): Boolean {
     if (!isTravelable) return true
     for (leg in legs) {
         if (!leg.isPublicLeg) continue
@@ -312,7 +325,7 @@ private fun KTrip.hasProblem(): Boolean {
 }
 
 @Composable
-@Preview
+//@Preview
 fun TripPreviewComposablePreview() {
     TripPreviewComposable(
         onClick = {},
