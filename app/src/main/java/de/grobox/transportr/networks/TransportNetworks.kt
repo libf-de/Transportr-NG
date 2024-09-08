@@ -20,18 +20,73 @@
 package de.grobox.transportr.networks
 
 import android.annotation.SuppressLint
-import android.util.Base64
 import android.content.Context
+import android.util.Base64
 import de.grobox.transportr.R
+import de.grobox.transportr.data.pteextension.AdvancedDbProvider
 import de.grobox.transportr.networks.TransportNetwork.Status.ALPHA
 import de.grobox.transportr.networks.TransportNetwork.Status.BETA
-import de.schildbach.pte.*
-import okhttp3.HttpUrl
+import de.schildbach.pte.AustraliaProvider
+import de.schildbach.pte.AvvAachenProvider
+import de.schildbach.pte.AvvAugsburgProvider
+import de.schildbach.pte.BartProvider
+import de.schildbach.pte.BayernProvider
+import de.schildbach.pte.BsvagProvider
+import de.schildbach.pte.BvgProvider
+import de.schildbach.pte.CHSearchProvider
+import de.schildbach.pte.CmtaProvider
+import de.schildbach.pte.DingProvider
+import de.schildbach.pte.DsbProvider
+import de.schildbach.pte.DubProvider
+import de.schildbach.pte.FranceNorthEastProvider
+import de.schildbach.pte.FranceNorthWestProvider
+import de.schildbach.pte.FranceSouthEastProvider
+import de.schildbach.pte.FranceSouthWestProvider
+import de.schildbach.pte.GvhProvider
+import de.schildbach.pte.InvgProvider
+import de.schildbach.pte.ItalyProvider
+import de.schildbach.pte.KvvProvider
+import de.schildbach.pte.LinzProvider
+import de.schildbach.pte.LuProvider
+import de.schildbach.pte.MerseyProvider
+import de.schildbach.pte.MvgProvider
+import de.schildbach.pte.MvvProvider
+import de.schildbach.pte.NasaProvider
+import de.schildbach.pte.NetworkId
+import de.schildbach.pte.NsProvider
+import de.schildbach.pte.NvbwProvider
+import de.schildbach.pte.NvvProvider
+import de.schildbach.pte.OebbProvider
+import de.schildbach.pte.ParisProvider
+import de.schildbach.pte.RtProvider
+import de.schildbach.pte.RtaChicagoProvider
+import de.schildbach.pte.SeProvider
+import de.schildbach.pte.ShProvider
+import de.schildbach.pte.SpainProvider
+import de.schildbach.pte.SydneyProvider
+import de.schildbach.pte.TlemProvider
+import de.schildbach.pte.VbbProvider
+import de.schildbach.pte.VblProvider
+import de.schildbach.pte.VbnProvider
+import de.schildbach.pte.VgnProvider
+import de.schildbach.pte.VgsProvider
+import de.schildbach.pte.VmobilProvider
+import de.schildbach.pte.VmtProvider
+import de.schildbach.pte.VmvProvider
+import de.schildbach.pte.VrnProvider
+import de.schildbach.pte.VrrProvider
+import de.schildbach.pte.VrsProvider
+import de.schildbach.pte.VvmProvider
+import de.schildbach.pte.VvoProvider
+import de.schildbach.pte.VvsProvider
+import de.schildbach.pte.VvtProvider
+import de.schildbach.pte.VvvProvider
+import de.schildbach.pte.WienProvider
+import de.schildbach.pte.ZvvProvider
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
-import java.util.*
 
 @SuppressLint("ConstantLocale")
-private val networks = arrayOf(
+val networks = arrayOf(
     Continent(
         R.string.np_continent_europe, R.drawable.continent_europe,
         listOf(
@@ -50,7 +105,7 @@ private val networks = arrayOf(
                         name = R.string.np_name_db,
                         description = R.string.np_desc_db2,
                         logo = R.drawable.network_db_logo,
-                        factory = { DbProvider("{\"type\":\"AID\",\"aid\":\"n91dB8Z77MLdoR0K\"}", "bdI8UVj40K5fvxwf".toByteArray(Charsets.UTF_8)) }
+                        factory = { AdvancedDbProvider("{\"type\":\"AID\",\"aid\":\"n91dB8Z77MLdoR0K\"}", "bdI8UVj40K5fvxwf".toByteArray(Charsets.UTF_8)) }
                     )
                 )
             ),
@@ -62,7 +117,7 @@ private val networks = arrayOf(
                         description = R.string.np_desc_db,
                         logo = R.drawable.network_db_logo,
                         itemIdExtra = 1,
-                        factory = { DbProvider("{\"type\":\"AID\",\"aid\":\"n91dB8Z77MLdoR0K\"}", "bdI8UVj40K5fvxwf".toByteArray(Charsets.UTF_8)) }
+                        factory = { AdvancedDbProvider("{\"type\":\"AID\",\"aid\":\"n91dB8Z77MLdoR0K\"}", "bdI8UVj40K5fvxwf".toByteArray(Charsets.UTF_8)) }
                     ),
                     TransportNetwork(
                         id = NetworkId.BVG,

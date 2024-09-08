@@ -16,23 +16,31 @@ androidx-room = "2.6.1"
 compose-bom = "2024.08.00"
 compose-activities = "1.9.0"
 compose-viewmodel = "2.6.1"
+compose-navigation = "2.8.0"
 ckchangelog = "1.2.2"
 flexbox = "3.0.0"
 maplibre = "11.2.0"
 maplibre-annotation = "3.0.0"
 material = "1.12.0" # 1.5.0
-okhttp = "3.12.13"
+okhttp = "4.12.0"
 koin-bom = "3.5.6"
 swipy = "1.2.3"
-
+kotlinx-serialization = "1.7.2"
+kotlinx-datetime = "0.6.1"
 compose-settings = "2.4.0"
+moko-geo = "0.6.0"
+moko-perm = "0.18.0"
 
 
 [libraries]
+moko-geo = { module = "dev.icerock.moko:geo-compose", version.ref = "moko-geo" }
+moko-perm = { module = "dev.icerock.moko:permissions-compose", version.ref = "moko-perm"}
 koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koin-bom" }
 koin-core = { module = "io.insert-koin:koin-core" }
 koin-android = { module = "io.insert-koin:koin-android" }
 koin-compose = { module = "io.insert-koin:koin-androidx-compose" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime"}
 agp = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
 kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin"}
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk7", version.ref = "kotlin" }
@@ -49,9 +57,11 @@ androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayo
 androidx-lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidx-lifecycle"}
 androidx-lifecycle-livedata = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "androidx-lifecycle"}
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "androidx-room" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "androidx-room" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "androidx-room" }
 androidx-localbroadcastmanager = {module = "androidx.localbroadcastmanager:localbroadcastmanager", version.ref = "androidx-localbroadcastmanager" }
 compose-material3 = { module = "androidx.compose.material3:material3" }
+compose-navigation = { module = "androidx.navigation:navigation-compose", version.ref = "compose-navigation" }
 compose-preview-debug = { module = "androidx.compose.ui:ui-tooling-preview" }
 compose-preview = { module = "androidx.compose.ui:ui-tooling" }
 compose-activities = { module = "androidx.activity:activity-compose", version.ref =  "compose-activities" }
@@ -94,5 +104,6 @@ composeSettings-ui-extended = { group = "com.github.alorma.compose-settings", na
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

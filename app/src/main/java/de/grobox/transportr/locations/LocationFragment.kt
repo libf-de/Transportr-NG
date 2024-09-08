@@ -37,17 +37,17 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.common.base.Strings
 import de.grobox.transportr.R
 import de.grobox.transportr.TransportrFragment
+import de.grobox.transportr.data.dto.KLocation
 import de.grobox.transportr.databinding.FragmentLocationBinding
 import de.grobox.transportr.departures.DeparturesActivity
 import de.grobox.transportr.departures.DeparturesLoader
 import de.grobox.transportr.locations.ReverseGeocoder.ReverseGeocoderCallback
-import de.grobox.transportr.map.MapViewModel
+import de.grobox.transportr.ui.map.MapViewModel
 import de.grobox.transportr.utils.Constants
 import de.grobox.transportr.utils.IntentUtils.findNearbyStations
 import de.grobox.transportr.utils.IntentUtils.startGeoIntent
 import de.grobox.transportr.utils.TransportrUtils.getCoordName
 import de.schildbach.pte.dto.Line
-import de.schildbach.pte.dto.LocationType
 import de.schildbach.pte.dto.QueryDeparturesResult
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import java.util.Date
@@ -105,7 +105,7 @@ class LocationFragment : TransportrFragment(), LoaderManager.LoaderCallbacks<Que
         locationInfo = binding.locationInfo
         showLocation()
 
-        if (location.location.type == LocationType.COORD) {
+        if (location.location.type == KLocation.Type.COORD) {
             val geocoder = ReverseGeocoder(requireActivity(), this)
             geocoder.findLocation(location.location)
         }
@@ -115,7 +115,7 @@ class LocationFragment : TransportrFragment(), LoaderManager.LoaderCallbacks<Que
         if (location.hasId()) {
             departuresButton.setOnClickListener {
                 val intent = Intent(context, DeparturesActivity::class.java)
-                intent.putExtra(Constants.WRAP_LOCATION, location)
+                //intent.putExtra(Constants.WRAP_LOCATION, location)
                 startActivity(intent)
             }
         } else {
@@ -157,12 +157,12 @@ class LocationFragment : TransportrFragment(), LoaderManager.LoaderCallbacks<Que
 
     private fun showLocation() {
         locationName.text = location.getName()
-        locationIcon.setImageDrawable(ContextCompat.getDrawable(context, location.drawable))
+        locationIcon.setImageDrawable(ContextCompat.getDrawable(context, location.drawableInt))
         val locationInfoStr = StringBuilder()
         if (!Strings.isNullOrEmpty(location.location.place)) {
             locationInfoStr.append(location.location.place)
         }
-        if (location.location.hasCoord()) {
+        if (location.location.hasCoords) {
             if (locationInfoStr.isNotEmpty()) locationInfoStr.append(", ")
             locationInfoStr.append(getCoordName(location.location))
         }
@@ -176,7 +176,7 @@ class LocationFragment : TransportrFragment(), LoaderManager.LoaderCallbacks<Que
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         if (location.hasId()) {
-            val args = DeparturesLoader.getBundle(location.getId(), Date(), DeparturesActivity.MAX_DEPARTURES)
+            val args = DeparturesLoader.getBundle(location.id, Date(), DeparturesActivity.MAX_DEPARTURES)
             loaderManager.initLoader(Constants.LOADER_DEPARTURES, args, this).forceLoad()
         }
     }
@@ -226,7 +226,7 @@ class LocationFragment : TransportrFragment(), LoaderManager.LoaderCallbacks<Que
             val f = LocationFragment()
 
             val args = Bundle()
-            args.putSerializable(Constants.WRAP_LOCATION, location)
+            //args.putSerializable(Constants.WRAP_LOCATION, location)
             f.arguments = args
 
             return f

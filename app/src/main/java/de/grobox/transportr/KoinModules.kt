@@ -21,19 +21,26 @@ package de.grobox.transportr
 
 import androidx.room.Room
 import de.grobox.transportr.data.Db
+import de.grobox.transportr.data.gps.AndroidGeocoder
+import de.grobox.transportr.data.gps.AndroidGpsRepository
+import de.grobox.transportr.data.gps.GpsRepository
+import de.grobox.transportr.data.gps.OsmGeocoder
+import de.grobox.transportr.data.gps.ReverseGeocoderV2
 import de.grobox.transportr.data.locations.LocationDao
 import de.grobox.transportr.data.locations.LocationRepository
 import de.grobox.transportr.data.searches.SearchesDao
 import de.grobox.transportr.data.searches.SearchesRepository
+import de.grobox.transportr.data.trips.TripsDao
+import de.grobox.transportr.data.trips.TripsRepository
 import de.grobox.transportr.locations.CombinedSuggestionRepository
 import de.grobox.transportr.locations.SuggestLocationsRepository
-import de.grobox.transportr.map.MapViewModel
 import de.grobox.transportr.map.PositionController
 import de.grobox.transportr.networks.TransportNetworkManager
 import de.grobox.transportr.settings.SettingsManager
-import de.grobox.transportr.settings.SettingsViewModel
-import de.grobox.transportr.trips.detail.TripDetailViewModel
-import de.grobox.transportr.trips.search.DirectionsViewModel
+import de.grobox.transportr.ui.directions.DirectionsViewModel
+import de.grobox.transportr.ui.map.MapViewModel
+import de.grobox.transportr.ui.settings.SettingsViewModel
+import de.grobox.transportr.ui.trips.TripDetailViewModel
 import kotlinx.coroutines.Dispatchers
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
@@ -47,6 +54,18 @@ val TransportrModule = module {
     single {
         TransportNetworkManager(settingsManager = get())
     }
+
+    single {
+        TripsRepository(
+            ctx = androidContext(),
+            networkManager = get(),
+            settingsManager = get(),
+            locationRepository = get(),
+            searchesRepository = get(),
+            tripsDao = get()
+        )
+    }
+
     single {
         LocationRepository(
             locationDao = get(),
@@ -75,6 +94,21 @@ val TransportrModule = module {
         )
     }
 
+    single<GpsRepository> {
+        AndroidGpsRepository(
+            context = androidContext()
+        )
+    }
+
+    single { AndroidGeocoder(context = androidContext()) }
+    single { OsmGeocoder() }
+    single { ReverseGeocoderV2(
+        geocoders = listOf(
+            get<AndroidGeocoder>(),
+            get<OsmGeocoder>()
+        ))
+    }
+
     factory {
         PositionController(context = androidContext())
     }
@@ -91,6 +125,8 @@ val DatabaseModule = module {
     single<LocationDao> { get<Db>().locationDao() }
 
     single<SearchesDao> { get<Db>().searchesDao() }
+
+    single<TripsDao> { get<Db>().tripsDao()}
 }
 
 val ViewModelModule = module {
@@ -113,7 +149,10 @@ val ViewModelModule = module {
             locationRepository = get(),
             searchesRepository = get(),
             positionController = get(),
-            combinedSuggestionRepository = get()
+            combinedSuggestionRepository = get(),
+            tripsRepository = get(),
+            geocoder = get(),
+            gpsRepository = get()
         )
     }
 
@@ -122,7 +161,8 @@ val ViewModelModule = module {
             application = androidApplication() as TransportrApplication,
             transportNetworkManager = get(),
             positionController = get(),
-            settingsManager = get()
+            settingsManager = get(),
+            tripsRepository = get()
         )
     }
 

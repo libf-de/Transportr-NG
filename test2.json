@@ -1,0 +1,3970 @@
+{
+  "entries": [
+    {
+      "bahnhofsId": "8010085",
+      "zeit": "2024-09-09T11:00:00",
+      "gleis": "14",
+      "ueber": [
+        "Dresden Hbf",
+        "Dresden Freiberger Straße",
+        "Dresden Mitte",
+        "Dresden-Neustadt",
+        "Dresden Bischofsplatz",
+        "Dresden-Pieschen",
+        "Dresden-Trachau",
+        "Meißen Altstadt"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#311559#TA#1#DA#90924#1S#8010022#1T#1015#LS#8012318#LT#1137#PU#80#RT#1#CA#s#ZE#1#ZB#S      1#PC#4#FR#8010022#FT#1015#TO#8012318#TT#1137#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "S 1",
+        "linienNummer": "1",
+        "kurzText": "S",
+        "mittelText": "S 1",
+        "langText": "S 1",
+        "produktGattung": "SBAHN"
+      },
+      "terminus": "Meißen Altstadt"
+    },
+    {
+      "bahnhofsId": "977992",
+      "zeit": "2024-09-09T11:01:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Carolaplatz, Dresden",
+        "Albertplatz, Dresden",
+        "Wilder Mann, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1476045#TA#27#DA#90924#1S#972142#1T#1049#LS#978591#LT#1126#PU#80#RT#1#CA#STR#ZE#3#ZB#STR    3#PC#8#FR#972142#FT#1049#TO#978591#TT#1126#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 3",
+        "linienNummer": "3",
+        "kurzText": "STR",
+        "mittelText": "STR 3",
+        "langText": "STR 3",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Wilder Mann, Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:02:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Carolaplatz, Dresden",
+        "Albertplatz, Dresden",
+        "Bahnhof Neustadt, Dresden",
+        "Wilder Mann, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1476045#TA#27#DA#90924#1S#972142#1T#1049#LS#978591#LT#1126#PU#80#RT#1#CA#STR#ZE#3#ZB#STR    3#PC#8#FR#972142#FT#1049#TO#978591#TT#1126#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 3",
+        "linienNummer": "3",
+        "kurzText": "STR",
+        "mittelText": "STR 3",
+        "langText": "STR 3",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Wilder Mann, Dresden"
+    },
+    {
+      "bahnhofsId": "975243",
+      "zeit": "2024-09-09T11:02:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Budapester Straße, Dresden",
+        "S-Bahnhof Freiberger Straße, Dresden",
+        "Bahnhof Mitte, Dresden",
+        "Weißeritzstraße, Dresden",
+        "Krankenhaus Friedrichstadt, Dresden",
+        "Vorwerkstraße, Dresden",
+        "Messe Gleisschleife, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1882955#TA#22#DA#90924#1S#972165#1T#952#LS#978870#LT#1118#PU#80#RT#1#CA#STR#ZE#12#ZB#STR   12#PC#8#FR#972165#FT#952#TO#978870#TT#1118#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 10",
+        "linienNummer": "10",
+        "kurzText": "STR",
+        "mittelText": "STR 10",
+        "langText": "STR 10",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Messe Gleisschleife, Dresden"
+    },
+    {
+      "bahnhofsId": "977992",
+      "zeit": "2024-09-09T11:03:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Carolaplatz, Dresden",
+        "Albertplatz, Dresden",
+        "Hellerau Kiefernweg, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483555#TA#10#DA#90924#1S#972114#1T#1058#LS#972217#LT#1133#PU#80#RT#1#CA#STR#ZE#8#ZB#STR    8#PC#8#FR#972114#FT#1058#TO#972217#TT#1133#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 8",
+        "linienNummer": "8",
+        "kurzText": "STR",
+        "mittelText": "STR 8",
+        "langText": "STR 8",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Hellerau Kiefernweg, Dresden"
+    },
+    {
+      "bahnhofsId": "977992",
+      "zeit": "2024-09-09T11:04:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Technische Universität, Dresden",
+        "Dresdner Straße, Wilsdruff",
+        "Abzw. Sachsdorf, Wilsdruff",
+        "Gewerbepark, Klipphausen",
+        "Deutschenbora Hirschfelder Straße, Nossen",
+        "Bahnübergang, Nossen",
+        "Waldheimer Str., Nossen"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1475885#TA#4#DA#90924#1S#977992#1T#1104#LS#980008#LT#1153#PU#80#RT#1#CA#Bus#ZE#424#ZB#Bus  424#PC#5#FR#977992#FT#1104#TO#980008#TT#1153#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "Bus 424",
+        "linienNummer": "424",
+        "kurzText": "Bus",
+        "mittelText": "Bus 424",
+        "langText": "Bus 424",
+        "produktGattung": "BUS"
+      },
+      "terminus": "Waldheimer Str., Nossen"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:04:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Hauptbahnhof, Dresden",
+        "Reichenbachstraße, Dresden",
+        "Nürnberger Platz, Dresden",
+        "Südvorstadt, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483456#TA#12#DA#90924#1S#972217#1T#1035#LS#972114#LT#1110#PU#80#RT#1#CA#STR#ZE#8#ZB#STR    8#PC#8#FR#972217#FT#1035#TO#972114#TT#1110#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 8",
+        "linienNummer": "8",
+        "kurzText": "STR",
+        "mittelText": "STR 8",
+        "langText": "STR 8",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Südvorstadt, Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:04:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Carolaplatz, Dresden",
+        "Albertplatz, Dresden",
+        "Louisenstraße, Dresden",
+        "Hellerau Kiefernweg, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483555#TA#10#DA#90924#1S#972114#1T#1058#LS#972217#LT#1133#PU#80#RT#1#CA#STR#ZE#8#ZB#STR    8#PC#8#FR#972114#FT#1058#TO#972217#TT#1133#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 8",
+        "linienNummer": "8",
+        "kurzText": "STR",
+        "mittelText": "STR 8",
+        "langText": "STR 8",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Hellerau Kiefernweg, Dresden"
+    },
+    {
+      "bahnhofsId": "975243",
+      "zeit": "2024-09-09T11:04:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Gret-Palucca-Straße, Dresden",
+        "Lennéplatz, Dresden",
+        "Georg-Arnhold-Bad, Dresden",
+        "Straßburger Platz, Dresden",
+        "Comeniusplatz, Dresden",
+        "Fetscherplatz, Dresden",
+        "Leutewitz, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1875456#TA#26#DA#90924#1S#978870#1T#1050#LS#972165#LT#1215#PU#80#RT#1#CA#STR#ZE#10#ZB#STR   10#PC#8#FR#978870#FT#1050#TO#972165#TT#1215#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 10",
+        "linienNummer": "10",
+        "kurzText": "STR",
+        "mittelText": "STR 10",
+        "langText": "STR 10",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Leutewitz, Dresden"
+    },
+    {
+      "bahnhofsId": "977992",
+      "zeit": "2024-09-09T11:04:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Reichenbachstraße, Dresden",
+        "Technische Universität, Dresden",
+        "Mommsenstraße, Dresden",
+        "Südhöhe, Dresden",
+        "Altkaitz, Dresden",
+        "Bannewitzer Straße, Dresden",
+        "Mockritz, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1915538#TA#6#DA#90924#1S#972431#1T#951#LS#972431#LT#1121#PU#80#RT#1#CA#Bus#ZE#66#ZB#Bus   66#PC#5#FR#972431#FT#951#TO#972431#TT#1121#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "Bus 66",
+        "linienNummer": "66",
+        "kurzText": "Bus",
+        "mittelText": "Bus 66",
+        "langText": "Bus 66",
+        "produktGattung": "BUS"
+      },
+      "terminus": "Mockritz, Dresden"
+    },
+    {
+      "bahnhofsId": "977992",
+      "zeit": "2024-09-09T11:05:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Reichenbachstraße, Dresden",
+        "Nürnberger Platz, Dresden",
+        "Südvorstadt, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483456#TA#12#DA#90924#1S#972217#1T#1035#LS#972114#LT#1110#PU#80#RT#1#CA#STR#ZE#8#ZB#STR    8#PC#8#FR#972217#FT#1035#TO#972114#TT#1110#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 8",
+        "linienNummer": "8",
+        "kurzText": "STR",
+        "mittelText": "STR 8",
+        "langText": "STR 8",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Südvorstadt, Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:05:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Carolaplatz, Dresden",
+        "Neustädter Markt, Dresden",
+        "Palaisplatz, Dresden",
+        "Kaditz Riegelplatz, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483670#TA#13#DA#90924#1S#978576#1T#1037#LS#972300#LT#1130#PU#80#RT#1#CA#STR#ZE#9#ZB#STR    9#PC#8#FR#978576#FT#1037#TO#972300#TT#1130#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 9",
+        "linienNummer": "9",
+        "kurzText": "STR",
+        "mittelText": "STR 9",
+        "langText": "STR 9",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Kaditz Riegelplatz, Dresden"
+    },
+    {
+      "bahnhofsId": "8010085",
+      "zeit": "2024-09-09T11:06:00",
+      "gleis": "2",
+      "ueber": [
+        "Dresden Hbf",
+        "Dresden Mitte",
+        "Dresden-Neustadt",
+        "Coswig(b Dresden)",
+        "Weinböhla Hp",
+        "Niederau",
+        "Priestewitz",
+        "Leipzig Hbf"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#310151#TA#0#DA#90924#1S#8010085#1T#1106#LS#8010205#LT#1250#PU#80#RT#1#CA#RE#ZE#16514#ZB#RE 16514#PC#3#FR#8010085#FT#1106#TO#8010205#TT#1250#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "RE 16514",
+        "kurzText": "RE",
+        "mittelText": "RE 50",
+        "langText": "RE 16514",
+        "produktGattung": "REGIONAL"
+      },
+      "terminus": "Leipzig Hbf"
+    },
+    {
+      "bahnhofsId": "975243",
+      "zeit": "2024-09-09T11:06:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Carolaplatz, Dresden",
+        "Albertplatz, Dresden",
+        "Weixdorf (Rathenaustraße), Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483354#TA#26#DA#90924#1S#978121#1T#1046#LS#978479#LT#1144#PU#80#RT#1#CA#STR#ZE#7#ZB#STR    7#PC#8#FR#978121#FT#1046#TO#978479#TT#1144#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 7",
+        "linienNummer": "7",
+        "kurzText": "STR",
+        "mittelText": "STR 7",
+        "langText": "STR 7",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Weixdorf (Rathenaustraße), Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:07:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Hauptbahnhof, Dresden",
+        "Budapester Straße, Dresden",
+        "S-Bahnhof Freiberger Straße, Dresden",
+        "Rosenstraße, Dresden",
+        "Oederaner Straße, Dresden",
+        "Löbtau Tharandter Straße, Dresden",
+        "Betriebshof Gorbitz, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483197#TA#27#DA#90924#1S#978479#1T#1030#LS#978121#LT#1128#PU#80#RT#1#CA#STR#ZE#7#ZB#STR    7#PC#8#FR#978479#FT#1030#TO#978121#TT#1128#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 7",
+        "linienNummer": "7",
+        "kurzText": "STR",
+        "mittelText": "STR 7",
+        "langText": "STR 7",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Betriebshof Gorbitz, Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:07:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Carolaplatz, Dresden",
+        "Albertplatz, Dresden",
+        "Louisenstraße, Dresden",
+        "Weixdorf (Rathenaustraße), Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483354#TA#26#DA#90924#1S#978121#1T#1046#LS#978479#LT#1144#PU#80#RT#1#CA#STR#ZE#7#ZB#STR    7#PC#8#FR#978121#FT#1046#TO#978479#TT#1144#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 7",
+        "linienNummer": "7",
+        "kurzText": "STR",
+        "mittelText": "STR 7",
+        "langText": "STR 7",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Weixdorf (Rathenaustraße), Dresden"
+    },
+    {
+      "bahnhofsId": "360028",
+      "zeit": "2024-09-09T11:07:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Gret-Palucca-Straße, Dresden",
+        "Uhlandstraße, Dresden",
+        "Strehlener Platz, Dresden",
+        "Weberplatz, Dresden",
+        "Caspar-David-Friedrich-Str., Dresden",
+        "Corinthstraße, Dresden",
+        "Mockritz, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1915538#TA#9#DA#90924#1S#972431#1T#1051#LS#972431#LT#1221#PU#80#RT#1#CA#Bus#ZE#66#ZB#Bus   66#PC#5#FR#972431#FT#1051#TO#972431#TT#1221#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "Bus 66",
+        "linienNummer": "66",
+        "kurzText": "Bus",
+        "mittelText": "Bus 66",
+        "langText": "Bus 66",
+        "produktGattung": "BUS"
+      },
+      "terminus": "Mockritz, Dresden"
+    },
+    {
+      "bahnhofsId": "8010085",
+      "zeit": "2024-09-09T11:08:00",
+      "ezGleis": "9",
+      "ueber": [
+        "Dresden Hbf",
+        "Dresden-Plauen",
+        "Freital-Potschappel",
+        "Freital-Deuben",
+        "Freital-Hainsberg",
+        "Freital-Hainsberg West",
+        "Tharandt"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#365858#TA#6#DA#90924#1S#8010085#1T#1108#LS#8013114#LT#1125#PU#80#RT#1#CA#DPN#ZE#56876#ZB#RB 56876#PC#3#FR#8010085#FT#1108#TO#8013114#TT#1125#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "RB 56876",
+        "kurzText": "RB",
+        "mittelText": "RB 30",
+        "langText": "RB 56876",
+        "produktGattung": "REGIONAL"
+      },
+      "terminus": "Tharandt"
+    },
+    {
+      "bahnhofsId": "975239",
+      "zeit": "2024-09-09T11:08:00",
+      "ueber": [
+        "Nürnberger Platz, Dresden",
+        "Technische Universität, Dresden",
+        "SLUB, Dresden",
+        "Zellescher Weg, Dresden",
+        "Caspar-David-Friedrich-Str., Dresden",
+        "Wasaplatz, Dresden",
+        "S-Bahnhof Strehlen, Dresden",
+        "Weißig Einkaufszentrum, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1475331#TA#7#DA#90924#1S#978024#1T#1102#LS#973993#LT#1206#PU#80#RT#1#CA#Bus#ZE#61#ZB#Bus   61#PC#5#FR#978024#FT#1102#TO#973993#TT#1206#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "Bus 61",
+        "linienNummer": "61",
+        "kurzText": "Bus",
+        "mittelText": "Bus 61",
+        "langText": "Bus 61",
+        "produktGattung": "BUS"
+      },
+      "terminus": "Weißig Einkaufszentrum, Dresden"
+    },
+    {
+      "bahnhofsId": "975246",
+      "zeit": "2024-09-09T11:08:00",
+      "ueber": [
+        "Nürnberger Platz, Dresden",
+        "Reichenbachstraße, Dresden",
+        "Hauptbahnhof, Dresden",
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Wilder Mann, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1476045#TA#28#DA#90924#1S#972142#1T#1059#LS#978591#LT#1136#PU#80#RT#1#CA#STR#ZE#3#ZB#STR    3#PC#8#FR#972142#FT#1059#TO#978591#TT#1136#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 3",
+        "linienNummer": "3",
+        "kurzText": "STR",
+        "mittelText": "STR 3",
+        "langText": "STR 3",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Wilder Mann, Dresden"
+    },
+    {
+      "bahnhofsId": "975243",
+      "zeit": "2024-09-09T11:08:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Budapester Straße, Dresden",
+        "S-Bahnhof Freiberger Straße, Dresden",
+        "Rosenstraße, Dresden",
+        "Oederaner Straße, Dresden",
+        "Löbtau Tharandter Straße, Dresden",
+        "Bünaustraße, Dresden",
+        "Betriebshof Gorbitz, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483197#TA#27#DA#90924#1S#978479#1T#1030#LS#978121#LT#1128#PU#80#RT#1#CA#STR#ZE#7#ZB#STR    7#PC#8#FR#978479#FT#1030#TO#978121#TT#1128#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 7",
+        "linienNummer": "7",
+        "kurzText": "STR",
+        "mittelText": "STR 7",
+        "langText": "STR 7",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Betriebshof Gorbitz, Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:09:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Gret-Palucca-Straße, Dresden",
+        "Lennéplatz, Dresden",
+        "Lennéplatz, Dresden",
+        "Zoo, Dresden",
+        "Querallee, Dresden",
+        "S-Bahnhof Strehlen, Dresden",
+        "Prohlis Gleisschleife, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1471927#TA#12#DA#90924#1S#972300#1T#1044#LS#978576#LT#1135#PU#80#RT#1#CA#STR#ZE#9#ZB#STR    9#PC#8#FR#972300#FT#1044#TO#978576#TT#1135#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 9",
+        "linienNummer": "9",
+        "kurzText": "STR",
+        "mittelText": "STR 9",
+        "langText": "STR 9",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Prohlis Gleisschleife, Dresden"
+    },
+    {
+      "bahnhofsId": "975239",
+      "zeit": "2024-09-09T11:09:00",
+      "ueber": [
+        "Nürnberger Platz, Dresden",
+        "Bernhardstraße, Dresden",
+        "Chemnitzer Straße, Dresden",
+        "Zwickauer Straße, Dresden",
+        "Fabrikstraße, Dresden",
+        "Löbtau Tharandter Straße, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1475120#TA#6#DA#90924#1S#973993#1T#1010#LS#978024#LT#1116#PU#80#RT#1#CA#Bus#ZE#61#ZB#Bus   61#PC#5#FR#973993#FT#1010#TO#978024#TT#1116#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "Bus 61",
+        "linienNummer": "61",
+        "kurzText": "Bus",
+        "mittelText": "Bus 61",
+        "langText": "Bus 61",
+        "produktGattung": "BUS"
+      },
+      "terminus": "Löbtau Tharandter Straße, Dresden"
+    },
+    {
+      "bahnhofsId": "975239",
+      "zeit": "2024-09-09T11:09:00",
+      "ueber": [
+        "Nürnberger Platz, Dresden",
+        "Südvorstadt, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483456#TA#12#DA#90924#1S#972217#1T#1035#LS#972114#LT#1110#PU#80#RT#1#CA#STR#ZE#8#ZB#STR    8#PC#8#FR#972217#FT#1035#TO#972114#TT#1110#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 8",
+        "linienNummer": "8",
+        "kurzText": "STR",
+        "mittelText": "STR 8",
+        "langText": "STR 8",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Südvorstadt, Dresden"
+    },
+    {
+      "bahnhofsId": "975239",
+      "zeit": "2024-09-09T11:09:00",
+      "ueber": [
+        "Nürnberger Platz, Dresden",
+        "Reichenbachstraße, Dresden",
+        "Hauptbahnhof, Dresden",
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Hellerau Kiefernweg, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483555#TA#11#DA#90924#1S#972114#1T#1108#LS#972217#LT#1143#PU#80#RT#1#CA#STR#ZE#8#ZB#STR    8#PC#8#FR#972114#FT#1108#TO#972217#TT#1143#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 8",
+        "linienNummer": "8",
+        "kurzText": "STR",
+        "mittelText": "STR 8",
+        "langText": "STR 8",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Hellerau Kiefernweg, Dresden"
+    },
+    {
+      "bahnhofsId": "977992",
+      "zeit": "2024-09-09T11:09:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Reichenbachstraße, Dresden",
+        "Technische Universität, Dresden",
+        "Mommsenstraße, Dresden",
+        "Südhöhe, Dresden",
+        "Nöthnitz, Bannewitz",
+        "Boderitzer Straße, Bannewitz",
+        "Bahnhof, Altenberg"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1892766#TA#0#DA#90924#1S#972034#1T#1100#LS#977963#LT#1224#PU#80#RT#1#CA#Bus#ZE#360#ZB#Bus  360#PC#5#FR#972034#FT#1100#TO#977963#TT#1224#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "Bus 360",
+        "linienNummer": "360",
+        "kurzText": "Bus",
+        "mittelText": "Bus 360",
+        "langText": "Bus 360",
+        "produktGattung": "BUS"
+      },
+      "terminus": "Bahnhof, Altenberg"
+    },
+    {
+      "bahnhofsId": "8010085",
+      "zeit": "2024-09-09T11:10:00",
+      "gleis": "13",
+      "ueber": [
+        "Dresden Hbf",
+        "Dresden-Strehlen",
+        "Dresden-Reick",
+        "Dresden-Dobritz",
+        "Dresden-Niedersedlitz",
+        "Dresden-Zschachwitz",
+        "Heidenau",
+        "Pirna"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#311856#TA#5#DA#90924#1S#8011399#1T#1048#LS#8010272#LT#1132#PU#80#RT#1#CA#s#ZE#2#ZB#S      2#PC#4#FR#8011399#FT#1048#TO#8010272#TT#1132#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "S 2",
+        "linienNummer": "2",
+        "kurzText": "S",
+        "mittelText": "S 2",
+        "langText": "S 2",
+        "produktGattung": "SBAHN"
+      },
+      "terminus": "Pirna"
+    },
+    {
+      "bahnhofsId": "8010085",
+      "zeit": "2024-09-09T11:10:00",
+      "gleis": "1",
+      "ueber": [
+        "Dresden Hbf",
+        "Bad Schandau",
+        "Decin hl.n.",
+        "Usti nad Labem hl.n.",
+        "Praha-Holesovice",
+        "Praha hl.n.",
+        "Kolin(CZ)",
+        "Budapest-Nyugati"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#411533#TA#0#DA#90924#1S#8098160#1T#916#LS#5500728#LT#2028#PU#80#RT#1#CA#EC#ZE#173#ZB#EC   173#PC#1#FR#8098160#FT#916#TO#5500728#TT#2028#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "EC 173",
+        "kurzText": "EC",
+        "mittelText": "EC 173",
+        "langText": "EC 173",
+        "produktGattung": "EC_IC"
+      },
+      "terminus": "Budapest-Nyugati"
+    },
+    {
+      "bahnhofsId": "977992",
+      "zeit": "2024-09-09T11:11:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Reichenbachstraße, Dresden",
+        "Nürnberger Platz, Dresden",
+        "Bernhardstraße, Dresden",
+        "Chemnitzer Straße, Dresden",
+        "Löbtau Tharandter Straße, Dresden",
+        "Julius-Vahlteich-Straße, Dresden",
+        "Hetzdorf Klinik, Halsbrücke"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1474287#TA#1#DA#90924#1S#972034#1T#1102#LS#980376#LT#1230#PU#80#RT#1#CA#Bus#ZE#333#ZB#Bus  333#PC#5#FR#972034#FT#1102#TO#980376#TT#1230#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "Bus 333",
+        "linienNummer": "333",
+        "kurzText": "Bus",
+        "mittelText": "Bus 333",
+        "langText": "Bus 333",
+        "produktGattung": "BUS"
+      },
+      "terminus": "Hetzdorf Klinik, Halsbrücke"
+    },
+    {
+      "bahnhofsId": "977992",
+      "zeit": "2024-09-09T11:11:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Carolaplatz, Dresden",
+        "Albertplatz, Dresden",
+        "Wilder Mann, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1476045#TA#28#DA#90924#1S#972142#1T#1059#LS#978591#LT#1136#PU#80#RT#1#CA#STR#ZE#3#ZB#STR    3#PC#8#FR#972142#FT#1059#TO#978591#TT#1136#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 3",
+        "linienNummer": "3",
+        "kurzText": "STR",
+        "mittelText": "STR 3",
+        "langText": "STR 3",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Wilder Mann, Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:12:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Carolaplatz, Dresden",
+        "Albertplatz, Dresden",
+        "Bahnhof Neustadt, Dresden",
+        "Wilder Mann, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1476045#TA#28#DA#90924#1S#972142#1T#1059#LS#978591#LT#1136#PU#80#RT#1#CA#STR#ZE#3#ZB#STR    3#PC#8#FR#972142#FT#1059#TO#978591#TT#1136#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 3",
+        "linienNummer": "3",
+        "kurzText": "STR",
+        "mittelText": "STR 3",
+        "langText": "STR 3",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Wilder Mann, Dresden"
+    },
+    {
+      "bahnhofsId": "975243",
+      "zeit": "2024-09-09T11:12:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Budapester Straße, Dresden",
+        "S-Bahnhof Freiberger Straße, Dresden",
+        "Bahnhof Mitte, Dresden",
+        "Weißeritzstraße, Dresden",
+        "Krankenhaus Friedrichstadt, Dresden",
+        "Vorwerkstraße, Dresden",
+        "Messe Gleisschleife, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1882955#TA#23#DA#90924#1S#972165#1T#1002#LS#978870#LT#1128#PU#80#RT#1#CA#STR#ZE#12#ZB#STR   12#PC#8#FR#972165#FT#1002#TO#978870#TT#1128#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 10",
+        "linienNummer": "10",
+        "kurzText": "STR",
+        "mittelText": "STR 10",
+        "langText": "STR 10",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Messe Gleisschleife, Dresden"
+    },
+    {
+      "bahnhofsId": "977992",
+      "zeit": "2024-09-09T11:13:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Carolaplatz, Dresden",
+        "Albertplatz, Dresden",
+        "Hellerau Kiefernweg, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483555#TA#11#DA#90924#1S#972114#1T#1108#LS#972217#LT#1143#PU#80#RT#1#CA#STR#ZE#8#ZB#STR    8#PC#8#FR#972114#FT#1108#TO#972217#TT#1143#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 8",
+        "linienNummer": "8",
+        "kurzText": "STR",
+        "mittelText": "STR 8",
+        "langText": "STR 8",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Hellerau Kiefernweg, Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:14:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Prager Straße, Dresden",
+        "Postplatz, Dresden",
+        "Am Zwingerteich, Dresden",
+        "Kongresszentrum/Haus d Presse, Dresden",
+        "Anton-/Leipziger Straße, Dresden",
+        "Eisenbahnstraße, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1472250#TA#9#DA#90924#1S#978111#1T#1111#LS#972170#LT#1127#PU#80#RT#1#CA#STR#ZE#11#ZB#STR   11#PC#8#FR#978111#FT#1111#TO#972170#TT#1127#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 11",
+        "linienNummer": "11",
+        "kurzText": "STR",
+        "mittelText": "STR 11",
+        "langText": "STR 11",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Eisenbahnstraße, Dresden"
+    },
+    {
+      "bahnhofsId": "975239",
+      "zeit": "2024-09-09T11:14:00",
+      "ueber": [
+        "Nürnberger Platz, Dresden",
+        "Bernhardstraße, Dresden",
+        "Chemnitzer Straße, Dresden",
+        "Löbtau Tharandter Straße, Dresden",
+        "Julius-Vahlteich-Straße, Dresden",
+        "Wölfnitzer Ring, Dresden",
+        "Kapellenweg, Dresden",
+        "Hetzdorf Klinik, Halsbrücke"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1474287#TA#1#DA#90924#1S#972034#1T#1102#LS#980376#LT#1230#PU#80#RT#1#CA#Bus#ZE#333#ZB#Bus  333#PC#5#FR#972034#FT#1102#TO#980376#TT#1230#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "Bus 333",
+        "linienNummer": "333",
+        "kurzText": "Bus",
+        "mittelText": "Bus 333",
+        "langText": "Bus 333",
+        "produktGattung": "BUS"
+      },
+      "terminus": "Hetzdorf Klinik, Halsbrücke"
+    },
+    {
+      "bahnhofsId": "977992",
+      "zeit": "2024-09-09T11:14:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Reichenbachstraße, Dresden",
+        "Technische Universität, Dresden",
+        "Mommsenstraße, Dresden",
+        "Südhöhe, Dresden",
+        "Höckendorfer Weg, Dresden",
+        "Dorfhainer Straße, Dresden",
+        "Coschütz, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1479883#TA#11#DA#90924#1S#972564#1T#1050#LS#972142#LT#1127#PU#80#RT#1#CA#Bus#ZE#66#ZB#Bus   66#PC#5#FR#972564#FT#1050#TO#972142#TT#1127#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "Bus 66",
+        "linienNummer": "66",
+        "kurzText": "Bus",
+        "mittelText": "Bus 66",
+        "langText": "Bus 66",
+        "produktGattung": "BUS"
+      },
+      "terminus": "Coschütz, Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:14:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Hauptbahnhof, Dresden",
+        "Reichenbachstraße, Dresden",
+        "Nürnberger Platz, Dresden",
+        "Südvorstadt, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483456#TA#13#DA#90924#1S#972217#1T#1045#LS#972114#LT#1120#PU#80#RT#1#CA#STR#ZE#8#ZB#STR    8#PC#8#FR#972217#FT#1045#TO#972114#TT#1120#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 8",
+        "linienNummer": "8",
+        "kurzText": "STR",
+        "mittelText": "STR 8",
+        "langText": "STR 8",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Südvorstadt, Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:14:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Carolaplatz, Dresden",
+        "Albertplatz, Dresden",
+        "Louisenstraße, Dresden",
+        "Hellerau Kiefernweg, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483555#TA#11#DA#90924#1S#972114#1T#1108#LS#972217#LT#1143#PU#80#RT#1#CA#STR#ZE#8#ZB#STR    8#PC#8#FR#972114#FT#1108#TO#972217#TT#1143#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 8",
+        "linienNummer": "8",
+        "kurzText": "STR",
+        "mittelText": "STR 8",
+        "langText": "STR 8",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Hellerau Kiefernweg, Dresden"
+    },
+    {
+      "bahnhofsId": "975243",
+      "zeit": "2024-09-09T11:14:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Gret-Palucca-Straße, Dresden",
+        "Lennéplatz, Dresden",
+        "Georg-Arnhold-Bad, Dresden",
+        "Straßburger Platz, Dresden",
+        "Comeniusplatz, Dresden",
+        "Fetscherplatz, Dresden",
+        "Leutewitz, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1875456#TA#27#DA#90924#1S#978870#1T#1100#LS#972165#LT#1225#PU#80#RT#1#CA#STR#ZE#10#ZB#STR   10#PC#8#FR#978870#FT#1100#TO#972165#TT#1225#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 10",
+        "linienNummer": "10",
+        "kurzText": "STR",
+        "mittelText": "STR 10",
+        "langText": "STR 10",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Leutewitz, Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:14:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Gret-Palucca-Straße, Dresden",
+        "Lennéplatz, Dresden",
+        "Georg-Arnhold-Bad, Dresden",
+        "Straßburger Platz, Dresden",
+        "Comeniusplatz, Dresden",
+        "Lipsiusstraße, Dresden",
+        "Laubegast Kronstädter Platz, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1876554#TA#2#DA#90924#1S#972170#1T#1100#LS#972070#LT#1146#PU#80#RT#1#CA#STR#ZE#11#ZB#STR   11#PC#8#FR#972170#FT#1100#TO#972070#TT#1146#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 11",
+        "linienNummer": "11",
+        "kurzText": "STR",
+        "mittelText": "STR 11",
+        "langText": "STR 11",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Laubegast Kronstädter Platz, Dresden"
+    },
+    {
+      "bahnhofsId": "360028",
+      "zeit": "2024-09-09T11:15:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Albertplatz, Dresden",
+        "Waldschlößchen, Dresden",
+        "Angelikastraße, Dresden",
+        "Plattleite, Dresden",
+        "Busbahnhof, Sebnitz"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1474016#TA#2#DA#90924#1S#360028#1T#1115#LS#974099#LT#1254#PU#80#RT#1#CA#Bus#ZE#261#ZB#Bus  261#PC#5#FR#360028#FT#1115#TO#974099#TT#1254#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "Bus 261",
+        "linienNummer": "261",
+        "kurzText": "Bus",
+        "mittelText": "Bus 261",
+        "langText": "Bus 261",
+        "produktGattung": "BUS"
+      },
+      "terminus": "Busbahnhof, Sebnitz"
+    },
+    {
+      "bahnhofsId": "977992",
+      "zeit": "2024-09-09T11:15:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Reichenbachstraße, Dresden",
+        "Nürnberger Platz, Dresden",
+        "Südvorstadt, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483456#TA#13#DA#90924#1S#972217#1T#1045#LS#972114#LT#1120#PU#80#RT#1#CA#STR#ZE#8#ZB#STR    8#PC#8#FR#972217#FT#1045#TO#972114#TT#1120#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 8",
+        "linienNummer": "8",
+        "kurzText": "STR",
+        "mittelText": "STR 8",
+        "langText": "STR 8",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Südvorstadt, Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:15:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Carolaplatz, Dresden",
+        "Neustädter Markt, Dresden",
+        "Palaisplatz, Dresden",
+        "Kaditz Riegelplatz, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483670#TA#14#DA#90924#1S#978576#1T#1047#LS#972300#LT#1140#PU#80#RT#1#CA#STR#ZE#9#ZB#STR    9#PC#8#FR#978576#FT#1047#TO#972300#TT#1140#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 9",
+        "linienNummer": "9",
+        "kurzText": "STR",
+        "mittelText": "STR 9",
+        "langText": "STR 9",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Kaditz Riegelplatz, Dresden"
+    },
+    {
+      "bahnhofsId": "975243",
+      "zeit": "2024-09-09T11:16:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Carolaplatz, Dresden",
+        "Albertplatz, Dresden",
+        "Weixdorf (Rathenaustraße), Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483354#TA#27#DA#90924#1S#978121#1T#1056#LS#978479#LT#1154#PU#80#RT#1#CA#STR#ZE#7#ZB#STR    7#PC#8#FR#978121#FT#1056#TO#978479#TT#1154#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 7",
+        "linienNummer": "7",
+        "kurzText": "STR",
+        "mittelText": "STR 7",
+        "langText": "STR 7",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Weixdorf (Rathenaustraße), Dresden"
+    },
+    {
+      "bahnhofsId": "360028",
+      "zeit": "2024-09-09T11:17:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Gret-Palucca-Straße, Dresden",
+        "Uhlandstraße, Dresden",
+        "Strehlener Platz, Dresden",
+        "Weberplatz, Dresden",
+        "Caspar-David-Friedrich-Str., Dresden",
+        "Corinthstraße, Dresden",
+        "Lockwitz, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1480008#TA#10#DA#90924#1S#972716#1T#1059#LS#972564#LT#1142#PU#80#RT#1#CA#Bus#ZE#66#ZB#Bus   66#PC#5#FR#972716#FT#1059#TO#972564#TT#1142#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "Bus 66",
+        "linienNummer": "66",
+        "kurzText": "Bus",
+        "mittelText": "Bus 66",
+        "langText": "Bus 66",
+        "produktGattung": "BUS"
+      },
+      "terminus": "Lockwitz, Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:17:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Hauptbahnhof, Dresden",
+        "Budapester Straße, Dresden",
+        "S-Bahnhof Freiberger Straße, Dresden",
+        "Rosenstraße, Dresden",
+        "Oederaner Straße, Dresden",
+        "Löbtau Tharandter Straße, Dresden",
+        "Betriebshof Gorbitz, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483197#TA#28#DA#90924#1S#978479#1T#1040#LS#978121#LT#1138#PU#80#RT#1#CA#STR#ZE#7#ZB#STR    7#PC#8#FR#978479#FT#1040#TO#978121#TT#1138#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 7",
+        "linienNummer": "7",
+        "kurzText": "STR",
+        "mittelText": "STR 7",
+        "langText": "STR 7",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Betriebshof Gorbitz, Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:17:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Carolaplatz, Dresden",
+        "Albertplatz, Dresden",
+        "Louisenstraße, Dresden",
+        "Weixdorf (Rathenaustraße), Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483354#TA#27#DA#90924#1S#978121#1T#1056#LS#978479#LT#1154#PU#80#RT#1#CA#STR#ZE#7#ZB#STR    7#PC#8#FR#978121#FT#1056#TO#978479#TT#1154#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 7",
+        "linienNummer": "7",
+        "kurzText": "STR",
+        "mittelText": "STR 7",
+        "langText": "STR 7",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Weixdorf (Rathenaustraße), Dresden"
+    },
+    {
+      "bahnhofsId": "8010085",
+      "zeit": "2024-09-09T11:18:00",
+      "gleis": "14",
+      "ueber": [
+        "Dresden Hbf",
+        "Dresden Freiberger Straße",
+        "Dresden Mitte",
+        "Dresden-Neustadt",
+        "Dresden Industriegelände",
+        "Dresden-Klotzsche",
+        "Dresden Grenzstraße",
+        "Dresden Flughafen"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#311855#TA#6#DA#90924#1S#8010272#1T#1053#LS#8011399#LT#1139#PU#80#RT#1#CA#s#ZE#2#ZB#S      2#PC#4#FR#8010272#FT#1053#TO#8011399#TT#1139#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "S 2",
+        "linienNummer": "2",
+        "kurzText": "S",
+        "mittelText": "S 2",
+        "langText": "S 2",
+        "produktGattung": "SBAHN"
+      },
+      "terminus": "Dresden Flughafen"
+    },
+    {
+      "bahnhofsId": "975239",
+      "zeit": "2024-09-09T11:18:00",
+      "ueber": [
+        "Nürnberger Platz, Dresden",
+        "Technische Universität, Dresden",
+        "SLUB, Dresden",
+        "Zellescher Weg, Dresden",
+        "Caspar-David-Friedrich-Str., Dresden",
+        "Wasaplatz, Dresden",
+        "S-Bahnhof Strehlen, Dresden",
+        "Pappritz Fernsehturm, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1475285#TA#16#DA#90924#1S#978024#1T#1112#LS#978133#LT#1211#PU#80#RT#1#CA#Bus#ZE#61#ZB#Bus   61#PC#5#FR#978024#FT#1112#TO#978133#TT#1211#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "Bus 61",
+        "linienNummer": "61",
+        "kurzText": "Bus",
+        "mittelText": "Bus 61",
+        "langText": "Bus 61",
+        "produktGattung": "BUS"
+      },
+      "terminus": "Pappritz Fernsehturm, Dresden"
+    },
+    {
+      "bahnhofsId": "975246",
+      "zeit": "2024-09-09T11:18:00",
+      "ueber": [
+        "Nürnberger Platz, Dresden",
+        "Reichenbachstraße, Dresden",
+        "Hauptbahnhof, Dresden",
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Wilder Mann, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1476045#TA#29#DA#90924#1S#972142#1T#1109#LS#978591#LT#1146#PU#80#RT#1#CA#STR#ZE#3#ZB#STR    3#PC#8#FR#972142#FT#1109#TO#978591#TT#1146#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 3",
+        "linienNummer": "3",
+        "kurzText": "STR",
+        "mittelText": "STR 3",
+        "langText": "STR 3",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Wilder Mann, Dresden"
+    },
+    {
+      "bahnhofsId": "975243",
+      "zeit": "2024-09-09T11:18:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Budapester Straße, Dresden",
+        "S-Bahnhof Freiberger Straße, Dresden",
+        "Rosenstraße, Dresden",
+        "Oederaner Straße, Dresden",
+        "Löbtau Tharandter Straße, Dresden",
+        "Bünaustraße, Dresden",
+        "Betriebshof Gorbitz, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483197#TA#28#DA#90924#1S#978479#1T#1040#LS#978121#LT#1138#PU#80#RT#1#CA#STR#ZE#7#ZB#STR    7#PC#8#FR#978479#FT#1040#TO#978121#TT#1138#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 7",
+        "linienNummer": "7",
+        "kurzText": "STR",
+        "mittelText": "STR 7",
+        "langText": "STR 7",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Betriebshof Gorbitz, Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:19:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Gret-Palucca-Straße, Dresden",
+        "Lennéplatz, Dresden",
+        "Lennéplatz, Dresden",
+        "Zoo, Dresden",
+        "Querallee, Dresden",
+        "S-Bahnhof Strehlen, Dresden",
+        "Prohlis Gleisschleife, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1471927#TA#13#DA#90924#1S#972300#1T#1054#LS#978576#LT#1145#PU#80#RT#1#CA#STR#ZE#9#ZB#STR    9#PC#8#FR#972300#FT#1054#TO#978576#TT#1145#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 9",
+        "linienNummer": "9",
+        "kurzText": "STR",
+        "mittelText": "STR 9",
+        "langText": "STR 9",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Prohlis Gleisschleife, Dresden"
+    },
+    {
+      "bahnhofsId": "975239",
+      "zeit": "2024-09-09T11:19:00",
+      "ueber": [
+        "Nürnberger Platz, Dresden",
+        "Bernhardstraße, Dresden",
+        "Chemnitzer Straße, Dresden",
+        "Zwickauer Straße, Dresden",
+        "Fabrikstraße, Dresden",
+        "Löbtau Tharandter Straße, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1475074#TA#6#DA#90924#1S#978133#1T#1023#LS#978024#LT#1126#PU#80#RT#1#CA#Bus#ZE#61#ZB#Bus   61#PC#5#FR#978133#FT#1023#TO#978024#TT#1126#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "Bus 61",
+        "linienNummer": "61",
+        "kurzText": "Bus",
+        "mittelText": "Bus 61",
+        "langText": "Bus 61",
+        "produktGattung": "BUS"
+      },
+      "terminus": "Löbtau Tharandter Straße, Dresden"
+    },
+    {
+      "bahnhofsId": "975239",
+      "zeit": "2024-09-09T11:19:00",
+      "ueber": [
+        "Nürnberger Platz, Dresden",
+        "Südvorstadt, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483456#TA#13#DA#90924#1S#972217#1T#1045#LS#972114#LT#1120#PU#80#RT#1#CA#STR#ZE#8#ZB#STR    8#PC#8#FR#972217#FT#1045#TO#972114#TT#1120#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 8",
+        "linienNummer": "8",
+        "kurzText": "STR",
+        "mittelText": "STR 8",
+        "langText": "STR 8",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Südvorstadt, Dresden"
+    },
+    {
+      "bahnhofsId": "975239",
+      "zeit": "2024-09-09T11:19:00",
+      "ueber": [
+        "Nürnberger Platz, Dresden",
+        "Reichenbachstraße, Dresden",
+        "Hauptbahnhof, Dresden",
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Hellerau Kiefernweg, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483555#TA#12#DA#90924#1S#972114#1T#1118#LS#972217#LT#1153#PU#80#RT#1#CA#STR#ZE#8#ZB#STR    8#PC#8#FR#972114#FT#1118#TO#972217#TT#1153#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 8",
+        "linienNummer": "8",
+        "kurzText": "STR",
+        "mittelText": "STR 8",
+        "langText": "STR 8",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Hellerau Kiefernweg, Dresden"
+    },
+    {
+      "bahnhofsId": "360028",
+      "zeit": "2024-09-09T11:19:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Ammon-/Budapester Str., Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1897853#TA#1#DA#90924#1S#977787#1T#941#LS#972034#LT#1122#PU#80#RT#1#CA#Bus#ZE#398#ZB#Bus  398#PC#5#FR#977787#FT#941#TO#972034#TT#1122#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "Bus 360",
+        "linienNummer": "360",
+        "kurzText": "Bus",
+        "mittelText": "Bus 360",
+        "langText": "Bus 360",
+        "produktGattung": "BUS"
+      },
+      "terminus": "Ammon-/Budapester Str., Dresden"
+    },
+    {
+      "bahnhofsId": "977992",
+      "zeit": "2024-09-09T11:21:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Carolaplatz, Dresden",
+        "Albertplatz, Dresden",
+        "Wilder Mann, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1476045#TA#29#DA#90924#1S#972142#1T#1109#LS#978591#LT#1146#PU#80#RT#1#CA#STR#ZE#3#ZB#STR    3#PC#8#FR#972142#FT#1109#TO#978591#TT#1146#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 3",
+        "linienNummer": "3",
+        "kurzText": "STR",
+        "mittelText": "STR 3",
+        "langText": "STR 3",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Wilder Mann, Dresden"
+    },
+    {
+      "bahnhofsId": "8010085",
+      "zeit": "2024-09-09T11:22:00",
+      "gleis": "3",
+      "ueber": [
+        "Dresden Hbf",
+        "Elsterwerda",
+        "Doberlug-Kirchhain",
+        "Flughafen BER",
+        "Berlin Südkreuz",
+        "Berlin Hbf",
+        "Berlin Gesundbrunnen",
+        "Warnemünde"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#268643#TA#0#DA#90924#1S#8010085#1T#1122#LS#8013236#LT#1605#PU#80#RT#1#CA#IC#ZE#2178#ZB#IC  2178#PC#1#FR#8010085#FT#1122#TO#8013236#TT#1605#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "IC 2178",
+        "kurzText": "IC",
+        "mittelText": "IC 2178",
+        "langText": "IC 2178",
+        "produktGattung": "EC_IC"
+      },
+      "terminus": "Warnemünde"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:22:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Carolaplatz, Dresden",
+        "Albertplatz, Dresden",
+        "Bahnhof Neustadt, Dresden",
+        "Wilder Mann, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1476045#TA#29#DA#90924#1S#972142#1T#1109#LS#978591#LT#1146#PU#80#RT#1#CA#STR#ZE#3#ZB#STR    3#PC#8#FR#972142#FT#1109#TO#978591#TT#1146#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 3",
+        "linienNummer": "3",
+        "kurzText": "STR",
+        "mittelText": "STR 3",
+        "langText": "STR 3",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Wilder Mann, Dresden"
+    },
+    {
+      "bahnhofsId": "975243",
+      "zeit": "2024-09-09T11:22:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Budapester Straße, Dresden",
+        "S-Bahnhof Freiberger Straße, Dresden",
+        "Bahnhof Mitte, Dresden",
+        "Weißeritzstraße, Dresden",
+        "Krankenhaus Friedrichstadt, Dresden",
+        "Vorwerkstraße, Dresden",
+        "Messe Gleisschleife, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1882955#TA#24#DA#90924#1S#972165#1T#1012#LS#978870#LT#1138#PU#80#RT#1#CA#STR#ZE#12#ZB#STR   12#PC#8#FR#972165#FT#1012#TO#978870#TT#1138#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 10",
+        "linienNummer": "10",
+        "kurzText": "STR",
+        "mittelText": "STR 10",
+        "langText": "STR 10",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Messe Gleisschleife, Dresden"
+    },
+    {
+      "bahnhofsId": "977992",
+      "zeit": "2024-09-09T11:23:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Carolaplatz, Dresden",
+        "Albertplatz, Dresden",
+        "Hellerau Kiefernweg, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483555#TA#12#DA#90924#1S#972114#1T#1118#LS#972217#LT#1153#PU#80#RT#1#CA#STR#ZE#8#ZB#STR    8#PC#8#FR#972114#FT#1118#TO#972217#TT#1153#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 8",
+        "linienNummer": "8",
+        "kurzText": "STR",
+        "mittelText": "STR 8",
+        "langText": "STR 8",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Hellerau Kiefernweg, Dresden"
+    },
+    {
+      "bahnhofsId": "8010085",
+      "zeit": "2024-09-09T11:24:00",
+      "gleis": "14",
+      "ueber": [
+        "Dresden Hbf",
+        "Dresden Mitte",
+        "Dresden-Neustadt",
+        "Dresden-Klotzsche",
+        "Radeberg",
+        "Arnsdorf(Dresden)",
+        "Bischofswerda",
+        "Zittau"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#385314#TA#0#DA#90924#1S#8010085#1T#1124#LS#8010393#LT#1256#PU#80#RT#1#CA#DPN#ZE#20847#ZB#TLX20847#PC#3#FR#8010085#FT#1124#TO#8010393#TT#1256#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "TLX20847",
+        "kurzText": "TLX",
+        "mittelText": "TLX RE2",
+        "langText": "TLX20847",
+        "produktGattung": "REGIONAL"
+      },
+      "terminus": "Zittau"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:24:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Hauptbahnhof, Dresden",
+        "Reichenbachstraße, Dresden",
+        "Nürnberger Platz, Dresden",
+        "Südvorstadt, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483456#TA#14#DA#90924#1S#972217#1T#1055#LS#972114#LT#1130#PU#80#RT#1#CA#STR#ZE#8#ZB#STR    8#PC#8#FR#972217#FT#1055#TO#972114#TT#1130#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 8",
+        "linienNummer": "8",
+        "kurzText": "STR",
+        "mittelText": "STR 8",
+        "langText": "STR 8",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Südvorstadt, Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:24:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Carolaplatz, Dresden",
+        "Albertplatz, Dresden",
+        "Louisenstraße, Dresden",
+        "Hellerau Kiefernweg, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483555#TA#12#DA#90924#1S#972114#1T#1118#LS#972217#LT#1153#PU#80#RT#1#CA#STR#ZE#8#ZB#STR    8#PC#8#FR#972114#FT#1118#TO#972217#TT#1153#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 8",
+        "linienNummer": "8",
+        "kurzText": "STR",
+        "mittelText": "STR 8",
+        "langText": "STR 8",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Hellerau Kiefernweg, Dresden"
+    },
+    {
+      "bahnhofsId": "975243",
+      "zeit": "2024-09-09T11:24:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Gret-Palucca-Straße, Dresden",
+        "Lennéplatz, Dresden",
+        "Georg-Arnhold-Bad, Dresden",
+        "Straßburger Platz, Dresden",
+        "Comeniusplatz, Dresden",
+        "Fetscherplatz, Dresden",
+        "Leutewitz, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1875456#TA#28#DA#90924#1S#978870#1T#1110#LS#972165#LT#1235#PU#80#RT#1#CA#STR#ZE#10#ZB#STR   10#PC#8#FR#978870#FT#1110#TO#972165#TT#1235#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 10",
+        "linienNummer": "10",
+        "kurzText": "STR",
+        "mittelText": "STR 10",
+        "langText": "STR 10",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Leutewitz, Dresden"
+    },
+    {
+      "bahnhofsId": "977992",
+      "zeit": "2024-09-09T11:24:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Reichenbachstraße, Dresden",
+        "Technische Universität, Dresden",
+        "Mommsenstraße, Dresden",
+        "Südhöhe, Dresden",
+        "Altkaitz, Dresden",
+        "Bannewitzer Straße, Dresden",
+        "Mockritz, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1915538#TA#7#DA#90924#1S#972431#1T#1011#LS#972431#LT#1141#PU#80#RT#1#CA#Bus#ZE#66#ZB#Bus   66#PC#5#FR#972431#FT#1011#TO#972431#TT#1141#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "Bus 66",
+        "linienNummer": "66",
+        "kurzText": "Bus",
+        "mittelText": "Bus 66",
+        "langText": "Bus 66",
+        "produktGattung": "BUS"
+      },
+      "terminus": "Mockritz, Dresden"
+    },
+    {
+      "bahnhofsId": "977992",
+      "zeit": "2024-09-09T11:25:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Reichenbachstraße, Dresden",
+        "Nürnberger Platz, Dresden",
+        "Südvorstadt, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483456#TA#14#DA#90924#1S#972217#1T#1055#LS#972114#LT#1130#PU#80#RT#1#CA#STR#ZE#8#ZB#STR    8#PC#8#FR#972217#FT#1055#TO#972114#TT#1130#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 8",
+        "linienNummer": "8",
+        "kurzText": "STR",
+        "mittelText": "STR 8",
+        "langText": "STR 8",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Südvorstadt, Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:25:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Carolaplatz, Dresden",
+        "Neustädter Markt, Dresden",
+        "Palaisplatz, Dresden",
+        "Kaditz Riegelplatz, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483670#TA#15#DA#90924#1S#978576#1T#1057#LS#972300#LT#1150#PU#80#RT#1#CA#STR#ZE#9#ZB#STR    9#PC#8#FR#978576#FT#1057#TO#972300#TT#1150#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 9",
+        "linienNummer": "9",
+        "kurzText": "STR",
+        "mittelText": "STR 9",
+        "langText": "STR 9",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Kaditz Riegelplatz, Dresden"
+    },
+    {
+      "bahnhofsId": "975243",
+      "zeit": "2024-09-09T11:26:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Carolaplatz, Dresden",
+        "Albertplatz, Dresden",
+        "Weixdorf (Rathenaustraße), Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483354#TA#28#DA#90924#1S#978121#1T#1106#LS#978479#LT#1204#PU#80#RT#1#CA#STR#ZE#7#ZB#STR    7#PC#8#FR#978121#FT#1106#TO#978479#TT#1204#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 7",
+        "linienNummer": "7",
+        "kurzText": "STR",
+        "mittelText": "STR 7",
+        "langText": "STR 7",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Weixdorf (Rathenaustraße), Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:27:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Hauptbahnhof, Dresden",
+        "Budapester Straße, Dresden",
+        "S-Bahnhof Freiberger Straße, Dresden",
+        "Rosenstraße, Dresden",
+        "Oederaner Straße, Dresden",
+        "Löbtau Tharandter Straße, Dresden",
+        "Betriebshof Gorbitz, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483197#TA#29#DA#90924#1S#978479#1T#1050#LS#978121#LT#1148#PU#80#RT#1#CA#STR#ZE#7#ZB#STR    7#PC#8#FR#978479#FT#1050#TO#978121#TT#1148#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 7",
+        "linienNummer": "7",
+        "kurzText": "STR",
+        "mittelText": "STR 7",
+        "langText": "STR 7",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Betriebshof Gorbitz, Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:27:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Carolaplatz, Dresden",
+        "Albertplatz, Dresden",
+        "Louisenstraße, Dresden",
+        "Weixdorf (Rathenaustraße), Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483354#TA#28#DA#90924#1S#978121#1T#1106#LS#978479#LT#1204#PU#80#RT#1#CA#STR#ZE#7#ZB#STR    7#PC#8#FR#978121#FT#1106#TO#978479#TT#1204#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 7",
+        "linienNummer": "7",
+        "kurzText": "STR",
+        "mittelText": "STR 7",
+        "langText": "STR 7",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Weixdorf (Rathenaustraße), Dresden"
+    },
+    {
+      "bahnhofsId": "360028",
+      "zeit": "2024-09-09T11:27:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Gret-Palucca-Straße, Dresden",
+        "Uhlandstraße, Dresden",
+        "Strehlener Platz, Dresden",
+        "Weberplatz, Dresden",
+        "Caspar-David-Friedrich-Str., Dresden",
+        "Corinthstraße, Dresden",
+        "Mockritz, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1915538#TA#10#DA#90924#1S#972431#1T#1111#LS#972431#LT#1241#PU#80#RT#1#CA#Bus#ZE#66#ZB#Bus   66#PC#5#FR#972431#FT#1111#TO#972431#TT#1241#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "Bus 66",
+        "linienNummer": "66",
+        "kurzText": "Bus",
+        "mittelText": "Bus 66",
+        "langText": "Bus 66",
+        "produktGattung": "BUS"
+      },
+      "terminus": "Mockritz, Dresden"
+    },
+    {
+      "bahnhofsId": "975239",
+      "zeit": "2024-09-09T11:28:00",
+      "ueber": [
+        "Nürnberger Platz, Dresden",
+        "Technische Universität, Dresden",
+        "SLUB, Dresden",
+        "Zellescher Weg, Dresden",
+        "Caspar-David-Friedrich-Str., Dresden",
+        "Wasaplatz, Dresden",
+        "S-Bahnhof Strehlen, Dresden",
+        "Weißig Einkaufszentrum, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1475331#TA#8#DA#90924#1S#978024#1T#1122#LS#973993#LT#1226#PU#80#RT#1#CA#Bus#ZE#61#ZB#Bus   61#PC#5#FR#978024#FT#1122#TO#973993#TT#1226#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "Bus 61",
+        "linienNummer": "61",
+        "kurzText": "Bus",
+        "mittelText": "Bus 61",
+        "langText": "Bus 61",
+        "produktGattung": "BUS"
+      },
+      "terminus": "Weißig Einkaufszentrum, Dresden"
+    },
+    {
+      "bahnhofsId": "975246",
+      "zeit": "2024-09-09T11:28:00",
+      "ueber": [
+        "Nürnberger Platz, Dresden",
+        "Reichenbachstraße, Dresden",
+        "Hauptbahnhof, Dresden",
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Wilder Mann, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1476045#TA#30#DA#90924#1S#972142#1T#1119#LS#978591#LT#1156#PU#80#RT#1#CA#STR#ZE#3#ZB#STR    3#PC#8#FR#972142#FT#1119#TO#978591#TT#1156#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 3",
+        "linienNummer": "3",
+        "kurzText": "STR",
+        "mittelText": "STR 3",
+        "langText": "STR 3",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Wilder Mann, Dresden"
+    },
+    {
+      "bahnhofsId": "975243",
+      "zeit": "2024-09-09T11:28:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Budapester Straße, Dresden",
+        "S-Bahnhof Freiberger Straße, Dresden",
+        "Rosenstraße, Dresden",
+        "Oederaner Straße, Dresden",
+        "Löbtau Tharandter Straße, Dresden",
+        "Bünaustraße, Dresden",
+        "Betriebshof Gorbitz, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483197#TA#29#DA#90924#1S#978479#1T#1050#LS#978121#LT#1148#PU#80#RT#1#CA#STR#ZE#7#ZB#STR    7#PC#8#FR#978479#FT#1050#TO#978121#TT#1148#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 7",
+        "linienNummer": "7",
+        "kurzText": "STR",
+        "mittelText": "STR 7",
+        "langText": "STR 7",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Betriebshof Gorbitz, Dresden"
+    },
+    {
+      "bahnhofsId": "8010085",
+      "zeit": "2024-09-09T11:29:00",
+      "gleis": "13",
+      "ueber": [
+        "Dresden Hbf",
+        "Dresden-Strehlen",
+        "Dresden-Reick",
+        "Dresden-Dobritz",
+        "Dresden-Niedersedlitz",
+        "Dresden-Zschachwitz",
+        "Heidenau",
+        "Schöna"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#311568#TA#0#DA#90924#1S#8012318#1T#1049#LS#8012898#LT#1225#PU#80#RT#1#CA#s#ZE#1#ZB#S      1#PC#4#FR#8012318#FT#1049#TO#8012898#TT#1225#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "S 1",
+        "linienNummer": "1",
+        "kurzText": "S",
+        "mittelText": "S 1",
+        "langText": "S 1",
+        "produktGattung": "SBAHN"
+      },
+      "terminus": "Schöna"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:29:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Gret-Palucca-Straße, Dresden",
+        "Lennéplatz, Dresden",
+        "Lennéplatz, Dresden",
+        "Zoo, Dresden",
+        "Querallee, Dresden",
+        "S-Bahnhof Strehlen, Dresden",
+        "Prohlis Gleisschleife, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1471927#TA#14#DA#90924#1S#972300#1T#1104#LS#978576#LT#1155#PU#80#RT#1#CA#STR#ZE#9#ZB#STR    9#PC#8#FR#972300#FT#1104#TO#978576#TT#1155#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 9",
+        "linienNummer": "9",
+        "kurzText": "STR",
+        "mittelText": "STR 9",
+        "langText": "STR 9",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Prohlis Gleisschleife, Dresden"
+    },
+    {
+      "bahnhofsId": "975239",
+      "zeit": "2024-09-09T11:29:00",
+      "ueber": [
+        "Nürnberger Platz, Dresden",
+        "Bernhardstraße, Dresden",
+        "Chemnitzer Straße, Dresden",
+        "Zwickauer Straße, Dresden",
+        "Fabrikstraße, Dresden",
+        "Löbtau Tharandter Straße, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1475120#TA#7#DA#90924#1S#973993#1T#1030#LS#978024#LT#1136#PU#80#RT#1#CA#Bus#ZE#61#ZB#Bus   61#PC#5#FR#973993#FT#1030#TO#978024#TT#1136#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "Bus 61",
+        "linienNummer": "61",
+        "kurzText": "Bus",
+        "mittelText": "Bus 61",
+        "langText": "Bus 61",
+        "produktGattung": "BUS"
+      },
+      "terminus": "Löbtau Tharandter Straße, Dresden"
+    },
+    {
+      "bahnhofsId": "975239",
+      "zeit": "2024-09-09T11:29:00",
+      "ueber": [
+        "Nürnberger Platz, Dresden",
+        "Südvorstadt, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483456#TA#14#DA#90924#1S#972217#1T#1055#LS#972114#LT#1130#PU#80#RT#1#CA#STR#ZE#8#ZB#STR    8#PC#8#FR#972217#FT#1055#TO#972114#TT#1130#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 8",
+        "linienNummer": "8",
+        "kurzText": "STR",
+        "mittelText": "STR 8",
+        "langText": "STR 8",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Südvorstadt, Dresden"
+    },
+    {
+      "bahnhofsId": "975239",
+      "zeit": "2024-09-09T11:29:00",
+      "ueber": [
+        "Nürnberger Platz, Dresden",
+        "Reichenbachstraße, Dresden",
+        "Hauptbahnhof, Dresden",
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Hellerau Kiefernweg, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483555#TA#13#DA#90924#1S#972114#1T#1128#LS#972217#LT#1203#PU#80#RT#1#CA#STR#ZE#8#ZB#STR    8#PC#8#FR#972114#FT#1128#TO#972217#TT#1203#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 8",
+        "linienNummer": "8",
+        "kurzText": "STR",
+        "mittelText": "STR 8",
+        "langText": "STR 8",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Hellerau Kiefernweg, Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:29:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Gret-Palucca-Straße, Dresden",
+        "Lennéplatz, Dresden",
+        "Georg-Arnhold-Bad, Dresden",
+        "Straßburger Platz, Dresden",
+        "Comeniusplatz, Dresden",
+        "Lipsiusstraße, Dresden",
+        "Laubegast Kronstädter Platz, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1876534#TA#10#DA#90924#1S#972170#1T#1115#LS#972070#LT#1201#PU#80#RT#1#CA#STR#ZE#11#ZB#STR   11#PC#8#FR#972170#FT#1115#TO#972070#TT#1201#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 11",
+        "linienNummer": "11",
+        "kurzText": "STR",
+        "mittelText": "STR 11",
+        "langText": "STR 11",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Laubegast Kronstädter Platz, Dresden"
+    },
+    {
+      "bahnhofsId": "977992",
+      "zeit": "2024-09-09T11:29:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Reichenbachstraße, Dresden",
+        "Technische Universität, Dresden",
+        "Mommsenstraße, Dresden",
+        "Südhöhe, Dresden",
+        "Nöthnitz, Bannewitz",
+        "Boderitzer Straße, Bannewitz",
+        "Bahnhof Deuben, Freital"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1892702#TA#2#DA#90924#1S#978006#1T#1124#LS#972694#LT#1209#PU#80#RT#1#CA#Bus#ZE#360#ZB#Bus  360#PC#5#FR#978006#FT#1124#TO#972694#TT#1209#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "Bus 360",
+        "linienNummer": "360",
+        "kurzText": "Bus",
+        "mittelText": "Bus 360",
+        "langText": "Bus 360",
+        "produktGattung": "BUS"
+      },
+      "terminus": "Bahnhof Deuben, Freital"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:29:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Prager Straße, Dresden",
+        "Postplatz, Dresden",
+        "Am Zwingerteich, Dresden",
+        "Kongresszentrum/Haus d Presse, Dresden",
+        "Anton-/Leipziger Straße, Dresden",
+        "Eisenbahnstraße, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1924132#TA#19#DA#90924#1S#972070#1T#1100#LS#972170#LT#1142#PU#80#RT#1#CA#STR#ZE#44#ZB#STR   44#PC#8#FR#972070#FT#1100#TO#972170#TT#1142#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 11",
+        "linienNummer": "11",
+        "kurzText": "STR",
+        "mittelText": "STR 11",
+        "langText": "STR 11",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Eisenbahnstraße, Dresden"
+    },
+    {
+      "bahnhofsId": "8010085",
+      "zeit": "2024-09-09T11:30:00",
+      "gleis": "14",
+      "ueber": [
+        "Dresden Hbf",
+        "Dresden Freiberger Straße",
+        "Dresden Mitte",
+        "Dresden-Neustadt",
+        "Dresden Bischofsplatz",
+        "Dresden-Pieschen",
+        "Dresden-Trachau",
+        "Meißen Altstadt"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#311556#TA#1#DA#90924#1S#8012898#1T#1035#LS#8012318#LT#1207#PU#80#RT#1#CA#s#ZE#1#ZB#S      1#PC#4#FR#8012898#FT#1035#TO#8012318#TT#1207#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "S 1",
+        "linienNummer": "1",
+        "kurzText": "S",
+        "mittelText": "S 1",
+        "langText": "S 1",
+        "produktGattung": "SBAHN"
+      },
+      "terminus": "Meißen Altstadt"
+    },
+    {
+      "bahnhofsId": "977992",
+      "zeit": "2024-09-09T11:31:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Carolaplatz, Dresden",
+        "Albertplatz, Dresden",
+        "Wilder Mann, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1476045#TA#30#DA#90924#1S#972142#1T#1119#LS#978591#LT#1156#PU#80#RT#1#CA#STR#ZE#3#ZB#STR    3#PC#8#FR#972142#FT#1119#TO#978591#TT#1156#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 3",
+        "linienNummer": "3",
+        "kurzText": "STR",
+        "mittelText": "STR 3",
+        "langText": "STR 3",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Wilder Mann, Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:32:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Carolaplatz, Dresden",
+        "Albertplatz, Dresden",
+        "Bahnhof Neustadt, Dresden",
+        "Wilder Mann, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1476045#TA#30#DA#90924#1S#972142#1T#1119#LS#978591#LT#1156#PU#80#RT#1#CA#STR#ZE#3#ZB#STR    3#PC#8#FR#972142#FT#1119#TO#978591#TT#1156#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 3",
+        "linienNummer": "3",
+        "kurzText": "STR",
+        "mittelText": "STR 3",
+        "langText": "STR 3",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Wilder Mann, Dresden"
+    },
+    {
+      "bahnhofsId": "975243",
+      "zeit": "2024-09-09T11:32:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Budapester Straße, Dresden",
+        "S-Bahnhof Freiberger Straße, Dresden",
+        "Bahnhof Mitte, Dresden",
+        "Weißeritzstraße, Dresden",
+        "Krankenhaus Friedrichstadt, Dresden",
+        "Vorwerkstraße, Dresden",
+        "Messe Gleisschleife, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1882955#TA#25#DA#90924#1S#972165#1T#1022#LS#978870#LT#1148#PU#80#RT#1#CA#STR#ZE#12#ZB#STR   12#PC#8#FR#972165#FT#1022#TO#978870#TT#1148#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 10",
+        "linienNummer": "10",
+        "kurzText": "STR",
+        "mittelText": "STR 10",
+        "langText": "STR 10",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Messe Gleisschleife, Dresden"
+    },
+    {
+      "bahnhofsId": "977992",
+      "zeit": "2024-09-09T11:33:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Carolaplatz, Dresden",
+        "Albertplatz, Dresden",
+        "Hellerau Kiefernweg, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483555#TA#13#DA#90924#1S#972114#1T#1128#LS#972217#LT#1203#PU#80#RT#1#CA#STR#ZE#8#ZB#STR    8#PC#8#FR#972114#FT#1128#TO#972217#TT#1203#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 8",
+        "linienNummer": "8",
+        "kurzText": "STR",
+        "mittelText": "STR 8",
+        "langText": "STR 8",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Hellerau Kiefernweg, Dresden"
+    },
+    {
+      "bahnhofsId": "8010085",
+      "zeit": "2024-09-09T11:34:00",
+      "gleis": "9",
+      "ueber": [
+        "Dresden Hbf",
+        "Dresden-Plauen",
+        "Freital-Potschappel",
+        "Freital-Deuben",
+        "Freital-Hainsberg",
+        "Freital-Hainsberg West",
+        "Tharandt"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#311966#TA#3#DA#90924#1S#8010085#1T#1134#LS#8013114#LT#1152#PU#80#RT#1#CA#s#ZE#3#ZB#S      3#PC#4#FR#8010085#FT#1134#TO#8013114#TT#1152#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "S 3",
+        "linienNummer": "3",
+        "kurzText": "S",
+        "mittelText": "S 3",
+        "langText": "S 3",
+        "produktGattung": "SBAHN"
+      },
+      "terminus": "Tharandt"
+    },
+    {
+      "bahnhofsId": "977992",
+      "zeit": "2024-09-09T11:34:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Reichenbachstraße, Dresden",
+        "Technische Universität, Dresden",
+        "Mommsenstraße, Dresden",
+        "Südhöhe, Dresden",
+        "Höckendorfer Weg, Dresden",
+        "Dorfhainer Straße, Dresden",
+        "Coschütz, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1479883#TA#12#DA#90924#1S#972564#1T#1110#LS#972142#LT#1147#PU#80#RT#1#CA#Bus#ZE#66#ZB#Bus   66#PC#5#FR#972564#FT#1110#TO#972142#TT#1147#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "Bus 66",
+        "linienNummer": "66",
+        "kurzText": "Bus",
+        "mittelText": "Bus 66",
+        "langText": "Bus 66",
+        "produktGattung": "BUS"
+      },
+      "terminus": "Coschütz, Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:34:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Hauptbahnhof, Dresden",
+        "Reichenbachstraße, Dresden",
+        "Nürnberger Platz, Dresden",
+        "Südvorstadt, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483456#TA#15#DA#90924#1S#972217#1T#1105#LS#972114#LT#1140#PU#80#RT#1#CA#STR#ZE#8#ZB#STR    8#PC#8#FR#972217#FT#1105#TO#972114#TT#1140#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 8",
+        "linienNummer": "8",
+        "kurzText": "STR",
+        "mittelText": "STR 8",
+        "langText": "STR 8",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Südvorstadt, Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:34:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Carolaplatz, Dresden",
+        "Albertplatz, Dresden",
+        "Louisenstraße, Dresden",
+        "Hellerau Kiefernweg, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483555#TA#13#DA#90924#1S#972114#1T#1128#LS#972217#LT#1203#PU#80#RT#1#CA#STR#ZE#8#ZB#STR    8#PC#8#FR#972114#FT#1128#TO#972217#TT#1203#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 8",
+        "linienNummer": "8",
+        "kurzText": "STR",
+        "mittelText": "STR 8",
+        "langText": "STR 8",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Hellerau Kiefernweg, Dresden"
+    },
+    {
+      "bahnhofsId": "975243",
+      "zeit": "2024-09-09T11:34:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Gret-Palucca-Straße, Dresden",
+        "Lennéplatz, Dresden",
+        "Georg-Arnhold-Bad, Dresden",
+        "Straßburger Platz, Dresden",
+        "Comeniusplatz, Dresden",
+        "Fetscherplatz, Dresden",
+        "Leutewitz, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1875456#TA#29#DA#90924#1S#978870#1T#1120#LS#972165#LT#1245#PU#80#RT#1#CA#STR#ZE#10#ZB#STR   10#PC#8#FR#978870#FT#1120#TO#972165#TT#1245#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 10",
+        "linienNummer": "10",
+        "kurzText": "STR",
+        "mittelText": "STR 10",
+        "langText": "STR 10",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Leutewitz, Dresden"
+    },
+    {
+      "bahnhofsId": "977992",
+      "zeit": "2024-09-09T11:35:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Reichenbachstraße, Dresden",
+        "Nürnberger Platz, Dresden",
+        "Südvorstadt, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483456#TA#15#DA#90924#1S#972217#1T#1105#LS#972114#LT#1140#PU#80#RT#1#CA#STR#ZE#8#ZB#STR    8#PC#8#FR#972217#FT#1105#TO#972114#TT#1140#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 8",
+        "linienNummer": "8",
+        "kurzText": "STR",
+        "mittelText": "STR 8",
+        "langText": "STR 8",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Südvorstadt, Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:35:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Carolaplatz, Dresden",
+        "Neustädter Markt, Dresden",
+        "Palaisplatz, Dresden",
+        "Kaditz Riegelplatz, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483670#TA#16#DA#90924#1S#978576#1T#1107#LS#972300#LT#1200#PU#80#RT#1#CA#STR#ZE#9#ZB#STR    9#PC#8#FR#978576#FT#1107#TO#972300#TT#1200#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 9",
+        "linienNummer": "9",
+        "kurzText": "STR",
+        "mittelText": "STR 9",
+        "langText": "STR 9",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Kaditz Riegelplatz, Dresden"
+    },
+    {
+      "bahnhofsId": "975243",
+      "zeit": "2024-09-09T11:36:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Carolaplatz, Dresden",
+        "Albertplatz, Dresden",
+        "Weixdorf (Rathenaustraße), Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483354#TA#29#DA#90924#1S#978121#1T#1116#LS#978479#LT#1214#PU#80#RT#1#CA#STR#ZE#7#ZB#STR    7#PC#8#FR#978121#FT#1116#TO#978479#TT#1214#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 7",
+        "linienNummer": "7",
+        "kurzText": "STR",
+        "mittelText": "STR 7",
+        "langText": "STR 7",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Weixdorf (Rathenaustraße), Dresden"
+    },
+    {
+      "bahnhofsId": "360028",
+      "zeit": "2024-09-09T11:37:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Gret-Palucca-Straße, Dresden",
+        "Uhlandstraße, Dresden",
+        "Strehlener Platz, Dresden",
+        "Weberplatz, Dresden",
+        "Caspar-David-Friedrich-Str., Dresden",
+        "Corinthstraße, Dresden",
+        "Lockwitz, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1480008#TA#11#DA#90924#1S#972716#1T#1119#LS#972564#LT#1202#PU#80#RT#1#CA#Bus#ZE#66#ZB#Bus   66#PC#5#FR#972716#FT#1119#TO#972564#TT#1202#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "Bus 66",
+        "linienNummer": "66",
+        "kurzText": "Bus",
+        "mittelText": "Bus 66",
+        "langText": "Bus 66",
+        "produktGattung": "BUS"
+      },
+      "terminus": "Lockwitz, Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:37:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Hauptbahnhof, Dresden",
+        "Budapester Straße, Dresden",
+        "S-Bahnhof Freiberger Straße, Dresden",
+        "Rosenstraße, Dresden",
+        "Oederaner Straße, Dresden",
+        "Löbtau Tharandter Straße, Dresden",
+        "Betriebshof Gorbitz, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483197#TA#30#DA#90924#1S#978479#1T#1100#LS#978121#LT#1158#PU#80#RT#1#CA#STR#ZE#7#ZB#STR    7#PC#8#FR#978479#FT#1100#TO#978121#TT#1158#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 7",
+        "linienNummer": "7",
+        "kurzText": "STR",
+        "mittelText": "STR 7",
+        "langText": "STR 7",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Betriebshof Gorbitz, Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:37:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Carolaplatz, Dresden",
+        "Albertplatz, Dresden",
+        "Louisenstraße, Dresden",
+        "Weixdorf (Rathenaustraße), Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483354#TA#29#DA#90924#1S#978121#1T#1116#LS#978479#LT#1214#PU#80#RT#1#CA#STR#ZE#7#ZB#STR    7#PC#8#FR#978121#FT#1116#TO#978479#TT#1214#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 7",
+        "linienNummer": "7",
+        "kurzText": "STR",
+        "mittelText": "STR 7",
+        "langText": "STR 7",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Weixdorf (Rathenaustraße), Dresden"
+    },
+    {
+      "bahnhofsId": "975239",
+      "zeit": "2024-09-09T11:38:00",
+      "ueber": [
+        "Nürnberger Platz, Dresden",
+        "Technische Universität, Dresden",
+        "SLUB, Dresden",
+        "Zellescher Weg, Dresden",
+        "Caspar-David-Friedrich-Str., Dresden",
+        "Wasaplatz, Dresden",
+        "S-Bahnhof Strehlen, Dresden",
+        "Pappritz Fernsehturm, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1475285#TA#17#DA#90924#1S#978024#1T#1132#LS#978133#LT#1231#PU#80#RT#1#CA#Bus#ZE#61#ZB#Bus   61#PC#5#FR#978024#FT#1132#TO#978133#TT#1231#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "Bus 61",
+        "linienNummer": "61",
+        "kurzText": "Bus",
+        "mittelText": "Bus 61",
+        "langText": "Bus 61",
+        "produktGattung": "BUS"
+      },
+      "terminus": "Pappritz Fernsehturm, Dresden"
+    },
+    {
+      "bahnhofsId": "975246",
+      "zeit": "2024-09-09T11:38:00",
+      "ueber": [
+        "Nürnberger Platz, Dresden",
+        "Reichenbachstraße, Dresden",
+        "Hauptbahnhof, Dresden",
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Wilder Mann, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1476045#TA#31#DA#90924#1S#972142#1T#1129#LS#978591#LT#1206#PU#80#RT#1#CA#STR#ZE#3#ZB#STR    3#PC#8#FR#972142#FT#1129#TO#978591#TT#1206#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 3",
+        "linienNummer": "3",
+        "kurzText": "STR",
+        "mittelText": "STR 3",
+        "langText": "STR 3",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Wilder Mann, Dresden"
+    },
+    {
+      "bahnhofsId": "975243",
+      "zeit": "2024-09-09T11:38:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Budapester Straße, Dresden",
+        "S-Bahnhof Freiberger Straße, Dresden",
+        "Rosenstraße, Dresden",
+        "Oederaner Straße, Dresden",
+        "Löbtau Tharandter Straße, Dresden",
+        "Bünaustraße, Dresden",
+        "Betriebshof Gorbitz, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483197#TA#30#DA#90924#1S#978479#1T#1100#LS#978121#LT#1158#PU#80#RT#1#CA#STR#ZE#7#ZB#STR    7#PC#8#FR#978479#FT#1100#TO#978121#TT#1158#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 7",
+        "linienNummer": "7",
+        "kurzText": "STR",
+        "mittelText": "STR 7",
+        "langText": "STR 7",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Betriebshof Gorbitz, Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:39:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Gret-Palucca-Straße, Dresden",
+        "Lennéplatz, Dresden",
+        "Lennéplatz, Dresden",
+        "Zoo, Dresden",
+        "Querallee, Dresden",
+        "S-Bahnhof Strehlen, Dresden",
+        "Prohlis Gleisschleife, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1471927#TA#15#DA#90924#1S#972300#1T#1114#LS#978576#LT#1205#PU#80#RT#1#CA#STR#ZE#9#ZB#STR    9#PC#8#FR#972300#FT#1114#TO#978576#TT#1205#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 9",
+        "linienNummer": "9",
+        "kurzText": "STR",
+        "mittelText": "STR 9",
+        "langText": "STR 9",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Prohlis Gleisschleife, Dresden"
+    },
+    {
+      "bahnhofsId": "975239",
+      "zeit": "2024-09-09T11:39:00",
+      "ueber": [
+        "Nürnberger Platz, Dresden",
+        "Bernhardstraße, Dresden",
+        "Chemnitzer Straße, Dresden",
+        "Zwickauer Straße, Dresden",
+        "Fabrikstraße, Dresden",
+        "Löbtau Tharandter Straße, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1475074#TA#7#DA#90924#1S#978133#1T#1043#LS#978024#LT#1146#PU#80#RT#1#CA#Bus#ZE#61#ZB#Bus   61#PC#5#FR#978133#FT#1043#TO#978024#TT#1146#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "Bus 61",
+        "linienNummer": "61",
+        "kurzText": "Bus",
+        "mittelText": "Bus 61",
+        "langText": "Bus 61",
+        "produktGattung": "BUS"
+      },
+      "terminus": "Löbtau Tharandter Straße, Dresden"
+    },
+    {
+      "bahnhofsId": "975239",
+      "zeit": "2024-09-09T11:39:00",
+      "ueber": [
+        "Nürnberger Platz, Dresden",
+        "Südvorstadt, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483456#TA#15#DA#90924#1S#972217#1T#1105#LS#972114#LT#1140#PU#80#RT#1#CA#STR#ZE#8#ZB#STR    8#PC#8#FR#972217#FT#1105#TO#972114#TT#1140#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 8",
+        "linienNummer": "8",
+        "kurzText": "STR",
+        "mittelText": "STR 8",
+        "langText": "STR 8",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Südvorstadt, Dresden"
+    },
+    {
+      "bahnhofsId": "975239",
+      "zeit": "2024-09-09T11:39:00",
+      "ueber": [
+        "Nürnberger Platz, Dresden",
+        "Reichenbachstraße, Dresden",
+        "Hauptbahnhof, Dresden",
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Hellerau Kiefernweg, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483555#TA#14#DA#90924#1S#972114#1T#1138#LS#972217#LT#1213#PU#80#RT#1#CA#STR#ZE#8#ZB#STR    8#PC#8#FR#972114#FT#1138#TO#972217#TT#1213#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 8",
+        "linienNummer": "8",
+        "kurzText": "STR",
+        "mittelText": "STR 8",
+        "langText": "STR 8",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Hellerau Kiefernweg, Dresden"
+    },
+    {
+      "bahnhofsId": "360028",
+      "zeit": "2024-09-09T11:39:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1887988#TA#1#DA#90924#1S#972825#1T#1041#LS#978006#LT#1145#PU#80#RT#1#CA#Bus#ZE#164#ZB#Bus  164#PC#5#FR#972825#FT#1041#TO#978006#TT#1145#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "Bus 360",
+        "linienNummer": "360",
+        "kurzText": "Bus",
+        "mittelText": "Bus 360",
+        "langText": "Bus 360",
+        "produktGattung": "BUS"
+      },
+      "terminus": "Pirnaischer Platz, Dresden"
+    },
+    {
+      "bahnhofsId": "977992",
+      "zeit": "2024-09-09T11:39:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Reichenbachstraße, Dresden",
+        "Technische Universität, Dresden",
+        "Mommsenstraße, Dresden",
+        "Südhöhe, Dresden",
+        "Nöthnitz, Bannewitz",
+        "Boderitzer Straße, Bannewitz",
+        "Teplice hlavni nadrazi (Bahnhof), Tschechien"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1892777#TA#2#DA#90924#1S#972034#1T#1130#LS#977787#LT#1315#PU#80#RT#1#CA#Bus#ZE#360#ZB#Bus  360#PC#5#FR#972034#FT#1130#TO#977787#TT#1315#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "Bus 360",
+        "linienNummer": "360",
+        "kurzText": "Bus",
+        "mittelText": "Bus 360",
+        "langText": "Bus 360",
+        "produktGattung": "BUS"
+      },
+      "terminus": "Teplice hlavni nadrazi (Bahnhof), Tschechien"
+    },
+    {
+      "bahnhofsId": "8010085",
+      "zeit": "2024-09-09T11:40:00",
+      "gleis": "13",
+      "ueber": [
+        "Dresden Hbf",
+        "Dresden-Strehlen",
+        "Dresden-Reick",
+        "Dresden-Dobritz",
+        "Dresden-Niedersedlitz",
+        "Dresden-Zschachwitz",
+        "Heidenau",
+        "Pirna"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#311858#TA#0#DA#90924#1S#8011399#1T#1118#LS#8010272#LT#1202#PU#80#RT#1#CA#s#ZE#2#ZB#S      2#PC#4#FR#8011399#FT#1118#TO#8010272#TT#1202#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "S 2",
+        "linienNummer": "2",
+        "kurzText": "S",
+        "mittelText": "S 2",
+        "langText": "S 2",
+        "produktGattung": "SBAHN"
+      },
+      "terminus": "Pirna"
+    },
+    {
+      "bahnhofsId": "975239",
+      "zeit": "2024-09-09T11:41:00",
+      "ueber": [
+        "Nürnberger Platz, Dresden",
+        "Reichenbachstraße, Dresden",
+        "Hauptbahnhof, Dresden",
+        "Ammon-/Budapester Str., Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1474336#TA#0#DA#90924#1S#974640#1T#1102#LS#972034#LT#1149#PU#80#RT#1#CA#Bus#ZE#333#ZB#Bus  333#PC#5#FR#974640#FT#1102#TO#972034#TT#1149#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "Bus 333",
+        "linienNummer": "333",
+        "kurzText": "Bus",
+        "mittelText": "Bus 333",
+        "langText": "Bus 333",
+        "produktGattung": "BUS"
+      },
+      "terminus": "Ammon-/Budapester Str., Dresden"
+    },
+    {
+      "bahnhofsId": "977992",
+      "zeit": "2024-09-09T11:41:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Carolaplatz, Dresden",
+        "Albertplatz, Dresden",
+        "Wilder Mann, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1476045#TA#31#DA#90924#1S#972142#1T#1129#LS#978591#LT#1206#PU#80#RT#1#CA#STR#ZE#3#ZB#STR    3#PC#8#FR#972142#FT#1129#TO#978591#TT#1206#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 3",
+        "linienNummer": "3",
+        "kurzText": "STR",
+        "mittelText": "STR 3",
+        "langText": "STR 3",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Wilder Mann, Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:42:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Carolaplatz, Dresden",
+        "Albertplatz, Dresden",
+        "Bahnhof Neustadt, Dresden",
+        "Wilder Mann, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1476045#TA#31#DA#90924#1S#972142#1T#1129#LS#978591#LT#1206#PU#80#RT#1#CA#STR#ZE#3#ZB#STR    3#PC#8#FR#972142#FT#1129#TO#978591#TT#1206#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 3",
+        "linienNummer": "3",
+        "kurzText": "STR",
+        "mittelText": "STR 3",
+        "langText": "STR 3",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Wilder Mann, Dresden"
+    },
+    {
+      "bahnhofsId": "975243",
+      "zeit": "2024-09-09T11:42:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Budapester Straße, Dresden",
+        "S-Bahnhof Freiberger Straße, Dresden",
+        "Bahnhof Mitte, Dresden",
+        "Weißeritzstraße, Dresden",
+        "Krankenhaus Friedrichstadt, Dresden",
+        "Vorwerkstraße, Dresden",
+        "Messe Gleisschleife, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1882955#TA#26#DA#90924#1S#972165#1T#1032#LS#978870#LT#1158#PU#80#RT#1#CA#STR#ZE#12#ZB#STR   12#PC#8#FR#972165#FT#1032#TO#978870#TT#1158#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 10",
+        "linienNummer": "10",
+        "kurzText": "STR",
+        "mittelText": "STR 10",
+        "langText": "STR 10",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Messe Gleisschleife, Dresden"
+    },
+    {
+      "bahnhofsId": "977992",
+      "zeit": "2024-09-09T11:43:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Carolaplatz, Dresden",
+        "Albertplatz, Dresden",
+        "Hellerau Kiefernweg, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483555#TA#14#DA#90924#1S#972114#1T#1138#LS#972217#LT#1213#PU#80#RT#1#CA#STR#ZE#8#ZB#STR    8#PC#8#FR#972114#FT#1138#TO#972217#TT#1213#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 8",
+        "linienNummer": "8",
+        "kurzText": "STR",
+        "mittelText": "STR 8",
+        "langText": "STR 8",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Hellerau Kiefernweg, Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:44:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Prager Straße, Dresden",
+        "Postplatz, Dresden",
+        "Am Zwingerteich, Dresden",
+        "Kongresszentrum/Haus d Presse, Dresden",
+        "Anton-/Leipziger Straße, Dresden",
+        "Eisenbahnstraße, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1472250#TA#10#DA#90924#1S#978111#1T#1141#LS#972170#LT#1157#PU#80#RT#1#CA#STR#ZE#11#ZB#STR   11#PC#8#FR#978111#FT#1141#TO#972170#TT#1157#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 11",
+        "linienNummer": "11",
+        "kurzText": "STR",
+        "mittelText": "STR 11",
+        "langText": "STR 11",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Eisenbahnstraße, Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:44:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Hauptbahnhof, Dresden",
+        "Reichenbachstraße, Dresden",
+        "Nürnberger Platz, Dresden",
+        "Südvorstadt, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483456#TA#16#DA#90924#1S#972217#1T#1115#LS#972114#LT#1150#PU#80#RT#1#CA#STR#ZE#8#ZB#STR    8#PC#8#FR#972217#FT#1115#TO#972114#TT#1150#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 8",
+        "linienNummer": "8",
+        "kurzText": "STR",
+        "mittelText": "STR 8",
+        "langText": "STR 8",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Südvorstadt, Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:44:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Carolaplatz, Dresden",
+        "Albertplatz, Dresden",
+        "Louisenstraße, Dresden",
+        "Hellerau Kiefernweg, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483555#TA#14#DA#90924#1S#972114#1T#1138#LS#972217#LT#1213#PU#80#RT#1#CA#STR#ZE#8#ZB#STR    8#PC#8#FR#972114#FT#1138#TO#972217#TT#1213#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 8",
+        "linienNummer": "8",
+        "kurzText": "STR",
+        "mittelText": "STR 8",
+        "langText": "STR 8",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Hellerau Kiefernweg, Dresden"
+    },
+    {
+      "bahnhofsId": "975243",
+      "zeit": "2024-09-09T11:44:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Gret-Palucca-Straße, Dresden",
+        "Lennéplatz, Dresden",
+        "Georg-Arnhold-Bad, Dresden",
+        "Straßburger Platz, Dresden",
+        "Comeniusplatz, Dresden",
+        "Fetscherplatz, Dresden",
+        "Leutewitz, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1875456#TA#30#DA#90924#1S#978870#1T#1130#LS#972165#LT#1255#PU#80#RT#1#CA#STR#ZE#10#ZB#STR   10#PC#8#FR#978870#FT#1130#TO#972165#TT#1255#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 10",
+        "linienNummer": "10",
+        "kurzText": "STR",
+        "mittelText": "STR 10",
+        "langText": "STR 10",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Leutewitz, Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:44:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Gret-Palucca-Straße, Dresden",
+        "Lennéplatz, Dresden",
+        "Georg-Arnhold-Bad, Dresden",
+        "Straßburger Platz, Dresden",
+        "Comeniusplatz, Dresden",
+        "Lipsiusstraße, Dresden",
+        "Laubegast Kronstädter Platz, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1876561#TA#2#DA#90924#1S#972170#1T#1130#LS#972070#LT#1216#PU#80#RT#1#CA#STR#ZE#11#ZB#STR   11#PC#8#FR#972170#FT#1130#TO#972070#TT#1216#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 11",
+        "linienNummer": "11",
+        "kurzText": "STR",
+        "mittelText": "STR 11",
+        "langText": "STR 11",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Laubegast Kronstädter Platz, Dresden"
+    },
+    {
+      "bahnhofsId": "977992",
+      "zeit": "2024-09-09T11:44:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Reichenbachstraße, Dresden",
+        "Technische Universität, Dresden",
+        "Mommsenstraße, Dresden",
+        "Südhöhe, Dresden",
+        "Altkaitz, Dresden",
+        "Bannewitzer Straße, Dresden",
+        "Mockritz, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1915538#TA#8#DA#90924#1S#972431#1T#1031#LS#972431#LT#1201#PU#80#RT#1#CA#Bus#ZE#66#ZB#Bus   66#PC#5#FR#972431#FT#1031#TO#972431#TT#1201#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "Bus 66",
+        "linienNummer": "66",
+        "kurzText": "Bus",
+        "mittelText": "Bus 66",
+        "langText": "Bus 66",
+        "produktGattung": "BUS"
+      },
+      "terminus": "Mockritz, Dresden"
+    },
+    {
+      "bahnhofsId": "977992",
+      "zeit": "2024-09-09T11:45:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Reichenbachstraße, Dresden",
+        "Nürnberger Platz, Dresden",
+        "Südvorstadt, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483456#TA#16#DA#90924#1S#972217#1T#1115#LS#972114#LT#1150#PU#80#RT#1#CA#STR#ZE#8#ZB#STR    8#PC#8#FR#972217#FT#1115#TO#972114#TT#1150#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 8",
+        "linienNummer": "8",
+        "kurzText": "STR",
+        "mittelText": "STR 8",
+        "langText": "STR 8",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Südvorstadt, Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:45:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Carolaplatz, Dresden",
+        "Neustädter Markt, Dresden",
+        "Palaisplatz, Dresden",
+        "Kaditz Riegelplatz, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483670#TA#17#DA#90924#1S#978576#1T#1117#LS#972300#LT#1210#PU#80#RT#1#CA#STR#ZE#9#ZB#STR    9#PC#8#FR#978576#FT#1117#TO#972300#TT#1210#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 9",
+        "linienNummer": "9",
+        "kurzText": "STR",
+        "mittelText": "STR 9",
+        "langText": "STR 9",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Kaditz Riegelplatz, Dresden"
+    },
+    {
+      "bahnhofsId": "360028",
+      "zeit": "2024-09-09T11:46:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Ammon-/Budapester Str., Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1474336#TA#0#DA#90924#1S#974640#1T#1102#LS#972034#LT#1149#PU#80#RT#1#CA#Bus#ZE#333#ZB#Bus  333#PC#5#FR#974640#FT#1102#TO#972034#TT#1149#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "Bus 333",
+        "linienNummer": "333",
+        "kurzText": "Bus",
+        "mittelText": "Bus 333",
+        "langText": "Bus 333",
+        "produktGattung": "BUS"
+      },
+      "terminus": "Ammon-/Budapester Str., Dresden"
+    },
+    {
+      "bahnhofsId": "975243",
+      "zeit": "2024-09-09T11:46:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Carolaplatz, Dresden",
+        "Albertplatz, Dresden",
+        "Weixdorf (Rathenaustraße), Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483354#TA#30#DA#90924#1S#978121#1T#1126#LS#978479#LT#1224#PU#80#RT#1#CA#STR#ZE#7#ZB#STR    7#PC#8#FR#978121#FT#1126#TO#978479#TT#1224#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 7",
+        "linienNummer": "7",
+        "kurzText": "STR",
+        "mittelText": "STR 7",
+        "langText": "STR 7",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Weixdorf (Rathenaustraße), Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:47:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Hauptbahnhof, Dresden",
+        "Budapester Straße, Dresden",
+        "S-Bahnhof Freiberger Straße, Dresden",
+        "Rosenstraße, Dresden",
+        "Oederaner Straße, Dresden",
+        "Löbtau Tharandter Straße, Dresden",
+        "Betriebshof Gorbitz, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483197#TA#31#DA#90924#1S#978479#1T#1110#LS#978121#LT#1208#PU#80#RT#1#CA#STR#ZE#7#ZB#STR    7#PC#8#FR#978479#FT#1110#TO#978121#TT#1208#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 7",
+        "linienNummer": "7",
+        "kurzText": "STR",
+        "mittelText": "STR 7",
+        "langText": "STR 7",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Betriebshof Gorbitz, Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:47:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Carolaplatz, Dresden",
+        "Albertplatz, Dresden",
+        "Louisenstraße, Dresden",
+        "Weixdorf (Rathenaustraße), Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483354#TA#30#DA#90924#1S#978121#1T#1126#LS#978479#LT#1224#PU#80#RT#1#CA#STR#ZE#7#ZB#STR    7#PC#8#FR#978121#FT#1126#TO#978479#TT#1224#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 7",
+        "linienNummer": "7",
+        "kurzText": "STR",
+        "mittelText": "STR 7",
+        "langText": "STR 7",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Weixdorf (Rathenaustraße), Dresden"
+    },
+    {
+      "bahnhofsId": "360028",
+      "zeit": "2024-09-09T11:47:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Gret-Palucca-Straße, Dresden",
+        "Uhlandstraße, Dresden",
+        "Strehlener Platz, Dresden",
+        "Weberplatz, Dresden",
+        "Caspar-David-Friedrich-Str., Dresden",
+        "Corinthstraße, Dresden",
+        "Mockritz, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1915538#TA#11#DA#90924#1S#972431#1T#1131#LS#972431#LT#1301#PU#80#RT#1#CA#Bus#ZE#66#ZB#Bus   66#PC#5#FR#972431#FT#1131#TO#972431#TT#1301#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "Bus 66",
+        "linienNummer": "66",
+        "kurzText": "Bus",
+        "mittelText": "Bus 66",
+        "langText": "Bus 66",
+        "produktGattung": "BUS"
+      },
+      "terminus": "Mockritz, Dresden"
+    },
+    {
+      "bahnhofsId": "8010085",
+      "zeit": "2024-09-09T11:48:00",
+      "gleis": "14",
+      "ueber": [
+        "Dresden Hbf",
+        "Dresden Freiberger Straße",
+        "Dresden Mitte",
+        "Dresden-Neustadt",
+        "Dresden Industriegelände",
+        "Dresden-Klotzsche",
+        "Dresden Grenzstraße",
+        "Dresden Flughafen"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#311857#TA#6#DA#90924#1S#8010272#1T#1123#LS#8011399#LT#1209#PU#80#RT#1#CA#s#ZE#2#ZB#S      2#PC#4#FR#8010272#FT#1123#TO#8011399#TT#1209#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "S 2",
+        "linienNummer": "2",
+        "kurzText": "S",
+        "mittelText": "S 2",
+        "langText": "S 2",
+        "produktGattung": "SBAHN"
+      },
+      "terminus": "Dresden Flughafen"
+    },
+    {
+      "bahnhofsId": "975239",
+      "zeit": "2024-09-09T11:48:00",
+      "ueber": [
+        "Nürnberger Platz, Dresden",
+        "Technische Universität, Dresden",
+        "SLUB, Dresden",
+        "Zellescher Weg, Dresden",
+        "Caspar-David-Friedrich-Str., Dresden",
+        "Wasaplatz, Dresden",
+        "S-Bahnhof Strehlen, Dresden",
+        "Weißig Einkaufszentrum, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1475331#TA#9#DA#90924#1S#978024#1T#1142#LS#973993#LT#1246#PU#80#RT#1#CA#Bus#ZE#61#ZB#Bus   61#PC#5#FR#978024#FT#1142#TO#973993#TT#1246#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "Bus 61",
+        "linienNummer": "61",
+        "kurzText": "Bus",
+        "mittelText": "Bus 61",
+        "langText": "Bus 61",
+        "produktGattung": "BUS"
+      },
+      "terminus": "Weißig Einkaufszentrum, Dresden"
+    },
+    {
+      "bahnhofsId": "975246",
+      "zeit": "2024-09-09T11:48:00",
+      "ueber": [
+        "Nürnberger Platz, Dresden",
+        "Reichenbachstraße, Dresden",
+        "Hauptbahnhof, Dresden",
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Wilder Mann, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1476045#TA#32#DA#90924#1S#972142#1T#1139#LS#978591#LT#1216#PU#80#RT#1#CA#STR#ZE#3#ZB#STR    3#PC#8#FR#972142#FT#1139#TO#978591#TT#1216#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 3",
+        "linienNummer": "3",
+        "kurzText": "STR",
+        "mittelText": "STR 3",
+        "langText": "STR 3",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Wilder Mann, Dresden"
+    },
+    {
+      "bahnhofsId": "975243",
+      "zeit": "2024-09-09T11:48:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Budapester Straße, Dresden",
+        "S-Bahnhof Freiberger Straße, Dresden",
+        "Rosenstraße, Dresden",
+        "Oederaner Straße, Dresden",
+        "Löbtau Tharandter Straße, Dresden",
+        "Bünaustraße, Dresden",
+        "Betriebshof Gorbitz, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483197#TA#31#DA#90924#1S#978479#1T#1110#LS#978121#LT#1208#PU#80#RT#1#CA#STR#ZE#7#ZB#STR    7#PC#8#FR#978479#FT#1110#TO#978121#TT#1208#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 7",
+        "linienNummer": "7",
+        "kurzText": "STR",
+        "mittelText": "STR 7",
+        "langText": "STR 7",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Betriebshof Gorbitz, Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:49:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Gret-Palucca-Straße, Dresden",
+        "Lennéplatz, Dresden",
+        "Lennéplatz, Dresden",
+        "Zoo, Dresden",
+        "Querallee, Dresden",
+        "S-Bahnhof Strehlen, Dresden",
+        "Prohlis Gleisschleife, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1471927#TA#16#DA#90924#1S#972300#1T#1124#LS#978576#LT#1215#PU#80#RT#1#CA#STR#ZE#9#ZB#STR    9#PC#8#FR#972300#FT#1124#TO#978576#TT#1215#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 9",
+        "linienNummer": "9",
+        "kurzText": "STR",
+        "mittelText": "STR 9",
+        "langText": "STR 9",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Prohlis Gleisschleife, Dresden"
+    },
+    {
+      "bahnhofsId": "975239",
+      "zeit": "2024-09-09T11:49:00",
+      "ueber": [
+        "Nürnberger Platz, Dresden",
+        "Bernhardstraße, Dresden",
+        "Chemnitzer Straße, Dresden",
+        "Zwickauer Straße, Dresden",
+        "Fabrikstraße, Dresden",
+        "Löbtau Tharandter Straße, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1475120#TA#8#DA#90924#1S#973993#1T#1050#LS#978024#LT#1156#PU#80#RT#1#CA#Bus#ZE#61#ZB#Bus   61#PC#5#FR#973993#FT#1050#TO#978024#TT#1156#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "Bus 61",
+        "linienNummer": "61",
+        "kurzText": "Bus",
+        "mittelText": "Bus 61",
+        "langText": "Bus 61",
+        "produktGattung": "BUS"
+      },
+      "terminus": "Löbtau Tharandter Straße, Dresden"
+    },
+    {
+      "bahnhofsId": "975239",
+      "zeit": "2024-09-09T11:49:00",
+      "ueber": [
+        "Nürnberger Platz, Dresden",
+        "Südvorstadt, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483456#TA#16#DA#90924#1S#972217#1T#1115#LS#972114#LT#1150#PU#80#RT#1#CA#STR#ZE#8#ZB#STR    8#PC#8#FR#972217#FT#1115#TO#972114#TT#1150#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 8",
+        "linienNummer": "8",
+        "kurzText": "STR",
+        "mittelText": "STR 8",
+        "langText": "STR 8",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Südvorstadt, Dresden"
+    },
+    {
+      "bahnhofsId": "975239",
+      "zeit": "2024-09-09T11:49:00",
+      "ueber": [
+        "Nürnberger Platz, Dresden",
+        "Reichenbachstraße, Dresden",
+        "Hauptbahnhof, Dresden",
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Hellerau Kiefernweg, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483555#TA#15#DA#90924#1S#972114#1T#1148#LS#972217#LT#1223#PU#80#RT#1#CA#STR#ZE#8#ZB#STR    8#PC#8#FR#972114#FT#1148#TO#972217#TT#1223#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 8",
+        "linienNummer": "8",
+        "kurzText": "STR",
+        "mittelText": "STR 8",
+        "langText": "STR 8",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Hellerau Kiefernweg, Dresden"
+    },
+    {
+      "bahnhofsId": "360028",
+      "zeit": "2024-09-09T11:49:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Ammon-/Budapester Str., Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1893322#TA#2#DA#90924#1S#977963#1T#1036#LS#972034#LT#1152#PU#80#RT#1#CA#Bus#ZE#367#ZB#Bus  367#PC#5#FR#977963#FT#1036#TO#972034#TT#1152#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "Bus 360",
+        "linienNummer": "360",
+        "kurzText": "Bus",
+        "mittelText": "Bus 360",
+        "langText": "Bus 360",
+        "produktGattung": "BUS"
+      },
+      "terminus": "Ammon-/Budapester Str., Dresden"
+    },
+    {
+      "bahnhofsId": "977992",
+      "zeit": "2024-09-09T11:51:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Carolaplatz, Dresden",
+        "Albertplatz, Dresden",
+        "Wilder Mann, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1476045#TA#32#DA#90924#1S#972142#1T#1139#LS#978591#LT#1216#PU#80#RT#1#CA#STR#ZE#3#ZB#STR    3#PC#8#FR#972142#FT#1139#TO#978591#TT#1216#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 3",
+        "linienNummer": "3",
+        "kurzText": "STR",
+        "mittelText": "STR 3",
+        "langText": "STR 3",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Wilder Mann, Dresden"
+    },
+    {
+      "bahnhofsId": "8010085",
+      "zeit": "2024-09-09T11:52:00",
+      "gleis": "10",
+      "ueber": [
+        "Dresden Hbf",
+        "Tharandt",
+        "Freiberg(Sachs)",
+        "Flöha",
+        "Chemnitz Hbf",
+        "Hohenstein-Ernstthal",
+        "Glauchau(Sachs)",
+        "Hof Hbf"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#365678#TA#3#DA#90924#1S#8010085#1T#1152#LS#8002924#LT#1431#PU#80#RT#1#CA#DPN#ZE#74016#ZB#RE 74016#PC#3#FR#8010085#FT#1152#TO#8002924#TT#1431#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "RE 74016",
+        "kurzText": "RE",
+        "mittelText": "RE 3",
+        "langText": "RE 74016",
+        "produktGattung": "REGIONAL"
+      },
+      "terminus": "Hof Hbf"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:52:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Carolaplatz, Dresden",
+        "Albertplatz, Dresden",
+        "Bahnhof Neustadt, Dresden",
+        "Wilder Mann, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1476045#TA#32#DA#90924#1S#972142#1T#1139#LS#978591#LT#1216#PU#80#RT#1#CA#STR#ZE#3#ZB#STR    3#PC#8#FR#972142#FT#1139#TO#978591#TT#1216#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 3",
+        "linienNummer": "3",
+        "kurzText": "STR",
+        "mittelText": "STR 3",
+        "langText": "STR 3",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Wilder Mann, Dresden"
+    },
+    {
+      "bahnhofsId": "975243",
+      "zeit": "2024-09-09T11:52:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Budapester Straße, Dresden",
+        "S-Bahnhof Freiberger Straße, Dresden",
+        "Bahnhof Mitte, Dresden",
+        "Weißeritzstraße, Dresden",
+        "Krankenhaus Friedrichstadt, Dresden",
+        "Vorwerkstraße, Dresden",
+        "Messe Gleisschleife, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1882955#TA#27#DA#90924#1S#972165#1T#1042#LS#978870#LT#1208#PU#80#RT#1#CA#STR#ZE#12#ZB#STR   12#PC#8#FR#972165#FT#1042#TO#978870#TT#1208#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 10",
+        "linienNummer": "10",
+        "kurzText": "STR",
+        "mittelText": "STR 10",
+        "langText": "STR 10",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Messe Gleisschleife, Dresden"
+    },
+    {
+      "bahnhofsId": "977992",
+      "zeit": "2024-09-09T11:53:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Carolaplatz, Dresden",
+        "Albertplatz, Dresden",
+        "Hellerau Kiefernweg, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483555#TA#15#DA#90924#1S#972114#1T#1148#LS#972217#LT#1223#PU#80#RT#1#CA#STR#ZE#8#ZB#STR    8#PC#8#FR#972114#FT#1148#TO#972217#TT#1223#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 8",
+        "linienNummer": "8",
+        "kurzText": "STR",
+        "mittelText": "STR 8",
+        "langText": "STR 8",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Hellerau Kiefernweg, Dresden"
+    },
+    {
+      "bahnhofsId": "8010085",
+      "zeit": "2024-09-09T11:54:00",
+      "gleis": "14",
+      "ueber": [
+        "Dresden Hbf",
+        "Dresden Mitte",
+        "Dresden-Neustadt",
+        "Dresden Industriegelände",
+        "Dresden-Klotzsche",
+        "Langebrück(Sachs)",
+        "Radeberg",
+        "Zittau"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#386040#TA#0#DA#90924#1S#8010085#1T#1154#LS#8010393#LT#1352#PU#80#RT#1#CA#DPN#ZE#76549#ZB#TL 76549#PC#3#FR#8010085#FT#1154#TO#8010393#TT#1352#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "TL 76549",
+        "kurzText": "TL",
+        "mittelText": "TL RB61",
+        "langText": "TL 76549",
+        "produktGattung": "REGIONAL"
+      },
+      "terminus": "Zittau"
+    },
+    {
+      "bahnhofsId": "977992",
+      "zeit": "2024-09-09T11:54:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Reichenbachstraße, Dresden",
+        "Technische Universität, Dresden",
+        "Mommsenstraße, Dresden",
+        "Südhöhe, Dresden",
+        "Höckendorfer Weg, Dresden",
+        "Dorfhainer Straße, Dresden",
+        "Coschütz, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1479883#TA#13#DA#90924#1S#972564#1T#1130#LS#972142#LT#1207#PU#80#RT#1#CA#Bus#ZE#66#ZB#Bus   66#PC#5#FR#972564#FT#1130#TO#972142#TT#1207#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "Bus 66",
+        "linienNummer": "66",
+        "kurzText": "Bus",
+        "mittelText": "Bus 66",
+        "langText": "Bus 66",
+        "produktGattung": "BUS"
+      },
+      "terminus": "Coschütz, Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:54:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Hauptbahnhof, Dresden",
+        "Reichenbachstraße, Dresden",
+        "Nürnberger Platz, Dresden",
+        "Südvorstadt, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483456#TA#17#DA#90924#1S#972217#1T#1125#LS#972114#LT#1200#PU#80#RT#1#CA#STR#ZE#8#ZB#STR    8#PC#8#FR#972217#FT#1125#TO#972114#TT#1200#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 8",
+        "linienNummer": "8",
+        "kurzText": "STR",
+        "mittelText": "STR 8",
+        "langText": "STR 8",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Südvorstadt, Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:54:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Carolaplatz, Dresden",
+        "Albertplatz, Dresden",
+        "Louisenstraße, Dresden",
+        "Hellerau Kiefernweg, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483555#TA#15#DA#90924#1S#972114#1T#1148#LS#972217#LT#1223#PU#80#RT#1#CA#STR#ZE#8#ZB#STR    8#PC#8#FR#972114#FT#1148#TO#972217#TT#1223#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 8",
+        "linienNummer": "8",
+        "kurzText": "STR",
+        "mittelText": "STR 8",
+        "langText": "STR 8",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Hellerau Kiefernweg, Dresden"
+    },
+    {
+      "bahnhofsId": "975243",
+      "zeit": "2024-09-09T11:54:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Gret-Palucca-Straße, Dresden",
+        "Lennéplatz, Dresden",
+        "Georg-Arnhold-Bad, Dresden",
+        "Straßburger Platz, Dresden",
+        "Comeniusplatz, Dresden",
+        "Fetscherplatz, Dresden",
+        "Leutewitz, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1875456#TA#31#DA#90924#1S#978870#1T#1140#LS#972165#LT#1305#PU#80#RT#1#CA#STR#ZE#10#ZB#STR   10#PC#8#FR#978870#FT#1140#TO#972165#TT#1305#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 10",
+        "linienNummer": "10",
+        "kurzText": "STR",
+        "mittelText": "STR 10",
+        "langText": "STR 10",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Leutewitz, Dresden"
+    },
+    {
+      "bahnhofsId": "977992",
+      "zeit": "2024-09-09T11:55:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Reichenbachstraße, Dresden",
+        "Nürnberger Platz, Dresden",
+        "Südvorstadt, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483456#TA#17#DA#90924#1S#972217#1T#1125#LS#972114#LT#1200#PU#80#RT#1#CA#STR#ZE#8#ZB#STR    8#PC#8#FR#972217#FT#1125#TO#972114#TT#1200#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 8",
+        "linienNummer": "8",
+        "kurzText": "STR",
+        "mittelText": "STR 8",
+        "langText": "STR 8",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Südvorstadt, Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:55:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Carolaplatz, Dresden",
+        "Neustädter Markt, Dresden",
+        "Palaisplatz, Dresden",
+        "Kaditz Riegelplatz, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483670#TA#18#DA#90924#1S#978576#1T#1127#LS#972300#LT#1220#PU#80#RT#1#CA#STR#ZE#9#ZB#STR    9#PC#8#FR#978576#FT#1127#TO#972300#TT#1220#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 9",
+        "linienNummer": "9",
+        "kurzText": "STR",
+        "mittelText": "STR 9",
+        "langText": "STR 9",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Kaditz Riegelplatz, Dresden"
+    },
+    {
+      "bahnhofsId": "975243",
+      "zeit": "2024-09-09T11:56:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Carolaplatz, Dresden",
+        "Albertplatz, Dresden",
+        "Weixdorf (Rathenaustraße), Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483354#TA#31#DA#90924#1S#978121#1T#1136#LS#978479#LT#1234#PU#80#RT#1#CA#STR#ZE#7#ZB#STR    7#PC#8#FR#978121#FT#1136#TO#978479#TT#1234#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 7",
+        "linienNummer": "7",
+        "kurzText": "STR",
+        "mittelText": "STR 7",
+        "langText": "STR 7",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Weixdorf (Rathenaustraße), Dresden"
+    },
+    {
+      "bahnhofsId": "360028",
+      "zeit": "2024-09-09T11:57:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Gret-Palucca-Straße, Dresden",
+        "Uhlandstraße, Dresden",
+        "Strehlener Platz, Dresden",
+        "Weberplatz, Dresden",
+        "Caspar-David-Friedrich-Str., Dresden",
+        "Corinthstraße, Dresden",
+        "Lockwitz, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1480008#TA#12#DA#90924#1S#972716#1T#1139#LS#972564#LT#1222#PU#80#RT#1#CA#Bus#ZE#66#ZB#Bus   66#PC#5#FR#972716#FT#1139#TO#972564#TT#1222#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "Bus 66",
+        "linienNummer": "66",
+        "kurzText": "Bus",
+        "mittelText": "Bus 66",
+        "langText": "Bus 66",
+        "produktGattung": "BUS"
+      },
+      "terminus": "Lockwitz, Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:57:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Hauptbahnhof, Dresden",
+        "Budapester Straße, Dresden",
+        "S-Bahnhof Freiberger Straße, Dresden",
+        "Rosenstraße, Dresden",
+        "Oederaner Straße, Dresden",
+        "Löbtau Tharandter Straße, Dresden",
+        "Betriebshof Gorbitz, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483197#TA#32#DA#90924#1S#978479#1T#1120#LS#978121#LT#1218#PU#80#RT#1#CA#STR#ZE#7#ZB#STR    7#PC#8#FR#978479#FT#1120#TO#978121#TT#1218#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 7",
+        "linienNummer": "7",
+        "kurzText": "STR",
+        "mittelText": "STR 7",
+        "langText": "STR 7",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Betriebshof Gorbitz, Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:57:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Carolaplatz, Dresden",
+        "Albertplatz, Dresden",
+        "Louisenstraße, Dresden",
+        "Weixdorf (Rathenaustraße), Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483354#TA#31#DA#90924#1S#978121#1T#1136#LS#978479#LT#1234#PU#80#RT#1#CA#STR#ZE#7#ZB#STR    7#PC#8#FR#978121#FT#1136#TO#978479#TT#1234#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 7",
+        "linienNummer": "7",
+        "kurzText": "STR",
+        "mittelText": "STR 7",
+        "langText": "STR 7",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Weixdorf (Rathenaustraße), Dresden"
+    },
+    {
+      "bahnhofsId": "975239",
+      "zeit": "2024-09-09T11:58:00",
+      "ueber": [
+        "Nürnberger Platz, Dresden",
+        "Technische Universität, Dresden",
+        "SLUB, Dresden",
+        "Zellescher Weg, Dresden",
+        "Caspar-David-Friedrich-Str., Dresden",
+        "Wasaplatz, Dresden",
+        "S-Bahnhof Strehlen, Dresden",
+        "Pappritz Fernsehturm, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1475285#TA#18#DA#90924#1S#978024#1T#1152#LS#978133#LT#1251#PU#80#RT#1#CA#Bus#ZE#61#ZB#Bus   61#PC#5#FR#978024#FT#1152#TO#978133#TT#1251#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "Bus 61",
+        "linienNummer": "61",
+        "kurzText": "Bus",
+        "mittelText": "Bus 61",
+        "langText": "Bus 61",
+        "produktGattung": "BUS"
+      },
+      "terminus": "Pappritz Fernsehturm, Dresden"
+    },
+    {
+      "bahnhofsId": "975246",
+      "zeit": "2024-09-09T11:58:00",
+      "ueber": [
+        "Nürnberger Platz, Dresden",
+        "Reichenbachstraße, Dresden",
+        "Hauptbahnhof, Dresden",
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Wilder Mann, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1476045#TA#33#DA#90924#1S#972142#1T#1149#LS#978591#LT#1226#PU#80#RT#1#CA#STR#ZE#3#ZB#STR    3#PC#8#FR#972142#FT#1149#TO#978591#TT#1226#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 3",
+        "linienNummer": "3",
+        "kurzText": "STR",
+        "mittelText": "STR 3",
+        "langText": "STR 3",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Wilder Mann, Dresden"
+    },
+    {
+      "bahnhofsId": "975243",
+      "zeit": "2024-09-09T11:58:00",
+      "ueber": [
+        "Hauptbahnhof, Dresden",
+        "Budapester Straße, Dresden",
+        "S-Bahnhof Freiberger Straße, Dresden",
+        "Rosenstraße, Dresden",
+        "Oederaner Straße, Dresden",
+        "Löbtau Tharandter Straße, Dresden",
+        "Bünaustraße, Dresden",
+        "Betriebshof Gorbitz, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483197#TA#32#DA#90924#1S#978479#1T#1120#LS#978121#LT#1218#PU#80#RT#1#CA#STR#ZE#7#ZB#STR    7#PC#8#FR#978479#FT#1120#TO#978121#TT#1218#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 7",
+        "linienNummer": "7",
+        "kurzText": "STR",
+        "mittelText": "STR 7",
+        "langText": "STR 7",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Betriebshof Gorbitz, Dresden"
+    },
+    {
+      "bahnhofsId": "8010085",
+      "zeit": "2024-09-09T11:59:00",
+      "gleis": "13",
+      "ueber": [
+        "Dresden Hbf",
+        "Dresden-Strehlen",
+        "Dresden-Reick",
+        "Dresden-Dobritz",
+        "Dresden-Niedersedlitz",
+        "Dresden-Zschachwitz",
+        "Heidenau",
+        "Bad Schandau"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#311570#TA#0#DA#90924#1S#8012318#1T#1119#LS#8010022#LT#1243#PU#80#RT#1#CA#s#ZE#1#ZB#S      1#PC#4#FR#8012318#FT#1119#TO#8010022#TT#1243#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "S 1",
+        "linienNummer": "1",
+        "kurzText": "S",
+        "mittelText": "S 1",
+        "langText": "S 1",
+        "produktGattung": "SBAHN"
+      },
+      "terminus": "Bad Schandau"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:59:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Gret-Palucca-Straße, Dresden",
+        "Lennéplatz, Dresden",
+        "Lennéplatz, Dresden",
+        "Zoo, Dresden",
+        "Querallee, Dresden",
+        "S-Bahnhof Strehlen, Dresden",
+        "Prohlis Gleisschleife, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1471927#TA#17#DA#90924#1S#972300#1T#1134#LS#978576#LT#1225#PU#80#RT#1#CA#STR#ZE#9#ZB#STR    9#PC#8#FR#972300#FT#1134#TO#978576#TT#1225#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 9",
+        "linienNummer": "9",
+        "kurzText": "STR",
+        "mittelText": "STR 9",
+        "langText": "STR 9",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Prohlis Gleisschleife, Dresden"
+    },
+    {
+      "bahnhofsId": "975239",
+      "zeit": "2024-09-09T11:59:00",
+      "ueber": [
+        "Nürnberger Platz, Dresden",
+        "Bernhardstraße, Dresden",
+        "Chemnitzer Straße, Dresden",
+        "Zwickauer Straße, Dresden",
+        "Fabrikstraße, Dresden",
+        "Löbtau Tharandter Straße, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1475074#TA#8#DA#90924#1S#978133#1T#1103#LS#978024#LT#1206#PU#80#RT#1#CA#Bus#ZE#61#ZB#Bus   61#PC#5#FR#978133#FT#1103#TO#978024#TT#1206#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "Bus 61",
+        "linienNummer": "61",
+        "kurzText": "Bus",
+        "mittelText": "Bus 61",
+        "langText": "Bus 61",
+        "produktGattung": "BUS"
+      },
+      "terminus": "Löbtau Tharandter Straße, Dresden"
+    },
+    {
+      "bahnhofsId": "975239",
+      "zeit": "2024-09-09T11:59:00",
+      "ueber": [
+        "Nürnberger Platz, Dresden",
+        "Südvorstadt, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483456#TA#17#DA#90924#1S#972217#1T#1125#LS#972114#LT#1200#PU#80#RT#1#CA#STR#ZE#8#ZB#STR    8#PC#8#FR#972217#FT#1125#TO#972114#TT#1200#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 8",
+        "linienNummer": "8",
+        "kurzText": "STR",
+        "mittelText": "STR 8",
+        "langText": "STR 8",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Südvorstadt, Dresden"
+    },
+    {
+      "bahnhofsId": "975239",
+      "zeit": "2024-09-09T11:59:00",
+      "ueber": [
+        "Nürnberger Platz, Dresden",
+        "Reichenbachstraße, Dresden",
+        "Hauptbahnhof, Dresden",
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Pirnaischer Platz, Dresden",
+        "Synagoge, Dresden",
+        "Hellerau Kiefernweg, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1483555#TA#16#DA#90924#1S#972114#1T#1158#LS#972217#LT#1233#PU#80#RT#1#CA#STR#ZE#8#ZB#STR    8#PC#8#FR#972114#FT#1158#TO#972217#TT#1233#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 8",
+        "linienNummer": "8",
+        "kurzText": "STR",
+        "mittelText": "STR 8",
+        "langText": "STR 8",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Hellerau Kiefernweg, Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:59:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Gret-Palucca-Straße, Dresden",
+        "Lennéplatz, Dresden",
+        "Georg-Arnhold-Bad, Dresden",
+        "Straßburger Platz, Dresden",
+        "Comeniusplatz, Dresden",
+        "Lipsiusstraße, Dresden",
+        "Laubegast Kronstädter Platz, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1876534#TA#11#DA#90924#1S#972170#1T#1145#LS#972070#LT#1231#PU#80#RT#1#CA#STR#ZE#11#ZB#STR   11#PC#8#FR#972170#FT#1145#TO#972070#TT#1231#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 11",
+        "linienNummer": "11",
+        "kurzText": "STR",
+        "mittelText": "STR 11",
+        "langText": "STR 11",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Laubegast Kronstädter Platz, Dresden"
+    },
+    {
+      "bahnhofsId": "972032",
+      "zeit": "2024-09-09T11:59:00",
+      "ueber": [
+        "Hauptbahnhof Nord, Dresden",
+        "Walpurgisstraße, Dresden",
+        "Prager Straße, Dresden",
+        "Postplatz, Dresden",
+        "Am Zwingerteich, Dresden",
+        "Kongresszentrum/Haus d Presse, Dresden",
+        "Anton-/Leipziger Straße, Dresden",
+        "Eisenbahnstraße, Dresden"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#1924132#TA#21#DA#90924#1S#972070#1T#1130#LS#972170#LT#1212#PU#80#RT#1#CA#STR#ZE#44#ZB#STR   44#PC#8#FR#972070#FT#1130#TO#972170#TT#1212#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "STR 11",
+        "linienNummer": "11",
+        "kurzText": "STR",
+        "mittelText": "STR 11",
+        "langText": "STR 11",
+        "produktGattung": "TRAM"
+      },
+      "terminus": "Eisenbahnstraße, Dresden"
+    },
+    {
+      "bahnhofsId": "8010085",
+      "zeit": "2024-09-09T12:00:00",
+      "gleis": "14",
+      "ueber": [
+        "Dresden Hbf",
+        "Dresden Freiberger Straße",
+        "Dresden Mitte",
+        "Dresden-Neustadt",
+        "Dresden Bischofsplatz",
+        "Dresden-Pieschen",
+        "Dresden-Trachau",
+        "Meißen Altstadt"
+      ],
+      "journeyId": "2|#VN#1#ST#1725477188#PI#0#ZI#311559#TA#2#DA#90924#1S#8010022#1T#1115#LS#8012318#LT#1237#PU#80#RT#1#CA#s#ZE#1#ZB#S      1#PC#4#FR#8010022#FT#1115#TO#8012318#TT#1237#",
+      "meldungen": [],
+      "verkehrmittel": {
+        "name": "S 1",
+        "linienNummer": "1",
+        "kurzText": "S",
+        "mittelText": "S 1",
+        "langText": "S 1",
+        "produktGattung": "SBAHN"
+      },
+      "terminus": "Meißen Altstadt"
+    }
+  ]
+}

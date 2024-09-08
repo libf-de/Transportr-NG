@@ -22,14 +22,12 @@ package de.grobox.transportr.locations
 import android.content.Context
 import android.location.Geocoder
 import androidx.annotation.WorkerThread
-import org.maplibre.android.geometry.LatLng
-import de.grobox.transportr.utils.hasLocation
-import de.schildbach.pte.dto.Location
-import de.schildbach.pte.dto.LocationType.ADDRESS
-import de.schildbach.pte.dto.Point
+import de.grobox.transportr.data.dto.KLocation
+import de.grobox.transportr.data.dto.KPoint
 import okhttp3.*
 import org.json.JSONException
 import org.json.JSONObject
+import org.maplibre.android.geometry.LatLng
 import java.io.IOException
 import java.util.*
 import kotlin.concurrent.thread
@@ -37,8 +35,8 @@ import kotlin.concurrent.thread
 
 class ReverseGeocoder(private val context: Context, private val callback: ReverseGeocoderCallback) {
 
-    fun findLocation(location: Location) {
-        if (!location.hasLocation()) return
+    fun findLocation(location: KLocation) {
+        if (!location.hasLocation) return
         findLocation(location.latAsDouble, location.lonAsDouble)
     }
 
@@ -47,7 +45,7 @@ class ReverseGeocoder(private val context: Context, private val callback: Revers
         findLocation(location.latitude, location.longitude)
     }
 
-    private fun findLocation(lat: Double, lon: Double) {
+    fun findLocation(lat: Double, lon: Double) {
         if (Geocoder.isPresent()) {
             findLocationWithGeocoder(lat, lon)
         } else {
@@ -68,8 +66,8 @@ class ReverseGeocoder(private val context: Context, private val callback: Revers
                 if (address.featureName != null) name += " " + address.featureName
                 val place = address.locality
 
-                val point = Point.fromDouble(lat, lon)
-                val l = Location(ADDRESS, null, point, place, name)
+                val point = KPoint.fromDouble(lat, lon)
+                val l = KLocation(null, KLocation.Type.ADDRESS, point, place, name)
 
                 callback.onLocationRetrieved(WrapLocation(l))
             } catch (e: IOException) {
@@ -125,8 +123,8 @@ class ReverseGeocoder(private val context: Context, private val callback: Revers
                     var place = address.optString("city")
                     if (place.isEmpty()) place = address.optString("state")
 
-                    val point = Point.fromDouble(lat, lon)
-                    val l = Location(ADDRESS, null, point, place, name)
+                    val point = KPoint.fromDouble(lat, lon)
+                    val l = KLocation(null, KLocation.Type.ADDRESS, point, place, name)
 
                     callback.onLocationRetrieved(WrapLocation(l))
                 } catch (e: JSONException) {

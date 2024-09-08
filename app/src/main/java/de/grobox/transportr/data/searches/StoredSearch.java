@@ -88,9 +88,9 @@ public class StoredSearch {
 	@Ignore
 	StoredSearch(@NonNull NetworkId networkId, FavoriteLocation from, @Nullable FavoriteLocation via, FavoriteLocation to) {
 		this.networkId = networkId;
-		this.fromId = from.getUid();
-		if (via != null) this.viaId = via.getUid();
-		this.toId = to.getUid();
+		this.fromId = from.uid;
+		if (via != null) this.viaId = via.uid;
+		this.toId = to.uid;
 		this.count = 1;
 		this.lastUsed = new Date();
 		this.favorite = false;

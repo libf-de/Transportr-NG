@@ -34,11 +34,12 @@ import androidx.annotation.RequiresPermission
 import androidx.core.content.ContextCompat
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import de.grobox.transportr.R
-import de.grobox.transportr.map.GpsMapViewModel.GpsFabState
+import de.grobox.transportr.ui.map.GpsMapViewModel.GpsFabState
 import de.grobox.transportr.map.PositionController.Companion.FIX_EXPIRY
 import de.grobox.transportr.map.PositionController.PositionState.DENIED
 import de.grobox.transportr.map.PositionController.PositionState.DISABLED
 import de.grobox.transportr.map.PositionController.PositionState.ENABLED
+import de.grobox.transportr.ui.map.GpsMapViewModel
 import de.grobox.transportr.utils.Constants.REQUEST_LOCATION_PERMISSION
 import org.maplibre.android.location.LocationComponent
 import org.maplibre.android.location.LocationComponentActivationOptions

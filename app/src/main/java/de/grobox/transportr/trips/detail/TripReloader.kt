@@ -17,27 +17,30 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.grobox.transportr.trips.detail
+package de.grobox.transportr.ui.trips.detail
 
-import androidx.lifecycle.MutableLiveData
 import androidx.annotation.WorkerThread
+import androidx.lifecycle.MutableLiveData
+import de.grobox.transportr.data.dto.KTrip
+import de.grobox.transportr.data.dto.toKTrip
+import de.grobox.transportr.data.dto.toLocation
+import de.grobox.transportr.data.dto.toProduct
 import de.grobox.transportr.settings.SettingsManager
-import de.grobox.transportr.trips.TripQuery
+import de.grobox.transportr.ui.trips.TripQuery
 import de.grobox.transportr.utils.SingleLiveEvent
 import de.schildbach.pte.NetworkProvider
 import de.schildbach.pte.dto.QueryTripsResult
 import de.schildbach.pte.dto.QueryTripsResult.Status.OK
-import de.schildbach.pte.dto.Trip
 import de.schildbach.pte.dto.TripOptions
-import java.util.*
+import java.util.Date
 
 class TripReloader(
-        private val networkProvider: NetworkProvider,
-        private val settingsManager: SettingsManager,
-        private val query: TripQuery,
-        private val trip: MutableLiveData<Trip>,
-        private val errorString: String,
-        private val tripReloadError: SingleLiveEvent<String>) {
+    private val networkProvider: NetworkProvider,
+    private val settingsManager: SettingsManager,
+    private val query: TripQuery,
+    private val trip: MutableLiveData<KTrip>,
+    private val errorString: String,
+    private val tripReloadError: SingleLiveEvent<String>) {
 
     fun reload() {
         // use a new date slightly earlier to avoid missing the right trip
@@ -47,8 +50,8 @@ class TripReloader(
         Thread {
             try {
                 val queryTripsResult = networkProvider.queryTrips(
-                    query.from.location, query.via?.location, query.to.location, newDate, true,
-                    TripOptions(query.products, settingsManager.optimize, settingsManager.walkSpeed, null, null)
+                    query.from.location.toLocation(), query.via?.location?.toLocation(), query.to.location.toLocation(), newDate, true,
+                    TripOptions(query.products.map { it.toProduct() }.toSet(), settingsManager.optimize, settingsManager.walkSpeed, null, null)
                 )
                 if (queryTripsResult.status == OK && queryTripsResult.trips.size > 0) {
                     onTripReloaded(queryTripsResult)
@@ -65,7 +68,7 @@ class TripReloader(
     private fun onTripReloaded(result: QueryTripsResult) {
         val oldTrip = this.trip.value ?: throw IllegalStateException()
 
-        for (newTrip in result.trips) {
+        for (newTrip in result.trips.map { it.toKTrip() } ) {
             if (oldTrip.isTheSame(newTrip)) {
                 trip.postValue(newTrip)
                 return
@@ -74,7 +77,7 @@ class TripReloader(
         tripReloadError.postValue(errorString)
     }
 
-    private fun Trip.isTheSame(newTrip: Trip): Boolean {
+    private fun KTrip.isTheSame(newTrip: KTrip): Boolean {
         // we can not rely on the trip ID as it is too generic with some providers
         if (numChanges != newTrip.numChanges) return false
         if (legs.size != newTrip.legs.size) return false
@@ -88,10 +91,13 @@ class TripReloader(
         return true
     }
 
-    private fun Trip.getPlannedDuration(): Long {
+    private fun KTrip.getPlannedDuration(): Long {
         val first = firstPublicLeg?.getDepartureTime(true) ?: firstDepartureTime
         val last = lastPublicLeg?.getDepartureTime(true) ?: lastArrivalTime
-        return last.time - first.time
+
+        if (first == null || last == null) return -1
+
+        return last - first
     }
 
 }

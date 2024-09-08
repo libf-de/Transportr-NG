@@ -24,7 +24,6 @@ import android.content.ActivityNotFoundException
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
 import android.net.Uri
 import android.os.Build
 import android.util.Log
@@ -33,13 +32,7 @@ import de.grobox.transportr.R
 import de.grobox.transportr.departures.DeparturesActivity
 import de.grobox.transportr.locations.WrapLocation
 import de.grobox.transportr.map.MapActivity
-import de.grobox.transportr.trips.search.DirectionsActivity.Companion.ACTION_PRE_FILL
-import de.grobox.transportr.trips.search.DirectionsActivity.Companion.ACTION_SEARCH
-import de.grobox.transportr.trips.search.DirectionsComposeActivity
-import de.grobox.transportr.utils.Constants.FROM
-import de.grobox.transportr.utils.Constants.TO
-import de.grobox.transportr.utils.Constants.VIA
-import de.grobox.transportr.utils.Constants.WRAP_LOCATION
+import de.grobox.transportr.ui.trips.search.DirectionsActivity.Companion.ACTION_SEARCH
 import org.maplibre.android.geometry.LatLng
 import java.io.UnsupportedEncodingException
 import java.net.URLEncoder
@@ -58,14 +51,14 @@ object IntentUtils {
         search: Boolean = true,
         clearTop: Boolean = false
     ) {
-        val intent = Intent(context, DirectionsComposeActivity::class.java)
-        if (clearTop) intent.flags = FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-        if (search) intent.action = ACTION_SEARCH
-        else intent.action = ACTION_PRE_FILL
-        intent.putExtra(FROM, from)
-        intent.putExtra(VIA, via)
-        intent.putExtra(TO, to)
-        context.startActivity(intent)
+//        val intent = Intent(context, DirectionsComposeActivity::class.java)
+//        if (clearTop) intent.flags = FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+//        if (search) intent.action = ACTION_SEARCH
+//        else intent.action = ACTION_PRE_FILL
+//        intent.putExtra(FROM, from)
+//        intent.putExtra(VIA, via)
+//        intent.putExtra(TO, to)
+//        context.startActivity(intent)
     }
 
     @JvmStatic
@@ -78,7 +71,7 @@ object IntentUtils {
     fun findDepartures(context: Context, location: WrapLocation) {
         val intent = Intent(context, DeparturesActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-        intent.putExtra(WRAP_LOCATION, location)
+        //intent.putExtra(WRAP_LOCATION, location)
         context.startActivity(intent)
     }
 
@@ -87,7 +80,7 @@ object IntentUtils {
         val intent = Intent(context, MapActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
         intent.action = ACTION_SEARCH
-        intent.putExtra(WRAP_LOCATION, location)
+        //intent.putExtra(WRAP_LOCATION, location)
         context.startActivity(intent)
     }
 

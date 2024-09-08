@@ -17,7 +17,7 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.grobox.transportr.trips.detail
+package de.grobox.transportr.ui.trips.detail
 
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -38,22 +38,22 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import de.grobox.transportr.R
 import de.grobox.transportr.TransportrFragment
+import de.grobox.transportr.data.dto.toKTrip
 import de.grobox.transportr.databinding.FragmentTripDetailBinding
-import de.grobox.transportr.trips.detail.TripDetailViewModel.SheetState
-import de.grobox.transportr.trips.detail.TripDetailViewModel.SheetState.BOTTOM
-import de.grobox.transportr.trips.detail.TripDetailViewModel.SheetState.EXPANDED
-import de.grobox.transportr.trips.detail.TripDetailViewModel.SheetState.MIDDLE
-import de.grobox.transportr.trips.detail.TripUtils.getStandardFare
-import de.grobox.transportr.trips.detail.TripUtils.hasFare
-import de.grobox.transportr.trips.detail.TripUtils.intoCalendar
-import de.grobox.transportr.trips.detail.TripUtils.share
+import de.grobox.transportr.ui.trips.TripDetailViewModel
+import de.grobox.transportr.ui.trips.detail.TripUtils.getStandardFare
+import de.grobox.transportr.ui.trips.detail.TripUtils.hasFare
+import de.grobox.transportr.ui.trips.detail.TripUtils.intoCalendar
+import de.grobox.transportr.ui.trips.detail.TripUtils.share
 import de.grobox.transportr.utils.DateUtils.formatDuration
 import de.grobox.transportr.utils.DateUtils.formatRelativeTime
 import de.grobox.transportr.utils.DateUtils.formatTime
 import de.grobox.transportr.utils.FullScreenUtil
 import de.schildbach.pte.dto.Trip
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
+import java.util.Date
 
+@Deprecated("USe composables")
 class TripDetailFragment : TransportrFragment(), Toolbar.OnMenuItemClickListener {
 
     companion object {
@@ -83,7 +83,7 @@ class TripDetailFragment : TransportrFragment(), Toolbar.OnMenuItemClickListener
     private val timeUpdater: CountDownTimer = object : CountDownTimer(Long.MAX_VALUE, 1000 * 30) {
         override fun onTick(millisUntilFinished: Long) {
             viewModel.getTrip().value?.let {
-                formatRelativeTime(fromTimeRel.context, it.firstDepartureTime).let {
+                formatRelativeTime(fromTimeRel.context, it.firstDepartureTime?.let(::Date)!!).let {
                     fromTimeRel.apply {
                         text = it.relativeTime
                         visibility = it.visibility
@@ -128,8 +128,8 @@ class TripDetailFragment : TransportrFragment(), Toolbar.OnMenuItemClickListener
         bottomBar.setOnClickListener { _ -> onBottomBarClick() }
 
 
-        viewModel.getTrip().observe(viewLifecycleOwner, Observer<Trip> { this.onTripChanged(it) })
-        viewModel.sheetState.observe(viewLifecycleOwner, Observer<SheetState> { this.onSheetStateChanged(it) })
+        //viewModel.getTrip().observe(viewLifecycleOwner, Observer<Trip> { this.onTripChanged(it) })
+        viewModel.sheetState.observe(viewLifecycleOwner, Observer<TripDetailViewModel.SheetState> { this.onSheetStateChanged(it) })
     }
 
     override fun onStart() {
@@ -176,8 +176,8 @@ class TripDetailFragment : TransportrFragment(), Toolbar.OnMenuItemClickListener
 
         val network = viewModel.transportNetwork.value
         val showLineName = network != null && network.hasGoodLineNames()
-        val adapter = LegAdapter(trip.legs, viewModel, showLineName)
-        list.adapter = adapter
+        //val adapter = LegAdapter(trip.legs, viewModel, showLineName)
+        //list.adapter = adapter
 
         fromTime.text = formatTime(context, trip.firstDepartureTime)
         formatRelativeTime(fromTimeRel.context, trip.firstDepartureTime).let {
@@ -191,36 +191,36 @@ class TripDetailFragment : TransportrFragment(), Toolbar.OnMenuItemClickListener
         to.text = trip.to.uniqueShortName()
         duration.text = formatDuration(trip.duration)
         durationTop.text = getString(R.string.total_time, formatDuration(trip.duration))
-        price.visibility = if (trip.hasFare()) VISIBLE else GONE
-        price.text = trip.getStandardFare()
-        priceTop.visibility = if (trip.hasFare()) VISIBLE else GONE
-        priceTop.text = trip.getStandardFare()
+        price.visibility = if (trip.toKTrip().hasFare()) VISIBLE else GONE
+        price.text = trip.toKTrip().getStandardFare()
+        priceTop.visibility = if (trip.toKTrip().hasFare()) VISIBLE else GONE
+        priceTop.text = trip.toKTrip().getStandardFare()
     }
 
     private fun onToolbarClose() {
-        viewModel.sheetState.value = BOTTOM
+        viewModel.sheetState.value = TripDetailViewModel.SheetState.BOTTOM
     }
 
     private fun onBottomBarClick() {
-        viewModel.sheetState.value = MIDDLE
+        viewModel.sheetState.value = TripDetailViewModel.SheetState.MIDDLE
     }
 
-    private fun onSheetStateChanged(sheetState: SheetState?) {
+    private fun onSheetStateChanged(sheetState: TripDetailViewModel.SheetState?) {
         FullScreenUtil.applyImageViewTopInset(closeButton)
         when (sheetState) {
             null -> return
-            BOTTOM -> {
+            TripDetailViewModel.SheetState.BOTTOM -> {
                 closeButton.visibility = GONE
                 topBar.visibility = GONE
                 bottomBar.visibility = VISIBLE
             }
-            MIDDLE -> {
+            TripDetailViewModel.SheetState.MIDDLE -> {
 
                 closeButton.visibility = GONE
                 topBar.visibility = VISIBLE
                 bottomBar.visibility = GONE
             }
-            EXPANDED -> {
+            TripDetailViewModel.SheetState.EXPANDED -> {
                 closeButton.visibility = VISIBLE
                 topBar.visibility = VISIBLE
                 bottomBar.visibility = GONE

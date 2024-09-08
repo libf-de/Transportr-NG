@@ -16,10 +16,9 @@
  *    You should have received a copy of the GNU General Public License
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.grobox.transportr.trips.search
+package de.grobox.transportr.ui.trips.search
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Pair
@@ -37,24 +36,23 @@ import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayout.OnRe
 import com.omadahealth.github.swipyrefreshlayout.library.SwipyRefreshLayoutDirection
 import de.grobox.transportr.R
 import de.grobox.transportr.TransportrFragment
+import de.grobox.transportr.data.trips.TripsRepository.QueryMoreState
 import de.grobox.transportr.databinding.FragmentTripsBinding
-import de.grobox.transportr.trips.detail.TripDetailActivity
-import de.grobox.transportr.trips.search.TripAdapter.OnTripClickListener
-import de.grobox.transportr.trips.search.TripsRepository.QueryMoreState
 import de.grobox.transportr.ui.LceAnimator
+import de.grobox.transportr.ui.directions.DirectionsViewModel
 import de.grobox.transportr.utils.Linkify
 import de.grobox.transportr.utils.TransportrUtils.getDragDistance
 import de.schildbach.pte.dto.Trip
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import java.util.regex.Pattern
 
-class TripsFragment : TransportrFragment(), OnRefreshListener, OnTripClickListener {
+class TripsFragment : TransportrFragment(), OnRefreshListener {
     private val viewModel: DirectionsViewModel by activityViewModel()
 
     private var _binding: FragmentTripsBinding? = null
     private val binding get() = _binding!!
 
-    private val adapter = TripAdapter(this)
+    //private val adapter = TripAdapter(this)
     private var topSwipingEnabled = false
     private var queryMoreDirection = SwipyRefreshLayoutDirection.BOTH
 
@@ -97,13 +95,13 @@ class TripsFragment : TransportrFragment(), OnRefreshListener, OnTripClickListen
         list.setHasFixedSize(false)
         viewModel.topSwipeEnabled.observe(viewLifecycleOwner, { enabled -> onSwipeEnabledChanged(enabled) })
         viewModel.queryMoreState.observe(viewLifecycleOwner, { state -> updateSwipeState(state) })
-        viewModel.trips.observe(viewLifecycleOwner) { trips -> onTripsLoaded(trips) }
+        //viewModel.trips.observe(viewLifecycleOwner) { trips -> onTripsLoaded(trips) }
         viewModel.queryError.observe(viewLifecycleOwner, { error -> onError(error) })
         viewModel.queryPTEError.observe(viewLifecycleOwner, { error -> onPTEError(error) })
         viewModel.queryMoreError.observe(viewLifecycleOwner, { error -> onMoreError(error) })
-        viewModel.timeUpdate.observe(viewLifecycleOwner, { adapter.notifyDataSetChanged() })
-        adapter.setHasStableIds(false)
-        list.adapter = adapter
+//        viewModel.timeUpdate.observe(viewLifecycleOwner, { adapter.notifyDataSetChanged() })
+//        adapter.setHasStableIds(false)
+//        list.adapter = adapter
         LceAnimator.showLoading(progressBar, list, errorLayout)
     }
 
@@ -137,15 +135,15 @@ class TripsFragment : TransportrFragment(), OnRefreshListener, OnTripClickListen
     }
 
     private fun onTripsLoaded(trips: Set<Trip>?) {
-        if (trips == null) return
-        val oldCount = adapter.itemCount
-        adapter.addAll(trips)
-        if (oldCount > 0) {
-            swipe.isRefreshing = false
-            list.smoothScrollBy(0, if (queryMoreDirection == SwipyRefreshLayoutDirection.BOTTOM) 200 else -200)
-        } else {
-            LceAnimator.showContent(progressBar, list, errorLayout)
-        }
+//        if (trips == null) return
+//        val oldCount = adapter.itemCount
+//        adapter.addAll(trips)
+//        if (oldCount > 0) {
+//            swipe.isRefreshing = false
+//            list.smoothScrollBy(0, if (queryMoreDirection == SwipyRefreshLayoutDirection.BOTTOM) 200 else -200)
+//        } else {
+//            LceAnimator.showContent(progressBar, list, errorLayout)
+//        }
     }
 
     private fun onError(error: String?) {
@@ -169,17 +167,17 @@ class TripsFragment : TransportrFragment(), OnRefreshListener, OnTripClickListen
         Toast.makeText(context, error, Toast.LENGTH_LONG).show()
     }
 
-    override fun onClick(trip: Trip) {
-        startActivity(
-            Intent(context, TripDetailActivity::class.java).apply {
-                putExtra(TripDetailActivity.TRIP, trip)
-                // unfortunately, PTE does not save these locations reliably in the Trip object
-                putExtra(TripDetailActivity.FROM, viewModel.fromLocation.value)
-                putExtra(TripDetailActivity.VIA, viewModel.viaLocation.value)
-                putExtra(TripDetailActivity.TO, viewModel.toLocation.value)
-            }
-        )
-    }
+//    override fun onClick(trip: Trip) {
+//        startActivity(
+//            Intent(context, TripDetailActivity::class.java).apply {
+//                putExtra(TripDetailActivity.TRIP, trip)
+//                // unfortunately, PTE does not save these locations reliably in the Trip object
+////                putExtra(TripDetailActivity.FROM, viewModel.fromLocation.value)
+////                putExtra(TripDetailActivity.VIA, viewModel.viaLocation.value)
+////                putExtra(TripDetailActivity.TO, viewModel.toLocation.value)
+//            }
+//        )
+//    }
 
     companion object {
         val TAG = TripsFragment::class.java.name

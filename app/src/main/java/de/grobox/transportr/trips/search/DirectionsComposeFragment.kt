@@ -17,9 +17,8 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.grobox.transportr.trips.search
+package de.grobox.transportr.ui.trips.search
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -28,9 +27,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import de.grobox.transportr.composables.BaseComposableCompat
-import de.grobox.transportr.trips.detail.TripDetailActivity
-import de.grobox.transportr.trips.detail.TripDetailComposeActivity
-import de.grobox.transportr.ui.TimeDateFragment
+import de.grobox.transportr.ui.directions.DirectionsViewModel
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 
 class DirectionsComposeFragment() : Fragment() {
@@ -45,29 +42,29 @@ class DirectionsComposeFragment() : Fragment() {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 BaseComposableCompat {
-                    DirectionsComposable(
-                        viewModel = viewModel,
-                        onSelectDepartureClicked = {
-                            if (viewModel.lastQueryCalendar.value == null) throw IllegalStateException()
-                            val fragment = TimeDateFragment.newInstance(viewModel.lastQueryCalendar.value!!, viewModel.isDeparture.value!!)
-                            fragment.setTimeDateListener(viewModel)
-                            fragment.show(requireActivity().supportFragmentManager, TimeDateFragment.TAG)
-                        },
-                        onSelectDepartureLongClicked = {
-                            viewModel.resetCalender()
-                        },
-                        tripClicked = {
-                            startActivity(
-                                Intent(context, TripDetailComposeActivity::class.java).apply {
-                                    putExtra(TripDetailActivity.TRIP, it)
-                                    // unfortunately, PTE does not save these locations reliably in the Trip object
-                                    putExtra(TripDetailActivity.FROM, viewModel.fromLocation.value)
-                                    putExtra(TripDetailActivity.VIA, viewModel.viaLocation.value)
-                                    putExtra(TripDetailActivity.TO, viewModel.toLocation.value)
-                                }
-                            )
-                        }
-                    )
+//                    DirectionsComposable(
+//                        viewModel = viewModel,
+//                        onSelectDepartureClicked = {
+//                            if (viewModel.lastQueryCalendar.value == null) throw IllegalStateException()
+//                            val fragment = TimeDateFragment.newInstance(viewModel.lastQueryCalendar.value!!, viewModel.isDeparture.value!!)
+//                            fragment.setTimeDateListener(viewModel)
+//                            fragment.show(requireActivity().supportFragmentManager, TimeDateFragment.TAG)
+//                        },
+//                        onSelectDepartureLongClicked = {
+//                            viewModel.resetCalender()
+//                        },
+//                        tripClicked = {
+//                            startActivity(
+//                                Intent(context, TripDetailComposeActivity::class.java).apply {
+//                                    putExtra(TripDetailActivity.TRIP, it)
+//                                    // unfortunately, PTE does not save these locations reliably in the Trip object
+//                                    putExtra(TripDetailActivity.FROM, viewModel.fromLocation.value)
+//                                    putExtra(TripDetailActivity.VIA, viewModel.viaLocation.value)
+//                                    putExtra(TripDetailActivity.TO, viewModel.toLocation.value)
+//                                }
+//                            )
+//                        }
+//                    )
                 }
             }
         }

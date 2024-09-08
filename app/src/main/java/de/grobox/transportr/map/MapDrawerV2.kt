@@ -19,8 +19,7 @@
 
 package de.grobox.transportr.map
 
-import de.grobox.transportr.utils.hasLocation
-import de.schildbach.pte.dto.Location
+import de.grobox.transportr.data.dto.KLocation
 import org.maplibre.android.annotations.Icon
 import org.maplibre.android.annotations.Marker
 import org.maplibre.android.annotations.MarkerOptions
@@ -52,8 +51,8 @@ abstract class MapDrawerV2(protected val mapView: MapView, protected val mapLibr
         }
     }
 
-    protected fun markLocation(map: MapLibreMap, location: Location, icon: Icon, title: String, snippet: String? = null): Marker? {
-        if (!location.hasLocation()) return null
+    protected fun markLocation(map: MapLibreMap, location: KLocation, icon: Icon, title: String, snippet: String? = null): Marker? {
+        if (!location.hasLocation) return null
 
         return map.addMarker(MarkerOptions()
                 .icon(icon)

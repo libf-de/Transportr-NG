@@ -17,11 +17,12 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.grobox.transportr.trips.detail
+package de.grobox.transportr.ui.trips.detail
 
 import androidx.annotation.LayoutRes
 import de.grobox.transportr.R
 import de.grobox.transportr.map.GpsMapFragment
+import de.grobox.transportr.ui.trips.TripDetailViewModel
 import de.schildbach.pte.dto.Trip
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import org.maplibre.android.geometry.LatLng
@@ -46,7 +47,7 @@ class TripMapFragment : GpsMapFragment<TripDetailViewModel>() {
         // set bottom padding, so everything gets centered in top half of screen
         setPadding(bottom = mapView.height / 2)
 
-        viewModel.getTrip().observe(this) { onTripChanged(it) }
+        //viewModel.getTrip().observe(this) { onTripChanged(it) }
         viewModel.getZoomLocation().observe(this) { this.animateTo(it) }
         viewModel.getZoomLeg().observe(this) { this.animateToBounds(it) }
     }
@@ -56,7 +57,7 @@ class TripMapFragment : GpsMapFragment<TripDetailViewModel>() {
 
         val tripDrawer = TripDrawer(context)
         val zoom = viewModel.isFreshStart.value ?: throw IllegalStateException()
-        tripDrawer.draw(map!!, trip, zoom)
+//        tripDrawer.draw(map!!, trip, zoom)
         if (zoom) {
             // do not zoom again when returning to this Fragment
             viewModel.isFreshStart.value = false

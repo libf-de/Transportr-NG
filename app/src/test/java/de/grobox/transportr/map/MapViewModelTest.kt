@@ -21,12 +21,12 @@ package de.grobox.transportr.map
 
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import de.grobox.transportr.TransportrApplication
 import de.grobox.transportr.data.locations.LocationRepository
 import de.grobox.transportr.data.searches.SearchesRepository
 import de.grobox.transportr.networks.TransportNetworkManager
+import de.grobox.transportr.ui.map.MapViewModel
 import org.junit.Assert.assertFalse
 import org.junit.Before
 import org.junit.Rule

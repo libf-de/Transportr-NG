@@ -37,7 +37,6 @@ import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import com.google.android.material.navigation.NavigationView
-import org.maplibre.android.geometry.LatLng
 import de.grobox.transportr.BuildConfig
 import de.grobox.transportr.R
 import de.grobox.transportr.TransportrActivity
@@ -52,14 +51,16 @@ import de.grobox.transportr.locations.WrapLocation.WrapType
 import de.grobox.transportr.networks.PickTransportNetworkActivity
 import de.grobox.transportr.networks.TransportNetwork
 import de.grobox.transportr.settings.SettingsActivity
-import de.grobox.transportr.trips.search.DirectionsActivity
 import de.grobox.transportr.ui.TransportrChangeLog
+import de.grobox.transportr.ui.map.MapViewModel
+import de.grobox.transportr.ui.trips.search.DirectionsActivity
 import de.grobox.transportr.utils.Constants
 import de.grobox.transportr.utils.FullScreenUtil.Companion.applyTopInset
 import de.grobox.transportr.utils.FullScreenUtil.Companion.drawBehindStatusbar
 import de.grobox.transportr.utils.IntentUtils.findDirections
 import de.grobox.transportr.utils.OnboardingBuilder
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.maplibre.android.geometry.LatLng
 import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt
 import javax.annotation.ParametersAreNonnullByDefault
 

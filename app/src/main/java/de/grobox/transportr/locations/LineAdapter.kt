@@ -23,6 +23,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import de.grobox.transportr.R
+import de.grobox.transportr.data.dto.toKLine
 import de.grobox.transportr.ui.LineView
 import de.schildbach.pte.dto.Line
 
@@ -52,6 +53,6 @@ class LineAdapter : RecyclerView.Adapter<LineViewHolder>() {
 
 class LineViewHolder(private val lineView: LineView) : RecyclerView.ViewHolder(lineView) {
 
-    fun bind(line: Line) = lineView.setLine(line)
+    fun bind(line: Line) = lineView.setLine(line.toKLine())
 
 }

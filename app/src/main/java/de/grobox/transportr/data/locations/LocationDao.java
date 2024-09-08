@@ -26,13 +26,16 @@ import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
+import de.grobox.transportr.data.dto.KLocation;
 import de.schildbach.pte.NetworkId;
-import de.schildbach.pte.dto.LocationType;
 
 import static androidx.room.OnConflictStrategy.REPLACE;
 
 @Dao
 public interface LocationDao {
+
+	@Query("SELECT * FROM locations WHERE networkId = :networkId")
+	LiveData<List<GenericLocation>> getAllLocations(NetworkId networkId);
 
 	// FavoriteLocation
 
@@ -48,10 +51,9 @@ public interface LocationDao {
 
 	@Nullable
 	@Query("SELECT * FROM locations WHERE networkId = :networkId AND type = :type AND id IS :id AND lat = :lat AND lon = :lon AND place IS :place AND name IS :name")
-	FavoriteLocation getFavoriteLocation(NetworkId networkId, LocationType type, @Nullable String id, int lat, int lon, @Nullable String place, @Nullable String name);
+	FavoriteLocation getFavoriteLocation(NetworkId networkId, KLocation.Type type, @Nullable String id, int lat, int lon, @Nullable String place, @Nullable String name);
 
 	// HomeLocation
-
 	@Query("SELECT * FROM home_locations WHERE networkId = :networkId")
 	LiveData<HomeLocation> getHomeLocation(NetworkId networkId);
 

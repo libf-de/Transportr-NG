@@ -22,21 +22,19 @@ package de.grobox.transportr.ui
 import android.content.Context
 import android.graphics.PorterDuff.Mode.SRC_IN
 import android.graphics.drawable.GradientDrawable
+import android.util.AttributeSet
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
-import androidx.core.content.ContextCompat.getColor
-import androidx.core.content.ContextCompat.getDrawable
 import androidx.appcompat.widget.AppCompatTextView
-import android.util.AttributeSet
+import androidx.core.content.ContextCompat.getDrawable
 import de.grobox.transportr.R
+import de.grobox.transportr.data.dto.KLine
 import de.grobox.transportr.utils.TransportrUtils.dpToPx
-import de.grobox.transportr.utils.TransportrUtils.getColorFromAttr
 import de.grobox.transportr.utils.TransportrUtils.getDrawableForProduct
-import de.schildbach.pte.dto.Line
 
 class LineView(context: Context, attr: AttributeSet?) : AppCompatTextView(context, attr) {
 
-    fun setLine(line: Line) {
+    fun setLine(line: KLine) {
         // get colors
         val foregroundColor = line.style?.foregroundColor
         val backgroundColor = line.style?.backgroundColor

@@ -31,18 +31,8 @@ import androidx.annotation.AttrRes
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import de.grobox.transportr.R
-import de.schildbach.pte.dto.Location
-import de.schildbach.pte.dto.LocationType
-import de.schildbach.pte.dto.Product
-import de.schildbach.pte.dto.Product.BUS
-import de.schildbach.pte.dto.Product.CABLECAR
-import de.schildbach.pte.dto.Product.FERRY
-import de.schildbach.pte.dto.Product.HIGH_SPEED_TRAIN
-import de.schildbach.pte.dto.Product.ON_DEMAND
-import de.schildbach.pte.dto.Product.REGIONAL_TRAIN
-import de.schildbach.pte.dto.Product.SUBURBAN_TRAIN
-import de.schildbach.pte.dto.Product.SUBWAY
-import de.schildbach.pte.dto.Product.TRAM
+import de.grobox.transportr.data.dto.KLocation
+import de.grobox.transportr.data.dto.KProduct
 import java.text.DecimalFormat
 import kotlin.math.roundToInt
 
@@ -51,17 +41,18 @@ object TransportrUtils {
 
     @JvmStatic
     @DrawableRes
-    fun getDrawableForProduct(p: Product?): Int = when (p) {
-        HIGH_SPEED_TRAIN -> R.drawable.product_high_speed_train
-        REGIONAL_TRAIN -> R.drawable.product_regional_train
-        SUBURBAN_TRAIN -> R.drawable.product_suburban_train
-        SUBWAY -> R.drawable.product_subway
-        TRAM -> R.drawable.product_tram
-        BUS -> R.drawable.product_bus
-        FERRY -> R.drawable.product_ferry
-        CABLECAR -> R.drawable.product_cablecar
-        ON_DEMAND -> R.drawable.product_on_demand
+    fun getDrawableForProduct(p: KProduct?): Int = when (p) {
+        KProduct.HIGH_SPEED_TRAIN -> R.drawable.product_high_speed_train
+        KProduct.REGIONAL_TRAIN -> R.drawable.product_regional_train
+        KProduct.SUBURBAN_TRAIN -> R.drawable.product_suburban_train
+        KProduct.SUBWAY -> R.drawable.product_subway
+        KProduct.TRAM -> R.drawable.product_tram
+        KProduct.BUS -> R.drawable.product_bus
+        KProduct.FERRY -> R.drawable.product_ferry
+        KProduct.CABLECAR -> R.drawable.product_cablecar
+        KProduct.ON_DEMAND -> R.drawable.product_on_demand
         null -> R.drawable.product_bus
+        else -> R.drawable.ic_action_about
     }
 
     @JvmStatic
@@ -72,17 +63,17 @@ object TransportrUtils {
     }
 
     @JvmStatic
-    fun getLocationName(l: Location?): String? {
+    fun getLocationName(l: KLocation?): String? {
         return when {
             l == null -> ""
-            l.type == LocationType.COORD -> getCoordName(l)
-            l.uniqueShortName() != null -> l.uniqueShortName()
+            l.type == KLocation.Type.COORD -> getCoordName(l)
+            l.uniqueShortName != null -> l.uniqueShortName
             else -> ""
         }
     }
 
     @JvmStatic
-    fun getCoordName(location: Location): String {
+    fun getCoordName(location: KLocation): String {
         return getCoordName(location.latAsDouble, location.lonAsDouble)
     }
 
@@ -121,5 +112,3 @@ object TransportrUtils {
     }
 
 }
-
-fun Location.hasLocation() = hasCoord() && (latAs1E6 != 0 || lonAs1E6 != 0)
