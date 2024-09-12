@@ -43,12 +43,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import de.grobox.transportr.R
-import de.grobox.transportr.data.dto.KLine
-import de.grobox.transportr.data.dto.KProduct
+import de.schildbach.pte.dto.Line
+import de.schildbach.pte.dto.Product
 
 @Composable
 fun ProductComposable(
-    line: KLine,
+    line: Line,
     modifier: Modifier = Modifier
 ) = ProductComposable(
     drawableId = line.product.getDrawableRes(),
@@ -125,29 +125,29 @@ fun FontTest() {
     }
 }
 
-fun KProduct?.getNameRes(): Int = when(this) {
-    KProduct.HIGH_SPEED_TRAIN -> R.string.product_high_speed_train
-    KProduct.REGIONAL_TRAIN -> R.string.product_regional_train
-    KProduct.SUBURBAN_TRAIN -> R.string.product_suburban_train
-    KProduct.SUBWAY -> R.string.product_subway
-    KProduct.TRAM -> R.string.product_tram
-    KProduct.BUS -> R.string.product_bus
-    KProduct.FERRY -> R.string.product_ferry
-    KProduct.CABLECAR -> R.string.product_cablecar
-    KProduct.ON_DEMAND -> R.string.product_on_demand
+fun Product?.getNameRes(): Int = when(this) {
+    Product.HIGH_SPEED_TRAIN -> R.string.product_high_speed_train
+    Product.REGIONAL_TRAIN -> R.string.product_regional_train
+    Product.SUBURBAN_TRAIN -> R.string.product_suburban_train
+    Product.SUBWAY -> R.string.product_subway
+    Product.TRAM -> R.string.product_tram
+    Product.BUS -> R.string.product_bus
+    Product.FERRY -> R.string.product_ferry
+    Product.CABLECAR -> R.string.product_cablecar
+    Product.ON_DEMAND -> R.string.product_on_demand
     else -> R.string.product_bus
 }
 
-fun KProduct?.getDrawableRes(): Int = when (this) {
-    KProduct.HIGH_SPEED_TRAIN -> R.drawable.product_high_speed_train
-    KProduct.REGIONAL_TRAIN -> R.drawable.product_regional_train
-    KProduct.SUBURBAN_TRAIN -> R.drawable.product_suburban_train
-    KProduct.SUBWAY -> R.drawable.product_subway
-    KProduct.TRAM -> R.drawable.product_tram
-    KProduct.BUS -> R.drawable.product_bus
-    KProduct.FERRY -> R.drawable.product_ferry
-    KProduct.CABLECAR -> R.drawable.product_cablecar
-    KProduct.ON_DEMAND -> R.drawable.product_on_demand
+fun Product?.getDrawableRes(): Int = when (this) {
+    Product.HIGH_SPEED_TRAIN -> R.drawable.product_high_speed_train
+    Product.REGIONAL_TRAIN -> R.drawable.product_regional_train
+    Product.SUBURBAN_TRAIN -> R.drawable.product_suburban_train
+    Product.SUBWAY -> R.drawable.product_subway
+    Product.TRAM -> R.drawable.product_tram
+    Product.BUS -> R.drawable.product_bus
+    Product.FERRY -> R.drawable.product_ferry
+    Product.CABLECAR -> R.drawable.product_cablecar
+    Product.ON_DEMAND -> R.drawable.product_on_demand
     null -> R.drawable.product_bus
     else -> R.drawable.ic_action_about
 }

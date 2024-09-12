@@ -19,9 +19,9 @@
 
 package de.grobox.transportr.data.gps
 
-import de.grobox.transportr.data.dto.KPoint
+import de.schildbach.pte.dto.Point
 import kotlinx.coroutines.flow.Flow
 
 interface GpsRepository {
-    fun getLocationFlow(): Flow<Result<KPoint>>
+    fun getLocationFlow(): Flow<Result<Point>>
 }

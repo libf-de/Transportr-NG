@@ -72,11 +72,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import de.grobox.transportr.R
-import de.grobox.transportr.data.dto.KLeg
-import de.grobox.transportr.data.dto.KLine
-import de.grobox.transportr.data.dto.KLine.Companion.DEFAULT_LINE_COLOR
-import de.grobox.transportr.data.dto.KLocation
-import de.grobox.transportr.data.dto.KStop
 import de.grobox.transportr.ui.transport.composables.ProductComposable
 import de.grobox.transportr.ui.trips.search.getArrivalTimes
 import de.grobox.transportr.ui.trips.search.getDepartureTimes
@@ -84,6 +79,11 @@ import de.grobox.transportr.utils.DateUtils.formatDuration
 import de.grobox.transportr.utils.DateUtils.formatTime
 import de.grobox.transportr.utils.TransportrUtils.getDrawableForProduct
 import de.grobox.transportr.utils.TransportrUtils.getLocationName
+import de.schildbach.pte.dto.Leg
+import de.schildbach.pte.dto.Line
+import de.schildbach.pte.dto.Line.Companion.DEFAULT_LINE_COLOR
+import de.schildbach.pte.dto.Location
+import de.schildbach.pte.dto.Stop
 import java.util.Date
 
 
@@ -96,22 +96,22 @@ fun <T> List<T>.forEachWithNeighbors(action: (prev: T?, current: T, next: T?) ->
 }
 
 @ColorInt
-private fun KLine.getColorInt(): Int {
+private fun Line.getColorInt(): Int {
     if (this.style == null) return DEFAULT_LINE_COLOR
-    if (this.style.backgroundColor != 0) return this.style.backgroundColor
-    if (this.style.backgroundColor2 != 0) return this.style.backgroundColor2
-    if (this.style.foregroundColor != 0) return this.style.foregroundColor
-    return if (this.style.borderColor != 0) this.style.borderColor else DEFAULT_LINE_COLOR
+    if (this.style!!.backgroundColor != 0) return this.style!!.backgroundColor
+    if (this.style!!.backgroundColor2 != 0) return this.style!!.backgroundColor2
+    if (this.style!!.foregroundColor != 0) return this.style!!.foregroundColor
+    return if (this.style!!.borderColor != 0) this.style!!.borderColor else DEFAULT_LINE_COLOR
 }
 
 
 @Composable
 fun LegListComposable(
-    legs: List<KLeg>,
+    legs: List<Leg>,
     showLineNames: Boolean,
     modifier: Modifier = Modifier
 ) {
-    var expandedLegs: List<KLeg> by remember { mutableStateOf(emptyList()) }
+    var expandedLegs: List<Leg> by remember { mutableStateOf(emptyList()) }
 
     LazyColumn(
         modifier = Modifier
@@ -171,9 +171,9 @@ fun LegListComposable(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FirstLegComponent(
-    leg: KLeg,
+    leg: Leg,
     dispTime: Pair<String, String>,
-    location: KLocation,
+    location: Location,
     customLineName: String? = null,
     stopCountClicked: () -> Unit,
     thisLegColor: Color = leg.getColor(),
@@ -326,7 +326,7 @@ fun FirstLegComponent(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MiddleStopComponent(
-    stop: KStop,
+    stop: Stop,
     type: LegType,
     thisLegColor: Color,
     modifier: Modifier = Modifier
@@ -398,7 +398,7 @@ fun MiddleStopComponent(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LastLegComponent(
-    leg: KLeg,
+    leg: Leg,
     dispTime: Pair<String, String>,
     thisLegColor: Color = leg.getColor(),
     otherLegColor: Color? = null,
@@ -463,7 +463,7 @@ fun LastLegComponent(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IntermediateComponent(
-    leg: KLeg,
+    leg: Leg,
     thisLegColor: Color = leg.getColor(),
     duration: String? = null,
     modifier: Modifier = Modifier
@@ -506,7 +506,7 @@ fun IntermediateComponent(
 }
 
 @Composable
-private fun KLeg.getColor(): Color {
+private fun Leg.getColor(): Color {
     //TODO: Harmonize colors
     return if(isPublicLeg) Color(this.line?.getColorInt() ?: -0x1000000) else colorResource(R.color.walking)
 }
@@ -516,8 +516,8 @@ private fun KLeg.getColor(): Color {
 @Composable
 fun LegComponent(
     dispTime: Pair<String, String>,
-    location: KLocation,
-    line: KLine?,
+    location: Location,
+    line: Line?,
     lineName: String? = null,
     type: LegType,
     thisLegColor: Color,
@@ -934,14 +934,14 @@ fun DrawScope.drawLastLeg(
 }
 
 
-fun KLeg.getDepartureTimes(context: Context): Pair<String, String> {
+fun Leg.getDepartureTimes(context: Context): Pair<String, String> {
     return if(isPublicLeg)
         this.departureStop?.getDepartureTimes(context) ?: Pair("", "")
     else
         Pair(formatTime(context, departureTime?.let(::Date)), "")
 }
 
-fun KLeg.getArrivalTimes(context: Context): Pair<String, String> {
+fun Leg.getArrivalTimes(context: Context): Pair<String, String> {
     return if(isPublicLeg)
         this.arrivalStop?.getArrivalTimes(context) ?: Pair("", "")
     else

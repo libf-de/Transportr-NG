@@ -24,13 +24,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SortedList
 import de.grobox.transportr.TransportrFragment
 import de.grobox.transportr.data.locations.HomeLocation
-import de.grobox.transportr.data.locations.WorkLocation
+import de.grobox.transportr.data.locations.WorLocation
 import de.grobox.transportr.databinding.FragmentFavoritesBinding
 import de.grobox.transportr.favorites.locations.HomePickerDialogFragment
 import de.grobox.transportr.favorites.locations.WorkPickerDialogFragment
@@ -61,9 +60,9 @@ abstract class FavoriteTripsFragment<VM : SavedSearchesViewModel> : TransportrFr
         list.setAdapter(adapter)
         list.setLayoutManager(LinearLayoutManager(getContext()))
 
-        viewModel.home.observe(getViewLifecycleOwner(), Observer<HomeLocation> { home: HomeLocation? -> this.onHomeLocationChanged(home) })
-        viewModel.work.observe(getViewLifecycleOwner(), Observer<WorkLocation> { work: WorkLocation? -> this.onWorkLocationChanged(work) })
-        viewModel.favoriteTrips.observe(getViewLifecycleOwner()) { trips: List<FavoriteTripItem> -> this.onFavoriteTripsChanged(trips) }
+//        viewModel.home.observe(getViewLifecycleOwner(), Observer<HomeLocation> { home: HomeLocation? -> this.onHomeLocationChanged(home) })
+//        viewModel.work.observe(getViewLifecycleOwner(), Observer<WorLocation> { work: WorLocation? -> this.onWorLocationChanged(work) })
+//        viewModel.favoriteTrips.observe(getViewLifecycleOwner()) { trips: List<FavoriteTripItem> -> this.onFavoriteTripsChanged(trips) }
 
         return binding.root
     }
@@ -78,7 +77,7 @@ abstract class FavoriteTripsFragment<VM : SavedSearchesViewModel> : TransportrFr
         }
     }
 
-    private fun onWorkLocationChanged(work: WorkLocation?) {
+    private fun onWorLocationChanged(work: WorLocation?) {
         val oldWork = adapter.work
         val newWork: FavoriteTripItem = FavoriteTripItem(work)
         if (oldWork == null) {

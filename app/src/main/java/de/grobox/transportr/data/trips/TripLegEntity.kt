@@ -24,9 +24,9 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import de.grobox.transportr.data.dto.KLeg
-import de.grobox.transportr.data.dto.KPoint
 import de.grobox.transportr.data.locations.GenericLocation
+import de.schildbach.pte.dto.Leg
+import de.schildbach.pte.dto.Point
 
 @Entity(
     tableName = "tripLegs",
@@ -49,7 +49,7 @@ data class TripLegEntity(
     val isPublicLeg: Boolean,
     val departureId: Long?,
     val arrivalId: Long?,
-    val path: List<KPoint>?,
+    val path: List<Point>?,
 
     @ColumnInfo(name = "lineId") val lineId: Long? = null,
     @ColumnInfo(name = "destinationId") val destinationId: Long? = null,
@@ -59,7 +59,7 @@ data class TripLegEntity(
     //intermediateStops
     val message: String? = null,
 
-    val individualType: KLeg.IndividualType? = null,
+    val individualType: Leg.IndividualType? = null,
     val departureTime: Long?,
     val arrivalTime: Long?,
     val min: Long? = null,

@@ -24,7 +24,7 @@ plugins {
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.serialization)
-    kotlin("kapt")
+    //kotlin("kapt")
     //id("witness")
 }
 
@@ -145,16 +145,16 @@ dependencies {
     implementation(libs.androidx.legacy.preference)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.lifecycle.viewmodel)
-    implementation(libs.androidx.lifecycle.livedata)
+//    implementation(libs.androidx.lifecycle.livedata)
     //kapt(libs.androidx.lifecycle.compiler)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
-    kapt(libs.androidx.room.compiler)
+    //kapt(libs.androidx.room.compiler)
     implementation(libs.androidx.localbroadcastmanager)
 
     implementation(libs.okhttp)
     implementation(libs.swipy)
-    implementation(libs.ckchangelog)
+//    implementation(libs.ckchangelog)
     implementation(libs.flexbox)
     implementation(libs.aboutlibraries)
     implementation(libs.fastadapter)
@@ -175,7 +175,7 @@ dependencies {
 
     implementation(libs.compose.activities)
     implementation(libs.compose.viewmodel)
-    implementation(libs.compose.livedata)
+//    implementation(libs.compose.livedata)
     implementation(libs.compose.ui)
     implementation(libs.compose.icons)
 
@@ -189,11 +189,12 @@ dependencies {
         exclude(module = "failureaccess")
         exclude(group = "com.google.j2objc")
     }
-    implementation(libs.public.transport.enabler) {
-        exclude(group = "com.google.guava")
-        exclude(group = "org.json", module = "json")
-        exclude(group = "net.sf.kxml", module = "kxml2")
-    }
+//    implementation(libs.public.transport.enabler) {
+//        exclude(group = "com.google.guava")
+//        exclude(group = "org.json", module = "json")
+//        exclude(group = "net.sf.kxml", module = "kxml2")
+//    }
+    implementation("de.schildbach.pte:public-transport-enabler-ktx-jvm:unspecified")
     debugImplementation(libs.slf4j)
     debugImplementation(libs.logback.android)
 
@@ -213,5 +214,8 @@ dependencies {
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.datetime)
+
+    implementation(libs.settings)
+    implementation(libs.settings.coroutines)
     //api(libs.moko.geo)
 }

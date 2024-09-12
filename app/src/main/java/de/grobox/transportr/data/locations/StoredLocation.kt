@@ -20,21 +20,21 @@ package de.grobox.transportr.data.locations
 
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
-import de.grobox.transportr.data.dto.KLocation
-import de.grobox.transportr.data.dto.KProduct
+import de.schildbach.pte.dto.Location
+import de.schildbach.pte.dto.Product
 import de.grobox.transportr.locations.WrapLocation
 import de.schildbach.pte.NetworkId
 
 abstract class StoredLocation internal constructor(
     @JvmField @PrimaryKey(autoGenerate = true) val uid: Long,
     @JvmField val networkId: NetworkId,
-    type: KLocation.Type?,
+    type: Location.Type?,
     id: String?,
     lat: Int,
     lon: Int,
     place: String?,
     name: String?,
-    products: Set<KProduct>?
+    products: Set<Product>?
 ) : WrapLocation(
     type!!, id, lat, lon, place, name, products
 ) {
@@ -55,7 +55,7 @@ abstract class StoredLocation internal constructor(
     internal constructor(networkId: NetworkId, l: WrapLocation) : this(0, networkId, l)
 
     @Ignore
-    internal constructor(networkId: NetworkId, l: KLocation) : this(
+    internal constructor(networkId: NetworkId, l: Location) : this(
         0,
         networkId,
         l.type,

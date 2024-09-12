@@ -27,19 +27,19 @@ import android.location.LocationManager
 import android.os.Bundle
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat.getSystemService
-import de.grobox.transportr.data.dto.KPoint
+import de.schildbach.pte.dto.Point
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 
 class AndroidGpsRepository(private val context: Context) : GpsRepository {
-    override fun getLocationFlow(): Flow<Result<KPoint>> = callbackFlow {
+    override fun getLocationFlow(): Flow<Result<Point>> = callbackFlow {
         val locationManager = getSystemService(context, LocationManager::class.java)
 
         val locationListener = object : LocationListener {
             override fun onLocationChanged(location: android.location.Location) {
-                val kPoint = KPoint.fromDouble(location.latitude, location.longitude)
-                trySend(Result.success(kPoint))
+                val Point = Point.fromDouble(location.latitude, location.longitude)
+                trySend(Result.success(Point))
             }
 
             @Deprecated("Deprecated in Java")

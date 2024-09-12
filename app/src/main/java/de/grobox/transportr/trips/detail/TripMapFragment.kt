@@ -48,8 +48,8 @@ class TripMapFragment : GpsMapFragment<TripDetailViewModel>() {
         setPadding(bottom = mapView.height / 2)
 
         //viewModel.getTrip().observe(this) { onTripChanged(it) }
-        viewModel.getZoomLocation().observe(this) { this.animateTo(it) }
-        viewModel.getZoomLeg().observe(this) { this.animateToBounds(it) }
+//        viewModel.getZoomLocation().observe(this) { this.animateTo(it) }
+//        viewModel.getZoomLeg().observe(this) { this.animateToBounds(it) }
     }
 
     private fun onTripChanged(trip: Trip?) {

@@ -26,8 +26,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import de.grobox.transportr.data.dto.KTrip
-import de.grobox.transportr.data.serializers.TripSerializer
 import de.grobox.transportr.favorites.trips.FavoriteTripType
 import de.grobox.transportr.locations.WrapLocation
 import de.grobox.transportr.ui.directions.DirectionsScreen
@@ -173,7 +171,7 @@ fun TransportrNavigationController() {
         }
 
         composable<Routes.TripDetail>(
-            typeMap = mapOf(typeOf<KTrip>() to serializableNavType<KTrip>())
+            typeMap = mapOf(typeOf<Trip>() to serializableNavType<Trip>())
         ) {
             val params = it.toRoute<Routes.TripDetail>()
             TripDetailScreen(
@@ -192,12 +190,4 @@ fun TransportrNavigationController() {
             )
         }
     }
-}
-
-private fun Trip.serialize(): String {
-    return Json.encodeToString(TripSerializer, this)
-}
-
-private fun deserializeTrip(json: String): Trip {
-    return Json.decodeFromString(TripSerializer, json)
 }

@@ -20,28 +20,26 @@
 package de.grobox.transportr.settings
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.content.res.Resources
 import android.os.Build
 import android.os.PowerManager
-import android.preference.PreferenceManager
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
 import androidx.core.content.ContextCompat
+import com.russhwolf.settings.Settings
+import com.russhwolf.settings.get
 import de.grobox.transportr.R
-import de.grobox.transportr.data.dto.KProduct
+import de.schildbach.pte.dto.Product
 import de.schildbach.pte.NetworkId
 import de.schildbach.pte.NetworkProvider.Optimize
 import de.schildbach.pte.NetworkProvider.WalkSpeed
 import java.util.Locale
 
 
-class SettingsManager constructor(private val context: Context) {
-
-    val settings: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+class SettingsManager constructor(private val context: Context, private val settings: Settings) {
 
     val locale: Locale
         get() {
@@ -105,12 +103,12 @@ class SettingsManager constructor(private val context: Context) {
 
     fun showLocationFragmentOnboarding(): Boolean = settings.getBoolean(LOCATION_ONBOARDING, true)
     fun locationFragmentOnboardingShown() {
-        settings.edit().putBoolean(LOCATION_ONBOARDING, false).apply()
+        settings.putBoolean(LOCATION_ONBOARDING, false)
     }
 
     fun showTripDetailFragmentOnboarding(): Boolean = settings.getBoolean(TRIP_DETAIL_ONBOARDING, true)
     fun tripDetailOnboardingShown() {
-        settings.edit().putBoolean(TRIP_DETAIL_ONBOARDING, false).apply()
+        settings.putBoolean(TRIP_DETAIL_ONBOARDING, false)
     }
 
     fun getNetworkId(i: Int): NetworkId? {
@@ -118,7 +116,7 @@ class SettingsManager constructor(private val context: Context) {
         if (i == 2) networkSettingsStr = NETWORK_ID_2
         else if (i == 3) networkSettingsStr = NETWORK_ID_3
 
-        val networkStr = settings.getString(networkSettingsStr, null) ?: return null
+        val networkStr = settings.getString(networkSettingsStr, "").takeIf { it.isNotEmpty() } ?: return null
 
         return try {
             NetworkId.valueOf(networkStr)
@@ -133,36 +131,35 @@ class SettingsManager constructor(private val context: Context) {
             return  // same network selected
         }
         val networkId2 = settings.getString(NETWORK_ID_2, "")
-        val editor = settings.edit()
         if (networkId2 != newNetworkId.name) {
-            editor.putString(NETWORK_ID_3, networkId2)
+            settings.putString(NETWORK_ID_3, networkId2)
         }
-        editor.putString(NETWORK_ID_2, networkId1)
-        editor.putString(NETWORK_ID_1, newNetworkId.name)
-        editor.apply()
+        settings.putString(NETWORK_ID_2, networkId1)
+        settings.putString(NETWORK_ID_1, newNetworkId.name)
     }
 
     fun showWhenLocked(): Boolean {
         return settings.getBoolean(SHOW_WHEN_LOCKED, true)
     }
 
-    fun setPreferredProducts(selected: Set<KProduct>) {
-        val editor = settings.edit()
-        KProduct.ALL.toSet().forEach { product ->
-            editor.putBoolean(LAST_PRODUCT_PREFIX + product.name, product in selected)
+    fun setPreferredProducts(selected: Set<Product>) {
+        Product.ALL.toSet().forEach { product ->
+            settings.putBoolean(LAST_PRODUCT_PREFIX + product.name, product in selected)
         }
-        editor.apply()
     }
 
-    fun getPreferredProducts(): Set<KProduct> {
-        val firstTime = KProduct.ALL.none { settings.contains(LAST_PRODUCT_PREFIX + it.name) }
+    fun getPreferredProducts(): Set<Product> {
+        val firstTime = Product.ALL.none {
+            val cand: Boolean? = settings[LAST_PRODUCT_PREFIX + it.name]
+            cand != null
+        }
         if (firstTime) {
-            setPreferredProducts(KProduct.ALL)
-            return KProduct.ALL
+            setPreferredProducts(Product.ALL)
+            return Product.ALL
         }
 
-        val products = mutableSetOf<KProduct>()
-        KProduct.ALL.toSet().forEach { product ->
+        val products = mutableSetOf<Product>()
+        Product.ALL.toSet().forEach { product ->
             if (settings.getBoolean(LAST_PRODUCT_PREFIX + product.name, false)) {
                 products.add(product)
             }

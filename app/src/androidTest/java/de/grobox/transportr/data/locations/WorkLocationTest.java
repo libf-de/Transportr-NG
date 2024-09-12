@@ -37,7 +37,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 @RunWith(AndroidJUnit4.class)
-public class WorkLocationTest extends DbTest {
+public class WorLocationTest extends DbTest {
 
 	private LocationDao dao;
 
@@ -49,43 +49,43 @@ public class WorkLocationTest extends DbTest {
 	}
 
 	@Test
-	public void insertWorkLocation() throws Exception {
+	public void insertWorLocation() throws Exception {
 		// no home location should exist
-		assertNull(getValue(dao.getWorkLocation(DB)));
+		assertNull(getValue(dao.getWorLocation(DB)));
 
 		// create a complete station location
 		Location location = new Location(STATION, "stationId", Point.from1E6(23, 42), "place", "name", Product.ALL);
-		long uid1 = dao.addWorkLocation(new WorkLocation(DB, location));
+		long uid1 = dao.addWorLocation(new WorLocation(DB, location));
 
 		// assert that location has been inserted and retrieved properly
-		WorkLocation workLocation = getValue(dao.getWorkLocation(DB));
-		assertNotNull(workLocation);
-		assertEquals(uid1, workLocation.uid);
-		assertEquals(DB, workLocation.networkId);
-		assertEquals(location.type, workLocation.type);
-		assertEquals(location.id, workLocation.id);
-		assertEquals(location.getLatAs1E6(), workLocation.lat);
-		assertEquals(location.getLonAs1E6(), workLocation.lon);
-		assertEquals(location.place, workLocation.place);
-		assertEquals(location.name, workLocation.name);
-		assertEquals(location.products, workLocation.products);
+		WorLocation worLocation = getValue(dao.getWorLocation(DB));
+		assertNotNull(worLocation);
+		assertEquals(uid1, worLocation.uid);
+		assertEquals(DB, worLocation.networkId);
+		assertEquals(location.type, worLocation.type);
+		assertEquals(location.id, worLocation.id);
+		assertEquals(location.getLatAs1E6(), worLocation.lat);
+		assertEquals(location.getLonAs1E6(), worLocation.lon);
+		assertEquals(location.place, worLocation.place);
+		assertEquals(location.name, worLocation.name);
+		assertEquals(location.products, worLocation.products);
 
 		// create a different home location
 		location = new Location(ADDRESS, null, Point.from1E6(1337, 0), "place2", "name2", null);
-		dao.addWorkLocation(new WorkLocation(DB, location));
+		dao.addWorLocation(new WorLocation(DB, location));
 
 		// assert that old home location has been replaced properly
 		assertEquals(1, dao.countWorks(DB));
-		workLocation = getValue(dao.getWorkLocation(DB));
-		assertNotNull(workLocation);
-		assertEquals(DB, workLocation.networkId);
-		assertEquals(location.type, workLocation.type);
-		assertEquals(location.id, workLocation.id);
-		assertEquals(location.getLatAs1E6(), workLocation.lat);
-		assertEquals(location.getLonAs1E6(), workLocation.lon);
-		assertEquals(location.place, workLocation.place);
-		assertEquals(location.name, workLocation.name);
-		assertEquals(location.products, workLocation.products);
+		worLocation = getValue(dao.getWorLocation(DB));
+		assertNotNull(worLocation);
+		assertEquals(DB, worLocation.networkId);
+		assertEquals(location.type, worLocation.type);
+		assertEquals(location.id, worLocation.id);
+		assertEquals(location.getLatAs1E6(), worLocation.lat);
+		assertEquals(location.getLonAs1E6(), worLocation.lon);
+		assertEquals(location.place, worLocation.place);
+		assertEquals(location.name, worLocation.name);
+		assertEquals(location.products, worLocation.products);
 	}
 
 }

@@ -28,15 +28,15 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Relation
 import androidx.room.Transaction
-import de.grobox.transportr.data.dto.KLeg
-import de.grobox.transportr.data.dto.KLine
-import de.grobox.transportr.data.dto.KLocation
-import de.grobox.transportr.data.dto.KStop
-import de.grobox.transportr.data.dto.KTrip
 import de.grobox.transportr.data.locations.GenericLocation
 import de.schildbach.pte.NetworkId
+import de.schildbach.pte.dto.Leg
+import de.schildbach.pte.dto.Line
+import de.schildbach.pte.dto.Location
+import de.schildbach.pte.dto.Stop
+import de.schildbach.pte.dto.Trip
 
-private fun KStop.toStopEntity(locationId: Long): StopEntity {
+private fun Stop.toStopEntity(locationId: Long): StopEntity {
     return StopEntity(
         uid = 0,
         locationId = locationId,
@@ -63,9 +63,9 @@ interface TripsDao {
         @Relation(parentColumn = "locationId", entityColumn = "uid")
         val location: GenericLocation
     ) {
-        fun toKStop(): KStop {
-            return KStop(
-                location = location.toKLocation(),
+        fun toStop(): Stop {
+            return Stop(
+                location = location.toLocation(),
                 plannedArrivalTime = stop.plannedArrivalTime,
                 predictedArrivalTime = stop.predictedArrivalTime,
                 plannedArrivalPosition = stop.plannedArrivalPosition,
@@ -147,30 +147,30 @@ interface TripsDao {
         )
         val to: GenericLocation
     ) {
-        fun toKTrip(): KTrip {
-            return KTrip(
+        fun toTrip(): Trip {
+            return Trip(
                 id = trip.id,
-                from = from.toKLocation(),
-                to = to.toKLocation(),
+                from = from.toLocation(),
+                to = to.toLocation(),
                 legs = legs.map {
                     if(it.tripLeg.isPublicLeg) {
-                        KLeg(
-                            line = it.line.toKLine(),
-                            destination = it.destination.toKLocation(),
-                            departureStop = it.departureStop.toKStop(),
-                            arrivalStop = it.arrivalStop.toKStop(),
+                        Leg(
+                            line = it.line.toLine(),
+                            destination = it.destination.toLocation(),
+                            departureStop = it.departureStop.toStop(),
+                            arrivalStop = it.arrivalStop.toStop(),
                             intermediateStops = it.intermediateStops.map { intStop ->
-                                intStop.toKStop()
+                                intStop.toStop()
                             },
                             path = it.tripLeg.path,
                             message = it.tripLeg.message,
                         )
                     } else {
-                        KLeg(
-                            type = it.tripLeg.individualType ?: KLeg.IndividualType.WALK,
-                            departure = it.departureStop.location.toKLocation(),
+                        Leg(
+                            type = it.tripLeg.individualType ?: Leg.IndividualType.WALK,
+                            departure = it.departureStop.location.toLocation(),
                             departureTime = it.tripLeg.departureTime ?: 0L,
-                            arrival = it.arrivalStop.location.toKLocation(),
+                            arrival = it.arrivalStop.location.toLocation(),
                             arrivalTime = it.tripLeg.arrivalTime ?: 0L,
                             path = it.tripLeg.path,
                             distance = it.tripLeg.distance
@@ -232,7 +232,7 @@ interface TripsDao {
     fun addTripEntity(location: TripEntity): Long
 
     @Transaction
-    suspend fun addTrip(trip: KTrip, network: NetworkId) {
+    suspend fun addTrip(trip: Trip, network: NetworkId) {
 
 
         val fromId = addLocation(trip.from.toGenericLocation(network))
@@ -381,7 +381,7 @@ interface TripsDao {
     }
 }
 
-private fun KLine.toLineEntity(network: NetworkId): LineEntity {
+private fun Line.toLineEntity(network: NetworkId): LineEntity {
     return LineEntity(
         id = this.id,
         networkId = network,
@@ -396,7 +396,7 @@ private fun KLine.toLineEntity(network: NetworkId): LineEntity {
     )
 }
 
-private fun KLocation.toGenericLocation(network: NetworkId): GenericLocation {
+private fun Location.toGenericLocation(network: NetworkId): GenericLocation {
     return GenericLocation(
         networkId = network,
         l = this

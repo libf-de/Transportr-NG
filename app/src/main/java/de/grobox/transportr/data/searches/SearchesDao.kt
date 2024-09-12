@@ -16,46 +16,39 @@
  *    You should have received a copy of the GNU General Public License
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package de.grobox.transportr.data.searches
 
-package de.grobox.transportr.data.searches;
-
-import androidx.lifecycle.LiveData;
-import androidx.room.Dao;
-import androidx.room.Delete;
-import androidx.room.Insert;
-import androidx.room.Query;
-import androidx.annotation.Nullable;
-
-import java.util.Date;
-import java.util.List;
-
-import de.schildbach.pte.NetworkId;
-
-import static androidx.room.OnConflictStrategy.REPLACE;
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import de.schildbach.pte.NetworkId
+import kotlinx.coroutines.flow.Flow
+import java.util.Date
 
 @Dao
-public interface SearchesDao {
+interface SearchesDao {
+    //	@Query("SELECT * FROM searches WHERE networkId = :networkId")
+    //	LiveData<List<StoredSearch>> getStoredSearches(NetworkId networkId);
+    @Query("SELECT * FROM searches WHERE networkId = :networkId")
+    fun getStoredSearchesAsFlow(networkId: NetworkId?): Flow<List<StoredSearch>>
 
-	@Query("SELECT * FROM searches WHERE networkId = :networkId")
-	LiveData<List<StoredSearch>> getStoredSearches(NetworkId networkId);
+    @Query("SELECT * FROM searches WHERE networkId = :networkId AND from_id = :fromId AND via_id IS :viaId AND to_id = :toId")
+    fun getStoredSearch(networkId: NetworkId, fromId: Long, viaId: Long?, toId: Long): StoredSearch?
 
-	@Nullable
-	@Query("SELECT * FROM searches WHERE networkId = :networkId AND from_id = :fromId AND via_id IS :viaId AND to_id = :toId")
-	StoredSearch getStoredSearch(NetworkId networkId, long fromId, @Nullable Long viaId, long toId);
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun storeSearch(storedSearch: StoredSearch): Long
 
-	@Insert(onConflict = REPLACE)
-	long storeSearch(StoredSearch storedSearch);
+    @Query("UPDATE searches SET count = count + 1, lastUsed = :lastUsed WHERE uid = :uid")
+    fun updateStoredSearch(uid: Long, lastUsed: Date?)
 
-	@Query("UPDATE searches SET count = count + 1, lastUsed = :lastUsed WHERE uid = :uid")
-	void updateStoredSearch(long uid, Date lastUsed);
+    @Query("SELECT favorite FROM searches WHERE uid = :uid")
+    fun isFavorite(uid: Long): Boolean
 
-	@Query("SELECT favorite FROM searches WHERE uid = :uid")
-	boolean isFavorite(long uid);
+    @Query("UPDATE searches SET favorite = :favorite WHERE uid = :uid")
+    fun setFavorite(uid: Long, favorite: Boolean)
 
-	@Query("UPDATE searches SET favorite = :favorite WHERE uid = :uid")
-	void setFavorite(long uid, boolean favorite);
-
-	@Delete
-	void delete(StoredSearch storedSearch);
-
+    @Delete
+    fun delete(storedSearch: StoredSearch)
 }

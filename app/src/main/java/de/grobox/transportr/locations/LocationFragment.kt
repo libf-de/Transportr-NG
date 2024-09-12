@@ -35,9 +35,8 @@ import androidx.loader.content.Loader
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.common.base.Strings
-import de.grobox.transportr.R
 import de.grobox.transportr.TransportrFragment
-import de.grobox.transportr.data.dto.KLocation
+import de.schildbach.pte.dto.Location
 import de.grobox.transportr.databinding.FragmentLocationBinding
 import de.grobox.transportr.departures.DeparturesActivity
 import de.grobox.transportr.departures.DeparturesLoader
@@ -86,7 +85,7 @@ class LocationFragment : TransportrFragment(), LoaderManager.LoaderCallbacks<Que
             )
         )
 
-        viewModel.nearbyStationsFound().observe(viewLifecycleOwner) { onNearbyStationsLoaded() }
+//        viewModel.nearbyStationsFound.observe(viewLifecycleOwner) { onNearbyStationsLoaded() }
 
         // Location
         locationIcon = binding.locationIcon
@@ -105,7 +104,7 @@ class LocationFragment : TransportrFragment(), LoaderManager.LoaderCallbacks<Que
         locationInfo = binding.locationInfo
         showLocation()
 
-        if (location.location.type == KLocation.Type.COORD) {
+        if (location.location.type == Location.Type.COORD) {
             val geocoder = ReverseGeocoder(requireActivity(), this)
             geocoder.findLocation(location.location)
         }
@@ -148,11 +147,11 @@ class LocationFragment : TransportrFragment(), LoaderManager.LoaderCallbacks<Que
     override fun onGlobalLayout() {
         // set peek distance to show view header
         if (activity == null) return
-        if (linesLayout.bottom > 0) {
-            viewModel.setPeekHeight(linesLayout.bottom + resources.getDimensionPixelSize(R.dimen.locationPeekPadding))
-        } else if (locationInfo.bottom > 0) {
-            viewModel.setPeekHeight(locationInfo.bottom + resources.getDimensionPixelSize(R.dimen.locationPeekPadding))
-        }
+//        if (linesLayout.bottom > 0) {
+//            viewModel.setPeekHeight(linesLayout.bottom + resources.getDimensionPixelSize(R.dimen.locationPeekPadding))
+//        } else if (locationInfo.bottom > 0) {
+//            viewModel.setPeekHeight(locationInfo.bottom + resources.getDimensionPixelSize(R.dimen.locationPeekPadding))
+//        }
     }
 
     private fun showLocation() {

@@ -19,18 +19,17 @@
 
 package de.grobox.transportr.ui.trips
 
-import de.grobox.transportr.data.dto.KProduct
+import de.schildbach.pte.dto.Product
 import de.grobox.transportr.locations.WrapLocation
-import java.util.Date
 import java.util.EnumSet
 
 class TripQuery internal constructor(
         val from: WrapLocation, val via: WrapLocation?, val to: WrapLocation,
-        val date: Date,
+        val date: Long,
         departure: Boolean?,
-        products: Set<KProduct>?) {
+        products: Set<Product>?) {
 
     val departure = departure != false
-    val products: Set<KProduct> = products ?: EnumSet.allOf(KProduct::class.java)
+    val products: Set<Product> = products ?: EnumSet.allOf(Product::class.java)
 
 }

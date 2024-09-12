@@ -59,8 +59,6 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import de.grobox.transportr.R
-import de.grobox.transportr.data.dto.KLeg
-import de.grobox.transportr.data.dto.KTrip
 import de.grobox.transportr.ui.transport.composables.getDrawableRes
 import de.grobox.transportr.ui.trips.detail.TripUtils.getStandardFare
 import de.grobox.transportr.ui.trips.search.getArrivalTimes
@@ -68,11 +66,13 @@ import de.grobox.transportr.ui.trips.search.getDepartureTimes
 import de.grobox.transportr.ui.trips.search.hasProblem
 import de.grobox.transportr.utils.DateUtils.formatDuration
 import de.grobox.transportr.utils.TransportrUtils.getLocationName
+import de.schildbach.pte.dto.Leg
+import de.schildbach.pte.dto.Trip
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun NewTripPreviewComposable(
-    trip: KTrip,
+    trip: Trip,
     context: Context = LocalContext.current,
     onClick: () -> Unit,
 ) {
@@ -160,7 +160,7 @@ fun NewTripPreviewComposable(
 
                         previous?.let { prev ->
                             if(prev.arrivalTime != null && leg.departureTime != null && prev.arrivalTime != leg.departureTime) {
-                                val diffMins = (leg.departureTime - prev.arrivalTime).toMins()
+                                val diffMins = (leg.departureTime!! - prev.arrivalTime!!).toMins()
                                 val diffTimeFraction = trip.duration?.toMins()?.let { totalMin -> diffMins / totalMin.toFloat() } ?: .1f
                                 val diffWidth = diffTimeFraction * size.width
 
@@ -228,7 +228,7 @@ fun NewTripPreviewComposable(
     }
 }
 
-private fun KLeg.getLineLabelOrNull(): String? {
+private fun Leg.getLineLabelOrNull(): String? {
     return if(this.isPublicLeg) this.line?.label
     else ""
 }

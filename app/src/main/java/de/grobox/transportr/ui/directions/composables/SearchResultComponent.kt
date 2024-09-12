@@ -30,13 +30,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import de.grobox.transportr.data.dto.KTrip
+import de.schildbach.pte.dto.Trip
 
 @Composable
 fun SearchResultComponent(
     modifier: Modifier,
-    trips: Set<KTrip>?,
-    tripClicked: (KTrip) -> Unit,
+    trips: Set<Trip>?,
+    tripClicked: (Trip) -> Unit,
     contentPadding: PaddingValues = PaddingValues(8.dp)
 ) {
     LazyColumn(

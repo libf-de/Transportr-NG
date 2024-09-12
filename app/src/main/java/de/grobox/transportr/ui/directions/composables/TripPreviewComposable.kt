@@ -49,13 +49,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import de.grobox.transportr.R
-import de.grobox.transportr.data.dto.KLeg
-import de.grobox.transportr.data.dto.KLine
-import de.grobox.transportr.data.dto.KLocation
-import de.grobox.transportr.data.dto.KProduct
-import de.grobox.transportr.data.dto.KStop
-import de.grobox.transportr.data.dto.KStyle
-import de.grobox.transportr.data.dto.KTrip
+import de.schildbach.pte.dto.Leg
+import de.schildbach.pte.dto.Line
+import de.schildbach.pte.dto.Location
+import de.schildbach.pte.dto.Product
+import de.schildbach.pte.dto.Stop
+import de.schildbach.pte.dto.Style
+import de.schildbach.pte.dto.Trip
 import de.grobox.transportr.ui.transport.composables.ProductComposable
 import de.grobox.transportr.ui.transport.composables.WalkComposable
 import de.grobox.transportr.ui.trips.detail.TripUtils.getStandardFare
@@ -68,7 +68,7 @@ import kotlinx.coroutines.delay
 import java.util.Date
 
 @Composable
-fun FromRelativeTimeText(trip: KTrip, max: Int = 99) {
+fun FromRelativeTimeText(trip: Trip, max: Int = 99) {
     var value by remember { mutableStateOf("") }
 
     val nowSmall = stringResource(R.string.now_small)
@@ -101,7 +101,7 @@ fun FromRelativeTimeText(trip: KTrip, max: Int = 99) {
     }
 }
 
-fun KStop.getDepartureTimes(context: Context): Pair<String, String> {
+fun Stop.getDepartureTimes(context: Context): Pair<String, String> {
     return this.getDepartureTime()?.let { departureTime ->
         val time = Date(departureTime)
 
@@ -122,7 +122,7 @@ fun KStop.getDepartureTimes(context: Context): Pair<String, String> {
     } ?: Pair("", "")
 }
 
-fun KStop.getArrivalTimes(context: Context): Pair<String, String> {
+fun Stop.getArrivalTimes(context: Context): Pair<String, String> {
     return this.getArrivalTime()?.let { arrivalTime ->
         val time = Date(arrivalTime)
 
@@ -143,7 +143,7 @@ fun KStop.getArrivalTimes(context: Context): Pair<String, String> {
     } ?: Pair("", "")
 }
 
-fun getDepartureTimes(trip: KTrip, context: Context): Pair<String, String> {
+fun getDepartureTimes(trip: Trip, context: Context): Pair<String, String> {
     val firstLeg = trip.legs[0]
     return if (firstLeg.isPublicLeg) {
         firstLeg.departureStop?.getDepartureTimes(context)
@@ -158,7 +158,7 @@ fun getDepartureTimes(trip: KTrip, context: Context): Pair<String, String> {
     } ?: Pair("", "")
 }
 
-fun getArrivalTimes(trip: KTrip, context: Context): Pair<String, String> {
+fun getArrivalTimes(trip: Trip, context: Context): Pair<String, String> {
     val lastLeg = trip.legs[trip.legs.size - 1]
     return if (lastLeg.isPublicLeg) {
         lastLeg.arrivalStop?.getArrivalTimes(context)
@@ -182,7 +182,7 @@ fun getArrivalTimes(trip: KTrip, context: Context): Pair<String, String> {
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun TripPreviewComposable(
-    trip: KTrip,
+    trip: Trip,
     context: Context = LocalContext.current,
     onClick: () -> Unit,
 ) {
@@ -314,7 +314,7 @@ private fun Long?.largerThan(i: Int): Boolean {
     return this?.let { it > i } ?: false
 }
 
-fun KTrip.hasProblem(): Boolean {
+fun Trip.hasProblem(): Boolean {
     if (!isTravelable) return true
     for (leg in legs) {
         if (!leg.isPublicLeg) continue
@@ -329,33 +329,33 @@ fun KTrip.hasProblem(): Boolean {
 fun TripPreviewComposablePreview() {
     TripPreviewComposable(
         onClick = {},
-        trip = KTrip(
+        trip = Trip(
             id = "FOOBAR",
-            from = KLocation("", KLocation.Type.STATION, null, "StPlace A", "Station A"),
-            to = KLocation("", KLocation.Type.STATION, null, "StPlace B", "Station B"),
+            from = Location("", Location.Type.STATION, null, "StPlace A", "Station A"),
+            to = Location("", Location.Type.STATION, null, "StPlace B", "Station B"),
             legs = listOf(
-                KLeg(
-                    line = KLine(
+                Leg(
+                    line = Line(
                         "3_800755_28",
                         "DB Regio AG Bayern",
-                        KProduct.REGIONAL_TRAIN,
+                        Product.REGIONAL_TRAIN,
                         "RE 4950",
                         "FooBar",
-                        KStyle(
-                            KStyle.Shape.RECT,
+                        Style(
+                            Style.Shape.RECT,
                             -7829368,
                             0,
                             -1,
                             0)
                     ),
-                    destination = KLocation(
-                        type = KLocation.Type.STATION,
+                    destination = Location(
+                        type = Location.Type.STATION,
                         name = "Coburg"
                     ),
-                    departureStop = KStop(
-                        location = KLocation(
+                    departureStop = Stop(
+                        location = Location(
                             "",
-                            KLocation.Type.STATION,
+                            Location.Type.STATION,
                             null,
                             "StPlace B",
                             "Lichtenfels"
@@ -365,10 +365,10 @@ fun TripPreviewComposablePreview() {
                         plannedDepartureTime = Date().time,
                         predictedDepartureTime = null
                     ),
-                    arrivalStop = KStop(
-                        location = KLocation(
+                    arrivalStop = Stop(
+                        location = Location(
                             "",
-                            KLocation.Type.STATION,
+                            Location.Type.STATION,
                             null,
                             "StPlace B",
                             "Lichtenfels"

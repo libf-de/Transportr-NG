@@ -18,13 +18,12 @@
  */
 package de.grobox.transportr.favorites.trips
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
 import de.grobox.transportr.TransportrApplication
 import de.grobox.transportr.data.locations.LocationRepository
 import de.grobox.transportr.data.searches.SearchesRepository
 import de.grobox.transportr.locations.LocationsViewModel
 import de.grobox.transportr.networks.TransportNetworkManager
+import kotlinx.coroutines.flow.combine
 
 abstract class SavedSearchesViewModel protected constructor(
     val application: TransportrApplication,
@@ -32,18 +31,9 @@ abstract class SavedSearchesViewModel protected constructor(
     locationRepository: LocationRepository,
     private val searchesRepository: SearchesRepository
 ) : LocationsViewModel(application, transportNetworkManager, locationRepository) {
-    val favoriteTrips: LiveData<List<FavoriteTripItem>> = searchesRepository.favoriteTrips
-    private val _specialLocations = MediatorLiveData<List<FavoriteTripItem>>(listOf())
-    val specialLocations: LiveData<List<FavoriteTripItem>> = _specialLocations
-
-    init {
-        _specialLocations.addSource(home) {
-            _specialLocations.value = listOf(FavoriteTripItem(home.value), FavoriteTripItem(work.value))
-        }
-
-        _specialLocations.addSource(work) {
-            _specialLocations.value = listOf(FavoriteTripItem(home.value), FavoriteTripItem(work.value))
-        }
+    val favoriteTrips = searchesRepository.favoriteTrips
+    val specialLocations = combine(home, work) { home, work ->
+        listOf(FavoriteTripItem(home), FavoriteTripItem(work))
     }
 
     fun updateFavoriteState(item: FavoriteTripItem?) {

@@ -45,7 +45,7 @@ import de.grobox.transportr.R;
 import de.grobox.transportr.data.locations.FavoriteLocation;
 import de.grobox.transportr.data.locations.FavoriteLocation.FavLocationType;
 import de.grobox.transportr.data.locations.HomeLocation;
-import de.grobox.transportr.data.locations.WorkLocation;
+import de.grobox.transportr.data.locations.WorLocation;
 import de.schildbach.pte.dto.SuggestedLocation;
 
 import static de.grobox.transportr.data.locations.FavoriteLocation.FavLocationType.FROM;
@@ -59,7 +59,7 @@ import static de.grobox.transportr.locations.WrapLocation.WrapType.NORMAL;
 class LocationAdapter extends ArrayAdapter<WrapLocation> implements Filterable {
 
 	private @Nullable HomeLocation homeLocation;
-	private @Nullable WorkLocation workLocation;
+	private @Nullable WorLocation worLocation;
 	private List<FavoriteLocation> favoriteLocations = new ArrayList<>();
 	private List<WrapLocation> locations = new ArrayList<>();
 	private @Nullable List<SuggestedLocation> suggestedLocations;
@@ -79,8 +79,8 @@ class LocationAdapter extends ArrayAdapter<WrapLocation> implements Filterable {
 		resetDropDownLocations();
 	}
 
-	void setWorkLocation(@Nullable WorkLocation workLocation) {
-		this.workLocation = workLocation;
+	void setWorLocation(@Nullable WorLocation worLocation) {
+		this.worLocation = worLocation;
 		updateLocations();
 		resetDropDownLocations();
 	}
@@ -98,9 +98,9 @@ class LocationAdapter extends ArrayAdapter<WrapLocation> implements Filterable {
 			favoriteLocations.remove(homeLocation);
 			locations.add(homeLocation);
 		}
-		if (workLocation != null) {
-			favoriteLocations.remove(workLocation);
-			locations.add(workLocation);
+		if (worLocation != null) {
+			favoriteLocations.remove(worLocation);
+			locations.add(worLocation);
 		}
 		switch (sort) {
 			case TO:

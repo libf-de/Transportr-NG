@@ -20,23 +20,25 @@
 package de.grobox.transportr.networks
 
 import androidx.annotation.VisibleForTesting
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.map
 import de.grobox.transportr.settings.SettingsManager
 import de.schildbach.pte.NetworkId
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.mapLatest
 
 class TransportNetworkManager
 constructor(private val settingsManager: SettingsManager) {
+    private val _transportNetwork = MutableStateFlow<TransportNetwork?>(null)
+    val transportNetwork = _transportNetwork.asStateFlow()
+    val networkId = transportNetwork.mapLatest { it?.id }
+    val networkProvider = transportNetwork.mapLatest { it?.networkProvider }
 
-    val transportNetwork = MutableLiveData<TransportNetwork?>()
-    val networkId: LiveData<NetworkId?> = transportNetwork.map { it?.id }
     private var transportNetwork2: TransportNetwork? = null
     private var transportNetwork3: TransportNetwork? = null
 
     init {
         val network = loadTransportNetwork(1)
-        network?.let { transportNetwork.value = it }
+        network?.let { _transportNetwork.value = it }
 
         transportNetwork2 = loadTransportNetwork(2)
         transportNetwork3 = loadTransportNetwork(3)
@@ -71,7 +73,7 @@ constructor(private val settingsManager: SettingsManager) {
         }
         // swap remaining networks
         this.transportNetwork2 = this.transportNetwork.value
-        this.transportNetwork.value = network
+        this._transportNetwork.value = network
     }
 
     fun getTransportNetworkByNetworkId(networkId: NetworkId?): TransportNetwork? {
@@ -80,7 +82,7 @@ constructor(private val settingsManager: SettingsManager) {
 
     @VisibleForTesting
     fun clearTransportNetwork() {
-        transportNetwork.value = null
+        _transportNetwork.value = null
     }
 
 }

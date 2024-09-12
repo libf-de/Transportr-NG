@@ -33,21 +33,15 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import de.grobox.transportr.R
 import de.grobox.transportr.TransportrFragment
-import de.grobox.transportr.data.dto.toKTrip
 import de.grobox.transportr.databinding.FragmentTripDetailBinding
 import de.grobox.transportr.ui.trips.TripDetailViewModel
-import de.grobox.transportr.ui.trips.detail.TripUtils.getStandardFare
-import de.grobox.transportr.ui.trips.detail.TripUtils.hasFare
 import de.grobox.transportr.ui.trips.detail.TripUtils.intoCalendar
 import de.grobox.transportr.ui.trips.detail.TripUtils.share
-import de.grobox.transportr.utils.DateUtils.formatDuration
 import de.grobox.transportr.utils.DateUtils.formatRelativeTime
-import de.grobox.transportr.utils.DateUtils.formatTime
 import de.grobox.transportr.utils.FullScreenUtil
 import de.schildbach.pte.dto.Trip
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
@@ -82,7 +76,7 @@ class TripDetailFragment : TransportrFragment(), Toolbar.OnMenuItemClickListener
 
     private val timeUpdater: CountDownTimer = object : CountDownTimer(Long.MAX_VALUE, 1000 * 30) {
         override fun onTick(millisUntilFinished: Long) {
-            viewModel.getTrip().value?.let {
+            viewModel.trip.value?.let {
                 formatRelativeTime(fromTimeRel.context, it.firstDepartureTime?.let(::Date)!!).let {
                     fromTimeRel.apply {
                         text = it.relativeTime
@@ -129,7 +123,7 @@ class TripDetailFragment : TransportrFragment(), Toolbar.OnMenuItemClickListener
 
 
         //viewModel.getTrip().observe(viewLifecycleOwner, Observer<Trip> { this.onTripChanged(it) })
-        viewModel.sheetState.observe(viewLifecycleOwner, Observer<TripDetailViewModel.SheetState> { this.onSheetStateChanged(it) })
+//        viewModel.sheetState.observe(viewLifecycleOwner, Observer<TripDetailViewModel.SheetState> { this.onSheetStateChanged(it) })
     }
 
     override fun onStart() {
@@ -145,7 +139,7 @@ class TripDetailFragment : TransportrFragment(), Toolbar.OnMenuItemClickListener
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         val toolbarMenu = toolbar.menu
         inflater.inflate(R.menu.trip_details, toolbarMenu)
-        viewModel.tripReloadError.observe(this, Observer<String> { this.onTripReloadError(it) })
+//        viewModel.tripReloadError.observe(this, Observer<String> { this.onTripReloadError(it) })
         super.onCreateOptionsMenu(menu, inflater)
     }
 
@@ -157,11 +151,11 @@ class TripDetailFragment : TransportrFragment(), Toolbar.OnMenuItemClickListener
                 return true
             }
             R.id.action_share -> {
-                share(context, viewModel.getTrip().value)
+                share(context, viewModel.trip.value)
                 return true
             }
             R.id.action_calendar -> {
-                intoCalendar(context, viewModel.getTrip().value)
+                intoCalendar(context, viewModel.trip.value)
                 return true
             }
             else -> return false
@@ -174,27 +168,27 @@ class TripDetailFragment : TransportrFragment(), Toolbar.OnMenuItemClickListener
         val reloadMenuItem = toolbar.menu.findItem(R.id.action_reload)
         if (reloadMenuItem != null) reloadMenuItem.actionView = null
 
-        val network = viewModel.transportNetwork.value
-        val showLineName = network != null && network.hasGoodLineNames()
+//        val network = viewModel.transportNetwork.value
+//        val showLineName = network != null && network.hasGoodLineNames()
         //val adapter = LegAdapter(trip.legs, viewModel, showLineName)
         //list.adapter = adapter
 
-        fromTime.text = formatTime(context, trip.firstDepartureTime)
-        formatRelativeTime(fromTimeRel.context, trip.firstDepartureTime).let {
-            fromTimeRel.apply {
-                text = it.relativeTime
-                visibility = it.visibility
-            }
-        }
-        from.text = trip.from.uniqueShortName()
-        toTime.text = formatTime(context, trip.lastArrivalTime)
-        to.text = trip.to.uniqueShortName()
-        duration.text = formatDuration(trip.duration)
-        durationTop.text = getString(R.string.total_time, formatDuration(trip.duration))
-        price.visibility = if (trip.toKTrip().hasFare()) VISIBLE else GONE
-        price.text = trip.toKTrip().getStandardFare()
-        priceTop.visibility = if (trip.toKTrip().hasFare()) VISIBLE else GONE
-        priceTop.text = trip.toKTrip().getStandardFare()
+//        fromTime.text = formatTime(context, trip.firstDepartureTime)
+//        formatRelativeTime(fromTimeRel.context, trip.firstDepartureTime).let {
+//            fromTimeRel.apply {
+//                text = it.relativeTime
+//                visibility = it.visibility
+//            }
+//        }
+//        from.text = trip.from.uniqueShortName()
+//        toTime.text = formatTime(context, trip.lastArrivalTime)
+//        to.text = trip.to.uniqueShortName()
+//        duration.text = formatDuration(trip.duration)
+//        durationTop.text = getString(R.string.total_time, formatDuration(trip.duration))
+//        price.visibility = if (trip.toTrip().hasFare()) VISIBLE else GONE
+//        price.text = trip.toTrip().getStandardFare()
+//        priceTop.visibility = if (trip.toTrip().hasFare()) VISIBLE else GONE
+//        priceTop.text = trip.toTrip().getStandardFare()
     }
 
     private fun onToolbarClose() {

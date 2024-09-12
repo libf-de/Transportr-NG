@@ -19,8 +19,8 @@
 
 package de.grobox.transportr.data.gps
 
-import de.grobox.transportr.data.dto.KLocation
-import de.grobox.transportr.data.dto.KPoint
+import de.schildbach.pte.dto.Location
+import de.schildbach.pte.dto.Point
 import de.grobox.transportr.locations.WrapLocation
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.serialization.SerialName
@@ -94,10 +94,10 @@ class OsmGeocoder : GeocodeProvider {
 
                     return Result.success(
                         WrapLocation(
-                            KLocation(
+                            Location(
                                 null,
-                                KLocation.Type.ADDRESS,
-                                KPoint.fromDouble(lat, lon),
+                                Location.Type.ADDRESS,
+                                Point.fromDouble(lat, lon),
                                 place,
                                 name
                             )

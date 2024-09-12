@@ -22,9 +22,9 @@ package de.grobox.transportr.data.trips
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import de.grobox.transportr.data.dto.KLine
-import de.grobox.transportr.data.dto.KProduct
-import de.grobox.transportr.data.dto.KStyle
+import de.schildbach.pte.dto.Line
+import de.schildbach.pte.dto.Product
+import de.schildbach.pte.dto.Style
 import de.schildbach.pte.NetworkId
 
 @Entity(
@@ -38,16 +38,16 @@ data class LineEntity(
     @PrimaryKey val uid: Long,
     val id: String,
     val networkId: NetworkId?,
-    val product: KProduct,
+    val product: Product,
     val label: String?,
     val name: String?,
-    val style: KStyle?,
-    val attributes: Set<KLine.Attr>?,
+    val style: Style?,
+    val attributes: Set<Line.Attr>?,
     val message: String?,
     val altName: String?
 ) {
-    fun toKLine(): KLine {
-        return KLine(
+    fun toLine(): Line {
+        return Line(
             id = id,
             network = networkId?.name,
             product = product,

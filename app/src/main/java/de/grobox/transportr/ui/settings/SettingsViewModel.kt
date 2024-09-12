@@ -22,9 +22,11 @@ package de.grobox.transportr.ui.settings
 import android.content.SharedPreferences
 import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
 import androidx.preference.PreferenceManager
+import com.russhwolf.settings.ObservableSettings
+import com.russhwolf.settings.coroutines.getBooleanStateFlow
+import com.russhwolf.settings.coroutines.getStringStateFlow
 import de.grobox.transportr.R
 import de.grobox.transportr.TransportrApplication
 import de.grobox.transportr.networks.TransportNetwork
@@ -33,19 +35,20 @@ import de.grobox.transportr.networks.TransportNetworkViewModel
 import de.grobox.transportr.settings.SettingsManager
 import de.schildbach.pte.NetworkProvider
 import de.schildbach.pte.NetworkProvider.WalkSpeed
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class SettingsViewModel(
     application: TransportrApplication,
-    private val netManager: TransportNetworkManager
+    private val netManager: TransportNetworkManager,
+    private val settings: ObservableSettings
 ) : TransportNetworkViewModel(application, netManager) {
     val sharedPrefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(application)
 
     val defaultOptimize = application.getString(R.string.pref_optimize_value_default)
-    val optimize: LiveData<NetworkProvider.Optimize> = SharedPreferenceStringLiveData(
-        sharedPrefs = sharedPrefs,
-        key = SettingsManager.OPTIMIZE,
-        defValue = defaultOptimize
-    ).map(NetworkProvider.Optimize::valueOf)
+    val optimize: Flow<NetworkProvider.Optimize> = settings
+        .getStringStateFlow(viewModelScope, SettingsManager.OPTIMIZE, defaultOptimize)
+        .map(NetworkProvider.Optimize::valueOf)
     val optimizeNames = mapOf(
         NetworkProvider.Optimize.LEAST_DURATION to R.string.pref_optimize_least_changes,
         NetworkProvider.Optimize.LEAST_CHANGES to R.string.pref_optimize_least_duration,
@@ -53,11 +56,9 @@ class SettingsViewModel(
     )
 
     val defaultWalkSpeed = application.getString(R.string.pref_walk_speed_value_default)
-    val walkSpeed: LiveData<WalkSpeed> = SharedPreferenceStringLiveData(
-        sharedPrefs = sharedPrefs,
-        key = SettingsManager.WALK_SPEED,
-        defValue = defaultWalkSpeed
-    ).map(WalkSpeed::valueOf)
+    val walkSpeed: Flow<WalkSpeed> = settings
+        .getStringStateFlow(viewModelScope,SettingsManager.WALK_SPEED, defaultWalkSpeed)
+        .map(WalkSpeed::valueOf)
     val walkSpeedNames = mapOf(
         WalkSpeed.SLOW to R.string.pref_walk_speed_slow,
         WalkSpeed.NORMAL to R.string.pref_walk_speed_normal,
@@ -68,17 +69,15 @@ class SettingsViewModel(
     private val themeLight = application.getString(R.string.pref_theme_value_light)
     private val themeAuto = application.getString(R.string.pref_theme_value_auto)
     val defaultTheme = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM else AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
-    val theme: LiveData<Int> = SharedPreferenceStringLiveData(
-        sharedPrefs = sharedPrefs,
-        key = SettingsManager.THEME,
-        defValue = themeAuto
-    ).map {
-        when (it) {
-            themeDark -> AppCompatDelegate.MODE_NIGHT_YES
-            themeLight -> AppCompatDelegate.MODE_NIGHT_NO
-            else -> defaultTheme
+    val theme: Flow<Int> = settings
+        .getStringStateFlow(viewModelScope,SettingsManager.THEME, themeAuto)
+        .map {
+            when (it) {
+                themeDark -> AppCompatDelegate.MODE_NIGHT_YES
+                themeLight -> AppCompatDelegate.MODE_NIGHT_NO
+                else -> defaultTheme
+            }
         }
-    }
     val themeNames = mapOf(
         AppCompatDelegate.MODE_NIGHT_YES to R.string.pref_theme_dark,
         AppCompatDelegate.MODE_NIGHT_NO to R.string.pref_theme_light,
@@ -88,12 +87,8 @@ class SettingsViewModel(
 
 
     val defaultLocale = application.getString(R.string.pref_language_value_default)
-    val locale: LiveData<String> = SharedPreferenceStringLiveData(
-        sharedPrefs = sharedPrefs,
-        key = SettingsManager.LANGUAGE,
-        defValue = defaultLocale
-    )
-
+    val locale: Flow<String> = settings
+        .getStringStateFlow(viewModelScope,SettingsManager.LANGUAGE, defaultLocale)
     val localeNames = mapOf(
         defaultLocale to R.string.system_default,
         "en" to R.string.english,
@@ -123,10 +118,9 @@ class SettingsViewModel(
     )
 
     val defaultShowWhenLocked = true
-    val showWhenLocked: LiveData<Boolean> = SharedPreferenceBooleanLiveData(
-        sharedPrefs = sharedPrefs,
-        key = SettingsManager.SHOW_WHEN_LOCKED,
-        defValue = defaultShowWhenLocked
+    val showWhenLocked: Flow<Boolean> = settings.getBooleanStateFlow(viewModelScope,
+        SettingsManager.SHOW_WHEN_LOCKED,
+        defaultShowWhenLocked
     )
 
     fun setTransportNetwork(transportNetwork: TransportNetwork) {
@@ -155,45 +149,5 @@ class SettingsViewModel(
 
     fun setShowWhenLocked(showWhenLocked: Boolean) {
         sharedPrefs.edit().putBoolean(SettingsManager.SHOW_WHEN_LOCKED, showWhenLocked).apply()
-    }
-
-
-
-    private abstract class SharedPreferenceLiveData<T>(val sharedPrefs: SharedPreferences,
-                                               val key: String,
-                                               val defValue: T) : LiveData<T>() {
-
-        private val preferenceChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
-            if (key == this.key) {
-                value = getValueFromPreferences(key, defValue)
-            }
-        }
-
-        abstract fun getValueFromPreferences(key: String, defValue: T): T
-
-        override fun onActive() {
-            super.onActive()
-            value = getValueFromPreferences(key, defValue)
-            sharedPrefs.registerOnSharedPreferenceChangeListener(preferenceChangeListener)
-        }
-
-        override fun onInactive() {
-            sharedPrefs.unregisterOnSharedPreferenceChangeListener(preferenceChangeListener)
-            super.onInactive()
-        }
-    }
-
-    private class SharedPreferenceStringLiveData(sharedPrefs: SharedPreferences, key: String, defValue: String) :
-        SharedPreferenceLiveData<String>(sharedPrefs, key, defValue) {
-        override fun getValueFromPreferences(key: String, defValue: String): String = sharedPrefs.getString(key, defValue) ?: defValue
-    }
-
-    private class SharedPreferenceBooleanLiveData(sharedPrefs: SharedPreferences, key: String, defValue: Boolean) :
-        SharedPreferenceLiveData<Boolean>(sharedPrefs, key, defValue) {
-        override fun getValueFromPreferences(key: String, defValue: Boolean): Boolean = sharedPrefs.getBoolean(key, defValue)
-    }
-
-    init {
-
     }
 }

@@ -20,25 +20,23 @@
 package de.grobox.transportr.networks
 
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
 import de.grobox.transportr.TransportrApplication
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.mapLatest
 
+@OptIn(ExperimentalCoroutinesApi::class)
 abstract class TransportNetworkViewModel protected constructor(
     application: TransportrApplication,
     manager: TransportNetworkManager
 ) : AndroidViewModel(application) {
-    val transportNetwork: LiveData<TransportNetwork?> = manager.transportNetwork
-    val transportNetworks = MediatorLiveData<List<TransportNetwork>>()
-
-    init {
-        transportNetworks.addSource(manager.transportNetwork) {
-            transportNetworks.value = listOfNotNull(
-                manager.getTransportNetwork(1),
-                manager.getTransportNetwork(2),
-                manager.getTransportNetwork(3)
-            )
-        }
+    val transportNetwork: StateFlow<TransportNetwork?> = manager.transportNetwork
+    val transportNetworks: Flow<List<TransportNetwork>> = transportNetwork.mapLatest {
+        listOfNotNull(
+            manager.getTransportNetwork(1),
+            manager.getTransportNetwork(2),
+            manager.getTransportNetwork(3)
+        )
     }
-
 }

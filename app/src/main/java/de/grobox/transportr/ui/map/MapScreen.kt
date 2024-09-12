@@ -50,7 +50,6 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -63,6 +62,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import de.grobox.transportr.R
 import de.grobox.transportr.Routes
@@ -83,12 +83,12 @@ fun MapScreen(
     geoUri: String? = null,
     location: WrapLocation? = null
 ) {
-    val searchSuggestions by viewModel.locationSuggestions.observeAsState()
+    val searchSuggestions by viewModel.locationSuggestions.collectAsStateWithLifecycle(emptySet())
     val focusManager = LocalFocusManager.current
     val mapState = remember { MapViewState() }
 
     val scope = rememberCoroutineScope()
-    val sheetContentState by viewModel.sheetContentState.observeAsState()
+    val sheetContentState by viewModel.sheetContentState.collectAsStateWithLifecycle()
     val drawerState = rememberDrawerState(
         initialValue = DrawerValue.Closed
     )
@@ -101,10 +101,10 @@ fun MapScreen(
 
     val barPadding = WindowInsets.systemBars.asPaddingValues()
 
-    val favoriteTrips by viewModel.favoriteTrips.observeAsState(emptyList())
-    val specialTrips by viewModel.specialLocations.observeAsState(emptyList())
+    val favoriteTrips by viewModel.favoriteTrips.collectAsStateWithLifecycle(emptyList())
+    val specialTrips by viewModel.specialLocations.collectAsStateWithLifecycle(emptyList())
 
-    val transportNetworks by viewModel.transportNetworks.observeAsState(emptyList())
+    val transportNetworks by viewModel.transportNetworks.collectAsStateWithLifecycle(emptyList())
 
     ModalNavigationDrawer(
         drawerState = drawerState,

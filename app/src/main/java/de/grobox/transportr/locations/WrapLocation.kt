@@ -23,29 +23,29 @@ import androidx.room.Ignore
 import com.google.common.base.Preconditions
 import com.google.common.base.Strings
 import de.grobox.transportr.R
-import de.grobox.transportr.data.dto.KLocation
-import de.grobox.transportr.data.dto.KPoint
-import de.grobox.transportr.data.dto.KProduct
+import de.schildbach.pte.dto.Location
+import de.schildbach.pte.dto.Point
+import de.schildbach.pte.dto.Product
 import de.grobox.transportr.utils.TransportrUtils.getCoordName
 import org.maplibre.android.geometry.LatLng
 import java.io.Serializable
 
 @kotlinx.serialization.Serializable
 open class WrapLocation(
-    val type: KLocation.Type,
+    val type: Location.Type,
     val id: String? = null,
     val lat: Int,
     val lon: Int,
     val place: String? = null,
     @JvmField val name: String? = null,
-    val products: Set<KProduct>? = null,
+    val products: Set<Product>? = null,
     @Ignore val wrapType: WrapType = WrapType.NORMAL
 ) : Serializable {
     enum class WrapType {
         NORMAL, GPS
     }
 
-    constructor(l: KLocation) : this(
+    constructor(l: Location) : this(
         l.type!!,
         l.id,
         if (l.hasCoords) l.latAs1E6 else 0,
@@ -56,7 +56,7 @@ open class WrapLocation(
     )
 
     constructor(wrapType: WrapType) : this(
-        type = KLocation.Type.ANY,
+        type = Location.Type.ANY,
         wrapType = wrapType,
         lat = 0,
         lon = 0
@@ -65,18 +65,18 @@ open class WrapLocation(
     }
 
     constructor(latLng: LatLng) : this(
-        type = KLocation.Type.COORD,
+        type = Location.Type.COORD,
         lat = (latLng.latitude * 1E6).toInt(),
         lon = (latLng.longitude * 1E6).toInt()
     ) {
         Preconditions.checkArgument(lat != 0 || lon != 0, "Null Island is not a valid location")
     }
 
-    val location: KLocation
+    val location: Location
         get() {
-            val point = KPoint.from1E6(lat, lon)
-            if (type == KLocation.Type.ANY && id != null) {
-                return KLocation(
+            val point = Point.from1E6(lat, lon)
+            if (type == Location.Type.ANY && id != null) {
+                return Location(
                     locId = null,
                     type = type,
                     coord = point,
@@ -85,7 +85,7 @@ open class WrapLocation(
                     products = products
                 )
             }
-            return KLocation(
+            return Location(
                 locId = id,
                 type = type,
                 coord = point,
@@ -123,10 +123,10 @@ open class WrapLocation(
             return when (wrapType) {
                 WrapType.GPS -> R.drawable.ic_gps
                 WrapType.NORMAL -> when (type) {
-                    KLocation.Type.ADDRESS -> R.drawable.ic_location_address
-                    KLocation.Type.POI -> R.drawable.ic_action_about
-                    KLocation.Type.STATION -> R.drawable.ic_location_station
-                    KLocation.Type.COORD -> R.drawable.ic_gps
+                    Location.Type.ADDRESS -> R.drawable.ic_location_address
+                    Location.Type.POI -> R.drawable.ic_action_about
+                    Location.Type.STATION -> R.drawable.ic_location_station
+                    Location.Type.COORD -> R.drawable.ic_gps
                     else -> R.drawable.ic_location
                 }
                 else -> R.drawable.ic_location
@@ -135,7 +135,7 @@ open class WrapLocation(
 
     fun getName(): String {
         // FIXME improve
-        return if (type == KLocation.Type.COORD) {
+        return if (type == Location.Type.COORD) {
             getCoordName(location)
         } else {
             location.uniqueShortName.takeIf { !it.isNullOrEmpty() }

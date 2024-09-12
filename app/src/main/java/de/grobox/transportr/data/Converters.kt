@@ -19,14 +19,14 @@
 package de.grobox.transportr.data
 
 import androidx.room.TypeConverter
-import de.grobox.transportr.data.dto.KLine
-import de.grobox.transportr.data.dto.KLocation
-import de.grobox.transportr.data.dto.KPoint
-import de.grobox.transportr.data.dto.KPosition
-import de.grobox.transportr.data.dto.KProduct
-import de.grobox.transportr.data.dto.KProduct.Companion.toCodes
-import de.grobox.transportr.data.dto.KStyle
 import de.schildbach.pte.NetworkId
+import de.schildbach.pte.dto.Line
+import de.schildbach.pte.dto.Location
+import de.schildbach.pte.dto.Point
+import de.schildbach.pte.dto.Position
+import de.schildbach.pte.dto.Product
+import de.schildbach.pte.dto.Product.Companion.toCodes
+import de.schildbach.pte.dto.Style
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.util.Date
@@ -47,49 +47,49 @@ object Converters {
 
     @JvmStatic
     @TypeConverter
-    fun fromKStyle(value: KStyle?): String {
+    fun fromStyle(value: Style?): String {
         return Json.encodeToString(value)
     }
 
     @JvmStatic
     @TypeConverter
-    fun toKStyle(json: String): KStyle? {
+    fun toStyle(json: String): Style? {
         return Json.decodeFromString(json)
     }
 
     @JvmStatic
     @TypeConverter
-    fun fromAttrSet(value: Set<KLine.Attr>?): String {
+    fun fromAttrSet(value: Set<Line.Attr>?): String {
         return Json.encodeToString(value)
     }
 
     @JvmStatic
     @TypeConverter
-    fun toAttrSet(json: String): Set<KLine.Attr>? {
+    fun toAttrSet(json: String): Set<Line.Attr>? {
         return Json.decodeFromString(json)
     }
 
     @JvmStatic
     @TypeConverter
-    fun fromKPosition(lineType: KPosition?): String {
+    fun fromPosition(lineType: Position?): String {
         return Json.encodeToString(lineType)
     }
 
     @JvmStatic
     @TypeConverter
-    fun toKPosition(type: String): KPosition? {
+    fun toPosition(type: String): Position? {
         return Json.decodeFromString(type)
     }
 
     @JvmStatic
     @TypeConverter
-    fun fromKPointList(type: List<KPoint>?): String {
+    fun fromPointList(type: List<Point>?): String {
         return Json.encodeToString(type)
     }
 
     @JvmStatic
     @TypeConverter
-    fun toKPointList(type: String): List<KPoint>? {
+    fun toPointList(type: String): List<Point>? {
         return Json.decodeFromString(type)
     }
 
@@ -124,31 +124,31 @@ object Converters {
 
     @JvmStatic
     @TypeConverter
-    fun fromLocationType(locationType: KLocation.Type): String {
+    fun fromLocationType(locationType: Location.Type): String {
         return locationType.name
     }
 
     @JvmStatic
     @TypeConverter
-    fun toLocationType(type: String?): KLocation.Type {
+    fun toLocationType(type: String?): Location.Type {
         return try {
-            KLocation.Type.valueOf(type!!)
+            Location.Type.valueOf(type!!)
         } catch (e: IllegalArgumentException) {
-            KLocation.Type.ANY
+            Location.Type.ANY
         }
     }
 
     @TypeConverter
-    fun fromProducts(products: Set<KProduct>?): String? {
+    fun fromProducts(products: Set<Product>?): String? {
         if (products == null) return null
         return String(products.toCodes())
     }
 
     @JvmStatic
     @TypeConverter
-    fun toProducts(codes: String?): Set<KProduct>? {
+    fun toProducts(codes: String?): Set<Product>? {
         if (codes == null) return null
-        return KProduct.fromCodes(codes.toCharArray())
+        return Product.fromCodes(codes.toCharArray())
     }
 
     @JvmStatic

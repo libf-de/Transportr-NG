@@ -93,12 +93,12 @@ class TripsFragment : TransportrFragment(), OnRefreshListener {
         val layoutManager = LinearLayoutManager(context)
         list.layoutManager = layoutManager
         list.setHasFixedSize(false)
-        viewModel.topSwipeEnabled.observe(viewLifecycleOwner, { enabled -> onSwipeEnabledChanged(enabled) })
-        viewModel.queryMoreState.observe(viewLifecycleOwner, { state -> updateSwipeState(state) })
+//        viewModel.topSwipeEnabled.observe(viewLifecycleOwner, { enabled -> onSwipeEnabledChanged(enabled) })
+//        viewModel.queryMoreState.observe(viewLifecycleOwner, { state -> updateSwipeState(state) })
         //viewModel.trips.observe(viewLifecycleOwner) { trips -> onTripsLoaded(trips) }
-        viewModel.queryError.observe(viewLifecycleOwner, { error -> onError(error) })
-        viewModel.queryPTEError.observe(viewLifecycleOwner, { error -> onPTEError(error) })
-        viewModel.queryMoreError.observe(viewLifecycleOwner, { error -> onMoreError(error) })
+//        viewModel.queryError.observe(viewLifecycleOwner, { error -> onError(error) })
+//        viewModel.queryPTEError.observe(viewLifecycleOwner, { error -> onPTEError(error) })
+//        viewModel.queryMoreError.observe(viewLifecycleOwner, { error -> onMoreError(error) })
 //        viewModel.timeUpdate.observe(viewLifecycleOwner, { adapter.notifyDataSetChanged() })
 //        adapter.setHasStableIds(false)
 //        list.adapter = adapter

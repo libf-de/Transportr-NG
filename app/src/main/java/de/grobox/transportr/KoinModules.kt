@@ -19,7 +19,10 @@
 
 package de.grobox.transportr
 
+import android.content.Context
 import androidx.room.Room
+import com.russhwolf.settings.ObservableSettings
+import com.russhwolf.settings.SharedPreferencesSettings
 import de.grobox.transportr.data.Db
 import de.grobox.transportr.data.gps.AndroidGeocoder
 import de.grobox.transportr.data.gps.AndroidGpsRepository
@@ -48,9 +51,17 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val TransportrModule = module {
-    single {
-        SettingsManager(context = androidContext())
+    single<ObservableSettings> {
+        SharedPreferencesSettings(androidContext().getSharedPreferences("settings", Context.MODE_PRIVATE))
     }
+
+    single {
+        SettingsManager(
+            context = androidContext(),
+            settings = get<ObservableSettings>()
+        )
+    }
+
     single {
         TransportNetworkManager(settingsManager = get())
     }
@@ -110,7 +121,10 @@ val TransportrModule = module {
     }
 
     factory {
-        PositionController(context = androidContext())
+        PositionController(
+            context = androidContext(),
+            geoCoder = get()
+        )
     }
 }
 
@@ -148,7 +162,7 @@ val ViewModelModule = module {
             settingsManager = get(),
             locationRepository = get(),
             searchesRepository = get(),
-            positionController = get(),
+//            positionController = get(),
             combinedSuggestionRepository = get(),
             tripsRepository = get(),
             geocoder = get(),
@@ -169,6 +183,7 @@ val ViewModelModule = module {
     viewModel {
         SettingsViewModel(
             application = androidApplication() as TransportrApplication,
+            settings = get(),
             netManager = get()
         )
     }

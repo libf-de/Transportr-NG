@@ -48,7 +48,7 @@ import de.grobox.transportr.R
 import de.grobox.transportr.data.locations.FavoriteLocation
 import de.grobox.transportr.data.locations.FavoriteLocation.FavLocationType
 import de.grobox.transportr.data.locations.HomeLocation
-import de.grobox.transportr.data.locations.WorkLocation
+import de.grobox.transportr.data.locations.WorLocation
 import de.grobox.transportr.locations.LocationAdapter.TYPING_THRESHOLD
 import de.grobox.transportr.locations.SuggestLocationsTask.SuggestLocationsTaskCallback
 import de.grobox.transportr.networks.TransportNetwork
@@ -205,8 +205,8 @@ open class LocationView @JvmOverloads constructor(context: Context, attrs: Attri
         adapter.setHomeLocation(homeLocation)
     }
 
-    fun setWorkLocation(workLocation: WorkLocation?) {
-        adapter.setWorkLocation(workLocation)
+    fun setWorLocation(worLocation: WorLocation?) {
+        adapter.setWorLocation(worLocation)
     }
 
     fun setFavoriteLocations(favoriteLocations: List<FavoriteLocation>) {

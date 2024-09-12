@@ -35,18 +35,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import de.grobox.transportr.R
-import de.grobox.transportr.data.dto.KProduct
+import de.schildbach.pte.dto.Product
 import java.util.EnumSet
 
 @Composable
 fun ProductSelectorDialog(
     show: Boolean,
-    selectedProducts: List<KProduct>?,
-    onConfirmation: (EnumSet<KProduct>) -> Unit,
+    selectedProducts: List<Product>?,
+    onConfirmation: (EnumSet<Product>) -> Unit,
     onDismissRequest: () -> Unit
 ) {
     if(show) {
-        var selected by remember { mutableStateOf(selectedProducts ?: KProduct.ALL) }
+        var selected by remember { mutableStateOf(selectedProducts ?: Product.ALL) }
 
         AlertDialog(
             icon = {
@@ -59,7 +59,7 @@ fun ProductSelectorDialog(
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    items(KProduct.ALL.toList()) { product ->
+                    items(Product.ALL.toList()) { product ->
                         ProductOptionComposable(
                             product = product,
                             selected = product in selected,
@@ -80,7 +80,7 @@ fun ProductSelectorDialog(
             confirmButton = {
                 TextButton(
                     onClick = {
-                        val temp = EnumSet.noneOf(KProduct::class.java)
+                        val temp = EnumSet.noneOf(Product::class.java)
                         temp.addAll(selected)
                         onConfirmation(temp)
                     }

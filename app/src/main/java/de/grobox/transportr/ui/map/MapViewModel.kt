@@ -21,15 +21,8 @@ package de.grobox.transportr.ui.map
 
 import android.net.Uri
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import de.grobox.transportr.TransportrApplication
-import de.grobox.transportr.data.dto.KLine
-import de.grobox.transportr.data.dto.toKLine
-import de.grobox.transportr.data.dto.toLocation
-import de.grobox.transportr.data.locations.FavoriteLocation
 import de.grobox.transportr.data.locations.LocationRepository
 import de.grobox.transportr.data.searches.SearchesRepository
 import de.grobox.transportr.departures.DeparturesActivity
@@ -42,11 +35,20 @@ import de.grobox.transportr.networks.TransportNetworkManager
 import de.grobox.transportr.utils.IntentUtils
 import de.grobox.transportr.utils.IntentUtils.presetDirections
 import de.grobox.transportr.utils.SingleLiveEvent
-import de.schildbach.pte.dto.LocationType
+import de.schildbach.pte.dto.Line
+import de.schildbach.pte.dto.Location
 import de.schildbach.pte.dto.NearbyLocationsResult
 import de.schildbach.pte.dto.QueryDeparturesResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.lastOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.maplibre.android.geometry.LatLng
@@ -63,29 +65,46 @@ class MapViewModel internal constructor(
     private val combinedSuggestionRepository: CombinedSuggestionRepository,
     ) : SavedSearchesViewModel(application, transportNetworkManager, locationRepository, searchesRepository), GpsMapViewModel by GpsMapViewModelImpl(positionController) {
 
-    private val peekHeight = MutableLiveData<Int>()
-    private val selectedLocationClicked = MutableLiveData<LatLng?>()
-    private val updatedLiveBounds = MutableLiveData<LatLngBounds?>()
+//    private val peekHeight = MutableStateFlow<Int>()
+    private val selectedLocationClicked = MutableStateFlow<LatLng?>(null)
+    private val updatedLiveBounds = MutableStateFlow<LatLngBounds?>(null)
 
     private var selectedLocationJob: Job? = null
-    private val selectedLocation = MutableLiveData<WrapLocation?>()
-    private val findNearbyStations = SingleLiveEvent<WrapLocation>()
-    private val nearbyStationsFound = SingleLiveEvent<Boolean>()
+    private val _selectedLocation = MutableStateFlow<WrapLocation?>(null)
+    val selectedLocation = _selectedLocation.asStateFlow()
+    private val _findNearbyStations = MutableSharedFlow<WrapLocation>(extraBufferCapacity = 1)
+    val findNearbyStations = _findNearbyStations.asSharedFlow()
+    private val _nearbyStationsFound = MutableSharedFlow<Boolean>(extraBufferCapacity = 1)
+    val nearbyStationsFound = _nearbyStationsFound.asSharedFlow()
 
     private var nearbyStationsJob: Job? = null
-    private val _nearbyStationsState = MutableLiveData<NearbyLocationsState>()
-    val nearbyStations: LiveData<NearbyLocationsState> = _nearbyStationsState
+    private val _nearbyStationsState = MutableStateFlow<NearbyLocationsState?>(null)
+    val nearbyStations = _nearbyStationsState.asStateFlow()
 
     val mapClicked = SingleLiveEvent<Void>()
     val markerClicked = SingleLiveEvent<Void>()
-    val liveBounds: LiveData<LatLngBounds?> = locations.switchMap(this::switchMap)
+    val liveBounds: Flow<LatLngBounds?> = locations.map { input ->
+        val points = input
+            .filter { it.hasLocation() }
+            .map { it.latLng }
+            .toMutableSet()
+        home.lastOrNull()?.let { if (it.hasLocation()) points.add(it.latLng) }
+        work.lastOrNull()?.let { if (it.hasLocation()) points.add(it.latLng) }
+        positionController.position.lastOrNull()?.let { points.add(LatLng(it)) }
+
+        if (points.size < 2) {
+            null
+        } else {
+            LatLngBounds.Builder().includes(ArrayList(points)).build()
+        }
+    }
     var transportNetworkWasChanged = false
 
-    val locationSuggestions: LiveData<Set<WrapLocation>> = combinedSuggestionRepository.suggestions
-    val suggestionsLoading: LiveData<Boolean> = combinedSuggestionRepository.isLoading
+    val locationSuggestions = combinedSuggestionRepository.suggestions
+    val suggestionsLoading = combinedSuggestionRepository.isLoading
 
-    private val _sheetContentState = MutableLiveData<BottomSheetContentState>(BottomSheetContentState.SavedSearches)
-    val sheetContentState: LiveData<BottomSheetContentState> = _sheetContentState
+    private val _sheetContentState = MutableStateFlow<BottomSheetContentState>(BottomSheetContentState.SavedSearches)
+    val sheetContentState: StateFlow<BottomSheetContentState> = _sheetContentState.asStateFlow()
 
     fun suggestLocations(query: String) {
         combinedSuggestionRepository.updateSuggestions(query)
@@ -99,18 +118,6 @@ class MapViewModel internal constructor(
         combinedSuggestionRepository.reset()
     }
 
-    fun getPeekHeight(): LiveData<Int> {
-        return peekHeight
-    }
-
-    fun setPeekHeight(peekHeight: Int) {
-        this.peekHeight.value = peekHeight
-    }
-
-    fun getSelectedLocationClicked(): LiveData<LatLng?> {
-        return selectedLocationClicked
-    }
-
     fun selectedLocationClicked(latLng: LatLng) {
         selectedLocationClicked.value = latLng
         // reset the selected location right away, observers will ignore this update
@@ -118,7 +125,7 @@ class MapViewModel internal constructor(
     }
 
     fun selectLocation(location: WrapLocation?) {
-        selectedLocation.value = location
+        _selectedLocation.value = location
 
         selectedLocationJob?.cancel()
 
@@ -130,10 +137,10 @@ class MapViewModel internal constructor(
 
         selectedLocationJob = viewModelScope.launch {
             val deps = transportNetwork
-                .value
+                .lastOrNull()
                 ?.networkProvider
-                ?.queryDepartures(location.id,
-                                    Date(),
+                ?.queryDepartures(location.id!!,
+                                    Date().time,
                                     DeparturesActivity.MAX_DEPARTURES,
                                     false)
                 ?.takeIf { it.status == QueryDeparturesResult.Status.OK }
@@ -145,7 +152,7 @@ class MapViewModel internal constructor(
 
             _sheetContentState.value = BottomSheetContentState.Location(
                 loc = location,
-                lines = deps?.map { it.toKLine() }
+                lines = deps
             )
         }
 
@@ -154,13 +161,9 @@ class MapViewModel internal constructor(
     }
 
     fun clearSelectedLocation() {
-        selectedLocation.postValue(null)
+        _selectedLocation.value = null
 
         _sheetContentState.value = BottomSheetContentState.Empty
-    }
-
-    fun getSelectedLocation(): LiveData<WrapLocation?> {
-        return selectedLocation
     }
 
     fun findNearbyStations(location: WrapLocation) {
@@ -175,9 +178,9 @@ class MapViewModel internal constructor(
 
             try {
                 val result = withContext(Dispatchers.IO) {
-                    transportNetwork.value?.networkProvider?.queryNearbyLocations(
-                        EnumSet.of(LocationType.STATION),
-                        location.location.toLocation(),
+                    transportNetwork.lastOrNull()?.networkProvider?.queryNearbyLocations(
+                        EnumSet.of(Location.Type.STATION),
+                        location.location,
                         1000,
                         0
                     )
@@ -191,17 +194,11 @@ class MapViewModel internal constructor(
         }
     }
 
-    @Deprecated("Use findNearbyStations() instead")
-    fun getFindNearbyStations(): LiveData<WrapLocation> {
-        return findNearbyStations
-    }
 
     fun setNearbyStationsFound(found: Boolean) {
-        nearbyStationsFound.value = found
-    }
-
-    fun nearbyStationsFound(): LiveData<Boolean> {
-        return nearbyStationsFound
+        viewModelScope.launch {
+            _nearbyStationsFound.emit(found)
+        }
     }
 
     fun setGeoUri(geoUri: Uri) {
@@ -212,26 +209,6 @@ class MapViewModel internal constructor(
             Log.w(MapViewModel::class.java.simpleName, "Invalid geo intent: " + geoUri.toString())
             //Toast.makeText(application.applicationContext, R.string.error_geo_intent, Toast.LENGTH_SHORT).show()
         }
-    }
-
-    private fun switchMap(input: List<FavoriteLocation>?): MutableLiveData<LatLngBounds?> {
-        if (input == null) {
-            updatedLiveBounds.setValue(null)
-        } else {
-            val points = input
-                .filter { it.hasLocation() }
-                .map { it.latLng as LatLng }
-                .toMutableSet()
-            home.value?.let { if (it.hasLocation()) points.add(it.latLng) }
-            work.value?.let { if (it.hasLocation()) points.add(it.latLng) }
-            positionController.position.value?.let { points.add(LatLng(it)) }
-            if (points.size < 2) {
-                updatedLiveBounds.setValue(null)
-            } else {
-                updatedLiveBounds.setValue(LatLngBounds.Builder().includes(ArrayList(points)).build())
-            }
-        }
-        return updatedLiveBounds
     }
 
     fun findDirectionsFromGpsToLocation(to: WrapLocation?) {
@@ -268,6 +245,6 @@ sealed class BottomSheetContentState {
     object Initial : BottomSheetContentState()
     object Empty : BottomSheetContentState()
     object Loading : BottomSheetContentState()
-    data class Location(val loc: WrapLocation?, val lines: List<KLine>?) : BottomSheetContentState()
+    data class Location(val loc: WrapLocation?, val lines: List<Line>?) : BottomSheetContentState()
     object SavedSearches : BottomSheetContentState()
 }

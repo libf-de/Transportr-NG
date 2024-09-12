@@ -47,7 +47,6 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -58,6 +57,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.alorma.compose.settings.ui.SettingsGroup
 import com.alorma.compose.settings.ui.SettingsMenuLink
 import com.alorma.compose.settings.ui.SettingsRadioButton
@@ -165,12 +165,12 @@ fun SettingsScreen(
 
     val viewModel: SettingsViewModel = koinViewModel()
 
-    val networkName by viewModel.transportNetwork.observeAsState()
-    val optimize by viewModel.optimize.observeAsState(NetworkProvider.Optimize.valueOf(viewModel.defaultOptimize))
-    val walkSpeed by viewModel.walkSpeed.observeAsState(NetworkProvider.WalkSpeed.valueOf(viewModel.defaultWalkSpeed))
-    val theme by viewModel.theme.observeAsState(viewModel.defaultTheme)
-    val locale by viewModel.locale.observeAsState(viewModel.defaultLocale)
-    val showWhenLocked by viewModel.showWhenLocked.observeAsState(viewModel.defaultShowWhenLocked)
+    val networkName by viewModel.transportNetwork.collectAsStateWithLifecycle()
+    val optimize by viewModel.optimize.collectAsStateWithLifecycle(NetworkProvider.Optimize.valueOf(viewModel.defaultOptimize))
+    val walkSpeed by viewModel.walkSpeed.collectAsStateWithLifecycle(NetworkProvider.WalkSpeed.valueOf(viewModel.defaultWalkSpeed))
+    val theme by viewModel.theme.collectAsStateWithLifecycle(viewModel.defaultTheme)
+    val locale by viewModel.locale.collectAsStateWithLifecycle(viewModel.defaultLocale)
+    val showWhenLocked by viewModel.showWhenLocked.collectAsStateWithLifecycle(viewModel.defaultShowWhenLocked)
 
     var openDialog: Dialogs? by remember { mutableStateOf(null) }
 

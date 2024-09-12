@@ -66,25 +66,25 @@ abstract class GpsMapFragment<ViewModel : GpsMapViewModel> : BaseMapFragment() {
 
         gpsFab = v.findViewById(R.id.gpsFab)
         gpsFab.setOnClickListener { onGpsFabClick() }
-        viewModel.gpsFabState.observe(viewLifecycleOwner) { state ->
-            // Floating GPS Action Button Style
-            val (iconColor, backgroundColor) = when (state) {
-                GpsFabState.TRACKING -> Pair(
-                    ContextCompat.getColor(context, R.color.fabForegroundFollow),
-                    ColorStateList.valueOf(ContextCompat.getColor(context, R.color.fabBackground))
-                )
-                GpsFabState.ENABLED -> Pair(
-                    ContextCompat.getColor(context, R.color.fabForegroundMoved),
-                    ColorStateList.valueOf(ContextCompat.getColor(context, R.color.fabBackgroundMoved))
-                )
-                else -> Pair(
-                    ContextCompat.getColor(context, R.color.fabForegroundInitial),
-                    ColorStateList.valueOf(ContextCompat.getColor(context, R.color.fabBackground))
-                )
-            }
-            gpsFab.drawable.setColorFilter(iconColor, PorterDuff.Mode.SRC_IN)
-            gpsFab.backgroundTintList = backgroundColor
-        }
+//        viewModel.gpsFabState.observe(viewLifecycleOwner) { state ->
+//            // Floating GPS Action Button Style
+//            val (iconColor, backgroundColor) = when (state) {
+//                GpsFabState.TRACKING -> Pair(
+//                    ContextCompat.getColor(context, R.color.fabForegroundFollow),
+//                    ColorStateList.valueOf(ContextCompat.getColor(context, R.color.fabBackground))
+//                )
+//                GpsFabState.ENABLED -> Pair(
+//                    ContextCompat.getColor(context, R.color.fabForegroundMoved),
+//                    ColorStateList.valueOf(ContextCompat.getColor(context, R.color.fabBackgroundMoved))
+//                )
+//                else -> Pair(
+//                    ContextCompat.getColor(context, R.color.fabForegroundInitial),
+//                    ColorStateList.valueOf(ContextCompat.getColor(context, R.color.fabBackground))
+//                )
+//            }
+//            gpsFab.drawable.setColorFilter(iconColor, PorterDuff.Mode.SRC_IN)
+//            gpsFab.backgroundTintList = backgroundColor
+//        }
 
         return v
     }
@@ -137,16 +137,16 @@ abstract class GpsMapFragment<ViewModel : GpsMapViewModel> : BaseMapFragment() {
                 renderMode = RenderMode.COMPASS
             }
 
-            viewModel.positionController.position.observe(viewLifecycleOwner) {
-                locationComponent?.forceLocationUpdate(it)
-            }
-
-            viewModel.positionController.positionState.observe(viewLifecycleOwner) {
-                locationComponent?.isLocationComponentEnabled = when (it) {
-                    ENABLED -> true
-                    else -> false
-                }
-            }
+//            viewModel.positionController.position.observe(viewLifecycleOwner) {
+//                locationComponent?.forceLocationUpdate(it)
+//            }
+//
+//            viewModel.positionController.positionState.observe(viewLifecycleOwner) {
+//                locationComponent?.isLocationComponentEnabled = when (it) {
+//                    ENABLED -> true
+//                    else -> false
+//                }
+//            }
         }
 
     }

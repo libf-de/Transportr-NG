@@ -19,13 +19,13 @@
 
 package de.grobox.transportr.data.gps
 
-import de.grobox.transportr.data.dto.KPoint
+import de.schildbach.pte.dto.Point
 import de.grobox.transportr.locations.WrapLocation
 
 class ReverseGeocoderV2(
     private val geocoders: List<GeocodeProvider>
 ) {
-    suspend fun findLocation(point: KPoint): Result<WrapLocation> {
+    suspend fun findLocation(point: Point): Result<WrapLocation> {
         val failures: MutableList<Throwable> = mutableListOf()
 
         geocoders.forEach { geocoder ->

@@ -30,12 +30,12 @@ import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
 import com.google.android.material.color.MaterialColors
 import de.grobox.transportr.R
-import de.grobox.transportr.data.dto.KLeg
-import de.grobox.transportr.data.dto.KLocation
-import de.grobox.transportr.data.dto.KStop
-import de.grobox.transportr.data.dto.KTrip
 import de.grobox.transportr.map.MapDrawer
 import de.grobox.transportr.utils.DateUtils.formatTime
+import de.schildbach.pte.dto.Leg
+import de.schildbach.pte.dto.Location
+import de.schildbach.pte.dto.Stop
+import de.schildbach.pte.dto.Trip
 import org.maplibre.android.annotations.Icon
 import org.maplibre.android.annotations.PolylineOptions
 import org.maplibre.android.geometry.LatLng
@@ -49,7 +49,7 @@ class TripDrawer(context: Context) : MapDrawer(context) {
         BEGIN, CHANGE, STOP, END, WALK
     }
 
-    fun draw(map: MapLibreMap, trip: KTrip, zoom: Boolean) {
+    fun draw(map: MapLibreMap, trip: Trip, zoom: Boolean) {
         // draw leg path first, so it is always at the bottom
         var i = 1
         val builder = LatLngBounds.Builder()
@@ -74,29 +74,29 @@ class TripDrawer(context: Context) : MapDrawer(context) {
                     for (stop in it) {
                         val stopIcon = getMarkerIcon(MarkerType.STOP, backgroundColor, foregroundColor) ?: continue
                         val text = getStopText(stop)
-                        markLocation(map, stop.location, stopIcon, text)
+                        marLocation(map, stop.location, stopIcon, text)
                     }
                 }
 
                 // Draw first station or change station
                 if (i == 1 || i == 2 && !trip.legs[0].isPublicLeg) {
                     val icon = getMarkerIcon(MarkerType.BEGIN, backgroundColor, foregroundColor) ?: continue
-                    markLocation(map, leg.departure, icon, getStationText(leg, MarkerType.BEGIN))
+                    marLocation(map, leg.departure, icon, getStationText(leg, MarkerType.BEGIN))
                 } else {
                     val icon = getMarkerIcon(MarkerType.CHANGE, backgroundColor, foregroundColor) ?: continue
-                    markLocation(map, leg.departure, icon, getStationText(trip.legs[i - 2], leg))
+                    marLocation(map, leg.departure, icon, getStationText(trip.legs[i - 2], leg))
                 }
 
                 // Draw final station only at the end or if end is walking
                 if (i == trip.legs.size || i == trip.legs.size - 1 && !trip.legs[i].isPublicLeg) {
                     val icon = getMarkerIcon(MarkerType.END, backgroundColor, foregroundColor) ?: continue
-                    markLocation(map, leg.arrival, icon, getStationText(leg, MarkerType.END))
+                    marLocation(map, leg.arrival, icon, getStationText(leg, MarkerType.END))
                 }
             } else {
                 // only draw an icon if walk is required in the middle of a trip
                 if (i > 1 && i < trip.legs.size) {
                     val icon = getMarkerIcon(MarkerType.WALK, backgroundColor, foregroundColor) ?: continue
-                    markLocation(map, leg.departure, icon, getStationText(trip.legs[i - 2], leg))
+                    marLocation(map, leg.departure, icon, getStationText(trip.legs[i - 2], leg))
                 }
             }
             i += 1
@@ -108,10 +108,10 @@ class TripDrawer(context: Context) : MapDrawer(context) {
     }
 
     @ColorInt
-    private fun KLeg.getBackgroundColor(): Int {
+    private fun Leg.getBackgroundColor(): Int {
         if (isPublicLeg) {
-            return if (line?.style != null && line.style.backgroundColor != 0) {
-                line.style.backgroundColor
+            return if (line?.style != null && line!!.style!!.backgroundColor != 0) {
+                line!!.style!!.backgroundColor
             } else {
                 MaterialColors.getColor(context, R.attr.colorPrimary, Color.TRANSPARENT)
             }
@@ -120,10 +120,10 @@ class TripDrawer(context: Context) : MapDrawer(context) {
     }
 
     @ColorInt
-    private fun KLeg.getForegroundColor(): Int {
+    private fun Leg.getForegroundColor(): Int {
         if (isPublicLeg) {
-            return if (line?.style != null && line.style.foregroundColor != 0) {
-                line.style.foregroundColor
+            return if (line?.style != null && line!!.style!!.foregroundColor != 0) {
+                line!!.style!!.foregroundColor
             } else {
                 ContextCompat.getColor(context, android.R.color.white)
             }
@@ -131,8 +131,8 @@ class TripDrawer(context: Context) : MapDrawer(context) {
         return ContextCompat.getColor(context, android.R.color.black)
     }
 
-    private fun markLocation(map: MapLibreMap, location: KLocation, icon: Icon, text: String) {
-        markLocation(map, location, icon, location.uniqueShortName ?: "", text)
+    private fun marLocation(map: MapLibreMap, location: Location, icon: Icon, text: String) {
+        marLocation(map, location, icon, location.uniqueShortName ?: "", text)
     }
 
     private fun getMarkerIcon(type: MarkerType, backgroundColor: Int, foregroundColor: Int): Icon? {
@@ -156,7 +156,7 @@ class TripDrawer(context: Context) : MapDrawer(context) {
         return drawable.toIcon()
     }
 
-    private fun getStopText(stop: KStop): String {
+    private fun getStopText(stop: Stop): String {
         var text = ""
         stop.getArrivalTime(false)?.let {
             text += "${context.getString(R.string.trip_arr)}: ${formatTime(context, Date(it))}"
@@ -168,7 +168,7 @@ class TripDrawer(context: Context) : MapDrawer(context) {
         return text
     }
 
-    private fun getStationText(leg: KLeg, type: MarkerType): String {
+    private fun getStationText(leg: Leg, type: MarkerType): String {
         return when (type) {
             MarkerType.BEGIN -> leg.getDepartureTime(false)?.let {
                 "${context.getString(R.string.trip_dep)}: ${formatTime(context, Date(it))}"
@@ -180,7 +180,7 @@ class TripDrawer(context: Context) : MapDrawer(context) {
         } ?: ""
     }
 
-    private fun getStationText(leg1: KLeg, leg2: KLeg): String {
+    private fun getStationText(leg1: Leg, leg2: Leg): String {
         var text = ""
         leg1.arrivalTime?.let {
             text += "${context.getString(R.string.trip_arr)}: ${formatTime(context, Date(it))}"

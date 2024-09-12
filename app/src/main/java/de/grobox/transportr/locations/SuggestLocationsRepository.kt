@@ -19,10 +19,6 @@
 
 package de.grobox.transportr.locations
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
-import de.grobox.transportr.data.dto.toKLocation
 import de.grobox.transportr.networks.TransportNetwork
 import de.grobox.transportr.networks.TransportNetworkManager
 import kotlinx.coroutines.CoroutineDispatcher
@@ -31,6 +27,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -42,19 +41,36 @@ class SuggestLocationsRepository(
 
     private val scope = CoroutineScope(dispatcher + SupervisorJob())
 
-    private val _suggestedLocations = MediatorLiveData<Set<WrapLocation>>()
-    val suggestedLocations: LiveData<Set<WrapLocation>> = _suggestedLocations
+//    private val _suggestedLocations = MediatorLiveData<Set<WrapLocation>>()
+//    val suggestedLocations: LiveData<Set<WrapLocation>> = _suggestedLocations
+//
+//    private val _isLoading: MutableLiveData<Boolean> = MutableLiveData(false)
+//    val isLoading: LiveData<Boolean> = _isLoading
+//
+//    private var suggestLocationsJob: Job? = null
+//    private var suggestLocationsTask: SuggestLocationsTask? = null
+//    private var transportNetwork: TransportNetwork? = null
 
-    private val _isLoading: MutableLiveData<Boolean> = MutableLiveData(false)
-    val isLoading: LiveData<Boolean> = _isLoading
+
+
+
+
+
+    private val _suggestedLocations = MutableStateFlow<Set<WrapLocation>>(emptySet())
+    val suggestedLocations: StateFlow<Set<WrapLocation>> = _suggestedLocations.asStateFlow()
+
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     private var suggestLocationsJob: Job? = null
     private var suggestLocationsTask: SuggestLocationsTask? = null
     private var transportNetwork: TransportNetwork? = null
 
     init {
-        _suggestedLocations.addSource(manager.transportNetwork) {
-            transportNetwork = it
+        scope.launch {
+            manager.transportNetwork.collect {
+                transportNetwork = it
+            }
         }
     }
 
@@ -63,8 +79,8 @@ class SuggestLocationsRepository(
         suggestLocationsTask?.cancel(true)
 
         if(query.isEmpty()) {
-            _suggestedLocations.postValue(emptySet())
-            _isLoading.postValue(false)
+            _suggestedLocations.value = emptySet()
+            _isLoading.value = false
             return
         }
 
@@ -80,32 +96,30 @@ class SuggestLocationsRepository(
     }
 
     private fun _suggestLocations(query: String) {
-        _isLoading.postValue(true)
+        _isLoading.value = true
         transportNetwork?.let {
             if (suggestLocationsTask != null && suggestLocationsTask?.isCancelled == false) return@let null
 
             suggestLocationsTask = SuggestLocationsTask(it) { suggestLocationsResult ->
-                _suggestedLocations.postValue(
-                    suggestLocationsResult?.suggestedLocations?.map { sl ->
-                        WrapLocation(sl.location.toKLocation())
-                    }?.toSet() ?: emptySet()
-                )
+                _suggestedLocations.value = suggestLocationsResult?.suggestedLocations?.map { sl ->
+                    WrapLocation(sl.location)
+                }?.toSet() ?: emptySet()
             }
             suggestLocationsTask?.execute(query)
         }.let {
-            if(it == null) _isLoading.postValue(false)
+            if(it == null) _isLoading.value = false
         }
     }
 
     fun cancelSuggestLocations() {
         suggestLocationsTask?.cancel(true)
-        _isLoading.postValue(false)
+        _isLoading.value = false
     }
 
     fun reset() {
         suggestLocationsJob?.cancel()
         suggestLocationsTask?.cancel(true)
-        _isLoading.postValue(false)
-        _suggestedLocations.postValue(emptySet())
+        _isLoading.value = false
+        _suggestedLocations.value = emptySet()
     }
 }

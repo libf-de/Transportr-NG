@@ -23,8 +23,8 @@ import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.Index
 import de.grobox.transportr.R
-import de.grobox.transportr.data.dto.KLocation
-import de.grobox.transportr.data.dto.KProduct
+import de.schildbach.pte.dto.Location
+import de.schildbach.pte.dto.Product
 import de.grobox.transportr.locations.WrapLocation
 import de.schildbach.pte.NetworkId
 
@@ -40,8 +40,8 @@ class FavoriteLocation : StoredLocation {
     var toCount: Int
 
     constructor(
-        uid: Long, networkId: NetworkId?, type: KLocation.Type?, id: String?, lat: Int, lon: Int,
-        place: String?, name: String?, products: Set<KProduct>?, fromCount: Int, viaCount: Int,
+        uid: Long, networkId: NetworkId?, type: Location.Type?, id: String?, lat: Int, lon: Int,
+        place: String?, name: String?, products: Set<Product>?, fromCount: Int, viaCount: Int,
         toCount: Int
     ) : super(uid, networkId!!, type, id, lat, lon, place, name, products) {
         this.fromCount = fromCount
@@ -64,7 +64,7 @@ class FavoriteLocation : StoredLocation {
     }
 
     @Ignore
-    constructor(networkId: NetworkId?, l: KLocation?) : super(networkId!!, l!!) {
+    constructor(networkId: NetworkId?, l: Location?) : super(networkId!!, l!!) {
         this.fromCount = 0
         this.viaCount = 0
         this.toCount = 0
@@ -73,9 +73,9 @@ class FavoriteLocation : StoredLocation {
     @get:DrawableRes
     override val drawableInt: Int
         get() = when (type) {
-            KLocation.Type.ADDRESS -> R.drawable.ic_location_address_fav
-            KLocation.Type.POI -> R.drawable.ic_location_poi_fav
-            KLocation.Type.STATION -> R.drawable.ic_location_station_fav
+            Location.Type.ADDRESS -> R.drawable.ic_location_address_fav
+            Location.Type.POI -> R.drawable.ic_location_poi_fav
+            Location.Type.STATION -> R.drawable.ic_location_station_fav
             else -> R.drawable.ic_location
         }
 

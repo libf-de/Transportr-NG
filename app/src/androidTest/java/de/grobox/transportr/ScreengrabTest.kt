@@ -84,7 +84,7 @@ abstract class ScreengrabTest {
             else -> throw RuntimeException()
         }
         else -> when(i) {
-            0 -> WrapLocation(STATION, "730874", 52507278, 13331992, null, "Checkpoint Charlie", null)
+            0 -> WrapLocation(STATION, "730874", 52507278, 13331992, null, "ChecPoint Charlie", null)
             1 -> getLocation("Bundestag")
             2 -> getLocation("Friedrichstraße")
             else -> throw RuntimeException()

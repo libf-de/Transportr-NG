@@ -55,7 +55,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -68,7 +67,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.map
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import de.grobox.transportr.R
 import de.grobox.transportr.composables.CustomSmallTopAppBar
@@ -77,6 +76,7 @@ import de.grobox.transportr.ui.map.MapViewComposable
 import de.grobox.transportr.ui.map.MapViewState
 import de.grobox.transportr.ui.trips.composables.LegListComposable
 import de.grobox.transportr.utils.DateUtils.formatDuration
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -128,10 +128,13 @@ fun TripDetailScreen(
         }
     }
 
-    val trip by viewModel.getTrip().observeAsState()
-    val zoomLocation by viewModel.getZoomLocation().observeAsState()
-    val zoomLeg by viewModel.getZoomLeg().observeAsState()
-    val showLineNames by viewModel.transportNetwork.map { it?.hasGoodLineNames() ?: false }.observeAsState(false)
+    val trip by viewModel.trip.collectAsStateWithLifecycle()
+    val zoomLocation by viewModel.zoomLocation.collectAsStateWithLifecycle(null)
+    val zoomLeg by viewModel.zoomLeg.collectAsStateWithLifecycle(null)
+    val showLineNames by viewModel.transportNetwork.map { it?.hasGoodLineNames() ?: false }.collectAsStateWithLifecycle(false)
+
+    // TODO: Show reload error as Snackbar
+    val tripReloadError by viewModel.tripReloadError.collectAsStateWithLifecycle(null)
 
     LaunchedEffect(tripId) {
         viewModel.getTripById(tripId)
@@ -143,11 +146,15 @@ fun TripDetailScreen(
     }
 
     LaunchedEffect(zoomLocation) {
-        mapState.animateTo(zoomLocation, 16)
+        zoomLocation?.let {
+            mapState.animateTo(it, 16)
+        }
     }
 
     LaunchedEffect(zoomLeg) {
-        mapState.animateToBounds(zoomLeg)
+        zoomLeg?.let {
+            mapState.animateToBounds(it)
+        }
     }
 
     Box(

@@ -41,7 +41,7 @@ public class NearbyLocationsLoader extends AsyncTaskLoader<NearbyLocationsResult
 
 	private final TransportNetwork network;
 	private final Location location;
-	private final static EnumSet<LocationType> types = EnumSet.of(LocationType.STATION);
+	private final static EnumSet<Location.Type> types = EnumSet.of(Location.Type.STATION);
 	private final int maxDistance;
 
 	public NearbyLocationsLoader(Context context, TransportNetwork network, Bundle args) {

@@ -26,26 +26,17 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.util.Pair
-import androidx.lifecycle.MutableLiveData
 import de.grobox.transportr.R
-import de.grobox.transportr.data.dto.KTrip
-import de.grobox.transportr.data.dto.toKTrip
-import de.grobox.transportr.data.dto.toLocation
-import de.grobox.transportr.data.dto.toProduct
 import de.grobox.transportr.data.locations.FavoriteLocation.FavLocationType.FROM
 import de.grobox.transportr.data.locations.FavoriteLocation.FavLocationType.TO
 import de.grobox.transportr.data.locations.FavoriteLocation.FavLocationType.VIA
 import de.grobox.transportr.data.locations.LocationRepository
 import de.grobox.transportr.data.searches.SearchesRepository
 import de.grobox.transportr.networks.TransportNetworkManager
-import de.grobox.transportr.networks.getTransportNetwork
 import de.grobox.transportr.settings.SettingsManager
 import de.grobox.transportr.ui.trips.TripQuery
-import de.grobox.transportr.utils.SingleLiveEvent
 import de.grobox.transportr.utils.TransportrUtils
-import de.schildbach.pte.NetworkId
-import de.schildbach.pte.NetworkProvider
-import de.schildbach.pte.dto.QueryTripsContext
+import de.schildbach.pte.QueryTripsContext
 import de.schildbach.pte.dto.QueryTripsResult
 import de.schildbach.pte.dto.QueryTripsResult.Status.AMBIGUOUS
 import de.schildbach.pte.dto.QueryTripsResult.Status.INVALID_DATE
@@ -58,23 +49,28 @@ import de.schildbach.pte.dto.QueryTripsResult.Status.UNKNOWN_LOCATION
 import de.schildbach.pte.dto.QueryTripsResult.Status.UNKNOWN_TO
 import de.schildbach.pte.dto.QueryTripsResult.Status.UNKNOWN_VIA
 import de.schildbach.pte.dto.QueryTripsResult.Status.UNRESOLVABLE_ADDRESS
+import de.schildbach.pte.dto.Trip
 import de.schildbach.pte.dto.TripOptions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.io.InterruptedIOException
 import java.net.SocketTimeoutException
 import java.util.Date
-import kotlin.concurrent.thread
 
 class TripsRepository(
-        private val ctx: Context,
-        //private val networkProvider: NetworkProvider,
-        private val networkManager: TransportNetworkManager,
-        private val settingsManager: SettingsManager,
-        private val locationRepository: LocationRepository,
-        private val searchesRepository: SearchesRepository,
-        private val tripsDao: TripsDao
+    private val ctx: Context,
+//    private val networkProvider: NetworkProvider,
+    private val networkManager: TransportNetworkManager,
+    private val settingsManager: SettingsManager,
+    private val locationRepository: LocationRepository,
+    private val searchesRepository: SearchesRepository,
+    private val tripsDao: TripsDao
 ) {
 
     companion object {
@@ -83,26 +79,49 @@ class TripsRepository(
 
     enum class QueryMoreState { EARLIER, LATER, BOTH, NONE }
 
-    val trips = MutableLiveData<Set<KTrip>>()
-    val queryMoreState = MutableLiveData<QueryMoreState>()
-    val queryError = SingleLiveEvent<String>()
-    val queryPTEError = SingleLiveEvent<Pair<String, String>>()
-    val queryMoreError = SingleLiveEvent<String>()
-    val isFavTrip = MutableLiveData<Boolean>()
-    private val networkProvider: NetworkProvider
+    //@OptIn(ExperimentalCoroutinesApi::class)
+//    private val networkProvider: StateFlow<NetworkProvider> = networkManager.transportNetwork.mapLatest { it?.networkProvider }
+
+//    val trips = MutableLiveData<Set<Trip>>()
+    private val _trips: MutableStateFlow<Set<Trip>> = MutableStateFlow(emptySet())
+    val trips = _trips.asStateFlow()
+//    val queryMoreState = MutableLiveData<QueryMoreState>()
+    private val _queryMoreState = MutableStateFlow(QueryMoreState.NONE)
+    val queryMoreState = _queryMoreState.asStateFlow()
+//    val queryError = SingleLiveEvent<String>()
+    private val _queryError = MutableSharedFlow<String>(extraBufferCapacity = 1)
+    val queryError = _queryError.asSharedFlow()
+//    val queryPTEError = SingleLiveEvent<Pair<String, String>>()
+    private val _queryPTEError = MutableSharedFlow<Pair<String, String>>(extraBufferCapacity = 1)
+    val queryPTEError = _queryPTEError.asSharedFlow()
+//    val queryMoreError = SingleLiveEvent<String>()
+    private val _queryMoreError = MutableSharedFlow<String>(extraBufferCapacity = 1)
+    val queryMoreError = _queryMoreError.asSharedFlow()
+//    val isFavTrip = MutableLiveData<Boolean>()
+    private val _isFavTrip = MutableStateFlow(false)
+    val isFavTrip = _isFavTrip.asStateFlow()
+
     //private val networkProvider = MediatorLiveData<NetworkProvider>(getTransportNetwork(NetworkId.DB)!!.networkProvider)
 
     private var uid: Long = 0L
     private var queryTripsContext: QueryTripsContext? = null
-    private var queryTripsTask = Thread()
+//    private var queryTripsTask = Thread()
+
+    private var queryTripsJob: Job? = null
 
     init {
-        queryMoreState.value = QueryMoreState.NONE
+        CoroutineScope(Dispatchers.IO).launch {
+            networkManager.transportNetwork.collect {
+                println("New TransportNetwork: ${it?.id}")
+            }
+        }
 
-        var network = networkManager.transportNetwork.value
-        if (network == null) network = getTransportNetwork(NetworkId.DB)!!
 
-        networkProvider = network.networkProvider
+
+//        var network = networkManager.transportNetwork.value
+//        if (network == null) network = getTransportNetwork(NetworkId.DB)!!
+//
+//        networkProvider = network.networkProvider
 
         // Delete trips that arrived more than 2 days ago
         CoroutineScope(Dispatchers.IO).launch {
@@ -113,18 +132,18 @@ class TripsRepository(
     }
 
     private fun clearState() {
-        trips.value = emptySet()
-        queryMoreState.value = QueryMoreState.NONE
+        _trips.value = emptySet()
+        _queryMoreState.value = QueryMoreState.NONE
         queryTripsContext = null
-        isFavTrip.value = false
+        _isFavTrip.value = false
         uid = 0L
     }
 
-    fun findTripById(id: String): KTrip {
-        return trips.value!!.firstOrNull { it.id == id } ?: tripsDao.getTripByIdWithLegs(id).toKTrip()
+    fun findTripById(id: String): Trip {
+        return _trips.value.firstOrNull { it.id == id } ?: tripsDao.getTripByIdWithLegs(id).toTrip()
     }
 
-    fun search(query: TripQuery) {
+    fun search(query: TripQuery, scope: CoroutineScope) {
         // reset current data
         clearState()
 
@@ -137,69 +156,73 @@ class TripsRepository(
         Log.i(TAG, "Optimize for: " + settingsManager.optimize)
         Log.i(TAG, "Walk Speed: " + settingsManager.walkSpeed)
 
-        if (queryTripsTask.isAlive && !queryTripsTask.isInterrupted) {
-            queryTripsTask.interrupt()
+        queryTripsJob?.cancel()
+
+        queryTripsJob = scope.launch {
+            queryTrips(query)
         }
-        queryTripsTask = thread(true) { queryTrips(query) }
     }
 
 //    @WorkerThread
     private fun queryTrips(query: TripQuery) {
-         try {
-            val queryTripsResult = networkProvider.queryTrips(
-                query.from.location.toLocation(), if (query.via == null) null else query.via.location.toLocation(), query.to.location.toLocation(),
-                query.date, query.departure,
-                TripOptions(query.products.mapNotNull { it.toProduct() }.toSet(), settingsManager.optimize, settingsManager.walkSpeed, null, null)
-            )
-            if (queryTripsResult.status == OK && queryTripsResult.trips.size > 0) {
-                // deliver result first, so UI can get updated
-                onQueryTripsResultReceived(queryTripsResult)
-                // store locations (needed for references in stored search)
-                val from = locationRepository.addFavoriteLocation(query.from, FROM)
-                val via = query.via?.let { locationRepository.addFavoriteLocation(it, VIA) }
-                val to = locationRepository.addFavoriteLocation(query.to, TO)
-                // store search query
-                uid = searchesRepository.storeSearch(from, via, to)
-                // set fav status
-                isFavTrip.postValue(searchesRepository.isFavorite(uid))
-            } else {
-                PTEError(queryTripsResult.status.name, queryTripsResult.getError(), query)
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            if (e is InterruptedIOException && e !is SocketTimeoutException) {
-                // return, because this thread was interrupted
-            } else if (!TransportrUtils.hasInternet(ctx)) {
-                queryError.postValue(ctx.getString(R.string.error_no_internet))
-            } else if (e is SocketTimeoutException) {
-                queryError.postValue(ctx.getString(R.string.error_connection_failure))
-            } else {
-                val errorBuilder = StringBuilder("$e\n${e.stackTrace[0]}\n${e.stackTrace[1]}\n${e.stackTrace[2]}")
-                e.cause?.let { errorBuilder.append("\nCause: ${it.stackTrace[0]}\n${it.stackTrace[1]}\n${it.stackTrace[2]}") }
-                PTEError(e.toString(), errorBuilder.toString(), query)
-            }
-        }
+         CoroutineScope(Dispatchers.IO).launch {
+             try {
+//            val queryTripsResult = networkProvider.last()!!.queryTrips(
+                 val queryTripsResult = networkManager.transportNetwork.value!!.networkProvider.queryTrips(
+                     query.from.location, if (query.via == null) null else query.via.location, query.to.location,
+                     query.date, query.departure,
+                     TripOptions(query.products.toSet(), settingsManager.optimize, settingsManager.walkSpeed, null, null)
+                 )!!
+                 if (queryTripsResult.status == OK && queryTripsResult.trips.size > 0) {
+                     // deliver result first, so UI can get updated
+                     onQueryTripsResultReceived(queryTripsResult)
+                     // store locations (needed for references in stored search)
+                     val from = locationRepository.addFavoriteLocation(query.from, FROM)
+                     val via = query.via?.let { locationRepository.addFavoriteLocation(it, VIA) }
+                     val to = locationRepository.addFavoriteLocation(query.to, TO)
+                     // store search query
+                     uid = searchesRepository.storeSearch(from, via, to)
+                     // set fav status
+                     _isFavTrip.value = searchesRepository.isFavorite(uid)
+                 } else {
+                     PTEError(queryTripsResult.status.name, queryTripsResult.getError(), query)
+                 }
+             } catch (e: Exception) {
+                 e.printStackTrace()
+                 if (e is InterruptedIOException && e !is SocketTimeoutException) {
+                     // return, because this thread was interrupted
+                 } else if (!TransportrUtils.hasInternet(ctx)) {
+                     _queryError.emit(ctx.getString(R.string.error_no_internet))
+                 } else if (e is SocketTimeoutException) {
+                     _queryError.emit(ctx.getString(R.string.error_connection_failure))
+                 } else {
+//                val errorBuilder = StringBuilder("$e\n${e.stackTrace[0]}\n${e.stackTrace[1]}\n${e.stackTrace[2]}")
+//                e.cause?.let { errorBuilder.append("\nCause: ${it.stackTrace[0]}\n${it.stackTrace[1]}\n${it.stackTrace[2]}") }
+                     PTEError(e.toString(), "", query)
+                 }
+             }
+         }
     }
 
     fun searchMore(later: Boolean) {
-        if (queryTripsContext == null) throw IllegalStateException("No query context")
+        CoroutineScope(Dispatchers.IO).launch {
+            if (queryTripsContext == null) throw IllegalStateException("No query context")
 
-        Log.i(TAG, "QueryTripsContext: " + queryTripsContext!!.toString())
-        Log.i(TAG, "Later: $later")
+            Log.i(TAG, "QueryTripsContext: " + queryTripsContext!!.toString())
+            Log.i(TAG, "Later: $later")
 
-        if (later && !queryTripsContext!!.canQueryLater()) throw IllegalStateException("Can not query later")
-        if (!later && !queryTripsContext!!.canQueryEarlier()) throw IllegalStateException("Can not query earlier")
+            if (later && !queryTripsContext!!.canQueryLater) throw IllegalStateException("Can not query later")
+            if (!later && !queryTripsContext!!.canQueryEarlier) throw IllegalStateException("Can not query earlier")
 
-        thread(true) {
             try {
-                val queryTripsResult = networkProvider.queryMoreTrips(queryTripsContext, later)
+                val queryTripsResult = networkManager.transportNetwork.value!!.networkProvider.queryMoreTrips(queryTripsContext!!, later)
                 if (queryTripsResult.status == OK && queryTripsResult.trips.size > 0) {
                     onQueryTripsResultReceived(queryTripsResult)
                 } else {
-                    queryMoreError.postValue(queryTripsResult.getError())
+                    _queryMoreError.emit(queryTripsResult.getError())
                 }
             } catch (e: Exception) {
-                queryMoreError.postValue(e.toString())
+                _queryMoreError.emit(e.toString())
             }
         }
     }
@@ -207,26 +230,28 @@ class TripsRepository(
     private fun onQueryTripsResultReceived(queryTripsResult: QueryTripsResult) {
         Handler(Looper.getMainLooper()).post {
             queryTripsContext = queryTripsResult.context
-            queryMoreState.value = getQueryMoreStateFromContext(queryTripsContext)
+            _queryMoreState.value = getQueryMoreStateFromContext(queryTripsContext)
 
-            val oldTrips = trips.value?.let { HashSet(it) } ?: HashSet()
-            val newTrips = queryTripsResult.trips.map { it.toKTrip() }.toSet()
+//            val nuTrips: Set<Trip> = _trips.value + queryTripsResult.trips.map { it.toTrip() }.toSet()
+
+            val oldTrips = _trips.value.let { HashSet(it) }
+            val newTrips = queryTripsResult.trips.toSet()
             oldTrips.addAll(newTrips)
 
             CoroutineScope(Dispatchers.IO).launch {
-                newTrips.forEach { tripsDao.addTrip(it, networkProvider.id()) }
+                newTrips.forEach { tripsDao.addTrip(it, networkManager.transportNetwork.value!!.networkProvider.id()!!) }
             }
 
-            trips.value = oldTrips
+            _trips.value = oldTrips
         }
     }
 
     private fun getQueryMoreStateFromContext(context: QueryTripsContext?): QueryMoreState = context?.let {
-        return if (it.canQueryEarlier() && it.canQueryLater()) {
+        return if (it.canQueryEarlier && it.canQueryLater) {
             QueryMoreState.BOTH
-        } else if (it.canQueryEarlier()) {
+        } else if (it.canQueryEarlier) {
             QueryMoreState.EARLIER
-        } else if (it.canQueryLater()) {
+        } else if (it.canQueryLater) {
             QueryMoreState.LATER
         } else {
             QueryMoreState.NONE
@@ -248,14 +273,14 @@ class TripsRepository(
         null -> throw IllegalStateException()
     }
 
-    private fun PTEError(errorShort: String, error: String, query: TripQuery) {
+    private suspend fun PTEError(errorShort: String, error: String, query: TripQuery) {
         val title = StringBuilder()
-            .append(networkProvider.id().name)
+            .append(networkManager.transportNetwork.value!!.networkProvider.id()!!.name)
             .append(": ")
             .append(errorShort)
         val body = StringBuilder()
             .appendLine("### Query")
-            .appendLine("- NetworkId: `${networkProvider.id().name}`")
+            .appendLine("- NetworkId: `${networkManager.transportNetwork.value!!.networkProvider.id()!!.name}`")
             .appendLine("- From: `${query.from.location}`")
             .appendLine("- Via: `${if (query.via == null) "null" else query.via.location}`")
             .appendLine("- To: `${query.to.location}`")
@@ -282,14 +307,17 @@ class TripsRepository(
             .appendPath("new")
             .appendQueryParameter("title", title.toString())
             .appendQueryParameter("body", body.toString())
-        queryPTEError.postValue(Pair(error, uri.build().toString()))
+
+        println(error)
+
+        _queryPTEError.emit(Pair(error, uri.build().toString()))
     }
 
     fun toggleFavState() {
         val oldFavState = isFavTrip.value
         if (uid == 0L || oldFavState == null) throw IllegalStateException()
         searchesRepository.updateFavoriteState(uid, !oldFavState)
-        isFavTrip.value = !oldFavState
+        _isFavTrip.value = !oldFavState
     }
 
 }

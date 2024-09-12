@@ -32,7 +32,6 @@ import android.view.WindowManager.LayoutParams
 import android.view.inputmethod.InputMethodManager
 import androidx.annotation.StringRes
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.Observer
 import de.grobox.transportr.data.locations.FavoriteLocation.FavLocationType
 import de.grobox.transportr.databinding.FragmentSpecialLocationBinding
 import de.grobox.transportr.favorites.trips.FavoriteTripListener
@@ -76,16 +75,16 @@ abstract class SpecialLocationFragment : DialogFragment(), LocationView.Location
         loc.setLocationViewListener(this)
 
         // Get view model and observe data
-        viewModel.transportNetwork.observe(viewLifecycleOwner, Observer {
-                transportNetwork -> transportNetwork?.let { loc.setTransportNetwork(it) }
-        })
-
-        viewModel.locations.observe(viewLifecycleOwner, Observer { favoriteLocations ->
-            favoriteLocations?.let {
-                loc.setFavoriteLocations(it)
-                loc.post { loc.onClick() }  // don't know why this only works when posted
-            }
-        })
+//        viewModel.transportNetwork.observe(viewLifecycleOwner, Observer {
+//                transportNetwork -> transportNetwork?.let { loc.setTransportNetwork(it) }
+//        })
+//
+//        viewModel.locations.observe(viewLifecycleOwner, Observer { favoriteLocations ->
+//            favoriteLocations?.let {
+//                loc.setFavoriteLocations(it)
+//                loc.post { loc.onClick() }  // don't know why this only works when posted
+//            }
+//        })
 
         return v
     }

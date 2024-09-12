@@ -16,64 +16,69 @@
  *    You should have received a copy of the GNU General Public License
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package de.grobox.transportr.data.locations
 
-package de.grobox.transportr.data.locations;
-
-import java.util.List;
-
-import androidx.annotation.Nullable;
-import androidx.lifecycle.LiveData;
-import androidx.room.Dao;
-import androidx.room.Insert;
-import androidx.room.Query;
-import de.grobox.transportr.data.dto.KLocation;
-import de.schildbach.pte.NetworkId;
-
-import static androidx.room.OnConflictStrategy.REPLACE;
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import de.schildbach.pte.dto.Location
+import de.schildbach.pte.NetworkId
+import kotlinx.coroutines.flow.Flow
 
 @Dao
-public interface LocationDao {
+interface LocationDao {
+    //	@Query("SELECT * FROM locations WHERE networkId = :networkId")
+    //	LiveData<List<GenericLocation>> getAllLocations(NetworkId networkId);
+    @Query("SELECT * FROM locations WHERE networkId = :networkId")
+    fun getAllLocationsAsFlow(networkId: NetworkId?): Flow<List<GenericLocation>>
 
-	@Query("SELECT * FROM locations WHERE networkId = :networkId")
-	LiveData<List<GenericLocation>> getAllLocations(NetworkId networkId);
+    // FavoriteLocation
+    //	@Query("SELECT * FROM locations WHERE networkId = :networkId")
+    //	LiveData<List<FavoriteLocation>> getFavoriteLocations(NetworkId networkId);
+    @Query("SELECT * FROM locations WHERE networkId = :networkId")
+    fun getFavoriteLocationsAsFlow(networkId: NetworkId?): Flow<List<FavoriteLocation>>
 
-	// FavoriteLocation
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun addFavoriteLocation(location: FavoriteLocation): Long
 
-	@Query("SELECT * FROM locations WHERE networkId = :networkId")
-	LiveData<List<FavoriteLocation>> getFavoriteLocations(NetworkId networkId);
+    @Query("SELECT * FROM locations WHERE uid = :uid")
+    suspend fun getFavoriteLocation(uid: Long): FavoriteLocation?
 
-	@Insert(onConflict = REPLACE)
-	long addFavoriteLocation(FavoriteLocation location);
+    @Query("SELECT * FROM locations WHERE networkId = :networkId AND type = :type AND id IS :id AND lat = :lat AND lon = :lon AND place IS :place AND name IS :name")
+    fun getFavoriteLocation(
+        networkId: NetworkId?,
+        type: Location.Type?,
+        id: String?,
+        lat: Int,
+        lon: Int,
+        place: String?,
+        name: String?
+    ): FavoriteLocation?
 
-	@Nullable
-	@Query("SELECT * FROM locations WHERE uid = :uid")
-	FavoriteLocation getFavoriteLocation(long uid);
+    // HomeLocation
+    //	@Query("SELECT * FROM home_locations WHERE networkId = :networkId")
+    //	LiveData<HomeLocation> getHomeLocation(NetworkId networkId);
+    @Query("SELECT * FROM home_locations WHERE networkId = :networkId")
+    fun getHomeLocationAsFlow(networkId: NetworkId?): Flow<HomeLocation>
 
-	@Nullable
-	@Query("SELECT * FROM locations WHERE networkId = :networkId AND type = :type AND id IS :id AND lat = :lat AND lon = :lon AND place IS :place AND name IS :name")
-	FavoriteLocation getFavoriteLocation(NetworkId networkId, KLocation.Type type, @Nullable String id, int lat, int lon, @Nullable String place, @Nullable String name);
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun addHomeLocation(location: HomeLocation): Long
 
-	// HomeLocation
-	@Query("SELECT * FROM home_locations WHERE networkId = :networkId")
-	LiveData<HomeLocation> getHomeLocation(NetworkId networkId);
+    /* This is just for tests to ensure, there's only ever one home location per network */
+    @Query("SELECT COUNT(uid) FROM home_locations WHERE networkId = :networkId")
+    fun countHomes(networkId: NetworkId?): Int
 
-	@Insert(onConflict = REPLACE)
-	long addHomeLocation(HomeLocation location);
+    // WorLocation
+    @Query("SELECT * FROM work_locations WHERE networkId = :networkId")
+    fun getWorLocationAsFlow(networkId: NetworkId?): Flow<WorLocation>
 
-	/* This is just for tests to ensure, there's only ever one home location per network */
-	@Query("SELECT COUNT(uid) FROM home_locations WHERE networkId = :networkId")
-	int countHomes(NetworkId networkId);
+    //	@Query("SELECT * FROM work_locations WHERE networkId = :networkId")
+    //	LiveData<WorLocation> getWorLocation(NetworkId networkId);
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun addWorLocation(location: WorLocation): Long
 
-	// WorkLocation
-
-	@Query("SELECT * FROM work_locations WHERE networkId = :networkId")
-	LiveData<WorkLocation> getWorkLocation(NetworkId networkId);
-
-	@Insert(onConflict = REPLACE)
-	long addWorkLocation(WorkLocation location);
-
-	/* This is just for tests to ensure, there's only ever one home location per network */
-	@Query("SELECT COUNT(uid) FROM work_locations WHERE networkId = :networkId")
-	int countWorks(NetworkId networkId);
-
+    /* This is just for tests to ensure, there's only ever one home location per network */
+    @Query("SELECT COUNT(uid) FROM work_locations WHERE networkId = :networkId")
+    fun countWorks(networkId: NetworkId?): Int
 }

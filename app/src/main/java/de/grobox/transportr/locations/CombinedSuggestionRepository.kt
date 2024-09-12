@@ -19,78 +19,70 @@
 
 package de.grobox.transportr.locations
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
 import de.grobox.transportr.data.locations.FavoriteLocation.Companion.FromComparator
 import de.grobox.transportr.data.locations.FavoriteLocation.Companion.ToComparator
 import de.grobox.transportr.data.locations.FavoriteLocation.Companion.ViaComparator
 import de.grobox.transportr.data.locations.FavoriteLocation.FavLocationType
 import de.grobox.transportr.data.locations.LocationRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import java.util.Locale
 
 class CombinedSuggestionRepository(
     private val suggestLocationsRepository: SuggestLocationsRepository,
     private val locationRepository: LocationRepository
 ) {
+    //    private val _combinedSuggestions = MediatorLiveData<Set<WrapLocation>>()
+//    private val _sorting = MutableLiveData(FavLocationType.FROM)
+    private val _sorting = MutableStateFlow(FavLocationType.FROM)
 
-    private val _combinedSuggestions = MediatorLiveData<Set<WrapLocation>>()
-    private val _sorting = MutableLiveData(FavLocationType.FROM)
-    private val _favoriteLocations = MediatorLiveData<Set<WrapLocation>>()
-    private val _searchQuery = MutableLiveData("")
 
-    val suggestions: LiveData<Set<WrapLocation>> = _combinedSuggestions
-    val isLoading: LiveData<Boolean> = suggestLocationsRepository.isLoading
+    private val _searchQuery = MutableStateFlow("")
 
-    init {
-        _favoriteLocations.addSource(locationRepository.homeLocation, ::updateFavorites)
-        _favoriteLocations.addSource(locationRepository.workLocation, ::updateFavorites)
-        _favoriteLocations.addSource(locationRepository.favoriteLocations, ::updateFavorites)
-        _favoriteLocations.addSource(_searchQuery, ::updateFavorites)
+    private val _favoriteLocations: Flow<Set<WrapLocation>> = combine(
+        locationRepository.homeLocation,
+        locationRepository.worLocation,
+        locationRepository.favoriteLocations,
+        _searchQuery
+    ) { home, work, favorites, query ->
+        setOfNotNull(
+            setOfNotNull(home, work),
 
-        _combinedSuggestions.addSource(_favoriteLocations, ::updateCombinedSuggestions)
-        _combinedSuggestions.addSource(suggestLocationsRepository.suggestedLocations, ::updateCombinedSuggestions)
-    }
-
-    private fun updateFavorites(ignored: Any?) {
-        _favoriteLocations.postValue(
-            setOfNotNull(
-                setOfNotNull(locationRepository.homeLocation.value,
-                    locationRepository.workLocation.value),
-
-                locationRepository.favoriteLocations.value
-                    /*?.filter {
-                    it != locationRepository.homeLocation.value &&
-                            it != locationRepository.workLocation.value
-                }*/?.sortedWith(
+            favorites
+                /*?.filter {
+                it != locationRepository.homeLocation.value &&
+                        it != locationRepository.worLocation.value
+            }*/?.sortedWith(
                     when (_sorting.value) {
                         FavLocationType.TO -> ToComparator
                         FavLocationType.VIA -> ViaComparator
                         else -> FromComparator
                     }
                 )
-            ).flatten().filter {
-                _searchQuery.value?.let { sq ->
-                    it.fullName.lowercase(Locale.getDefault()).contains(sq)
-                } ?: true
-            }.toSet()
-        )
+        ).flatten().filter {
+            it.fullName.lowercase(Locale.getDefault()).contains(query)
+        }.toSet()
     }
 
-    private fun updateCombinedSuggestions(ignored: Any?) {
-        _combinedSuggestions.postValue(
-            setOfNotNull(
-                _favoriteLocations.value,
-                suggestLocationsRepository.suggestedLocations.value
-            ).flatten().toSet()
-        )
+    val suggestions = combine(
+        _favoriteLocations,
+        suggestLocationsRepository.suggestedLocations
+    ) { favorites, suggestions ->
+        setOfNotNull(favorites, suggestions).flatten().toSet()
     }
 
-    fun setSorting(sorting: FavLocationType) = _sorting.postValue(sorting)
+    val isLoading: Flow<Boolean> = suggestLocationsRepository.isLoading
+
+    fun setSorting(sorting: FavLocationType) {
+        _sorting.value = sorting
+    }
+
     fun updateSuggestions(query: String) {
-        _searchQuery.postValue(query.lowercase(Locale.getDefault()))
+        _searchQuery.value = query.lowercase(Locale.getDefault())
         suggestLocationsRepository.suggestLocations(query)
     }
+
     fun cancelSuggestions() = suggestLocationsRepository.cancelSuggestLocations()
     fun reset() = suggestLocationsRepository.reset()
 

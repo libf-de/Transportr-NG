@@ -42,12 +42,12 @@ abstract class BaseViewHolder(v: View) : RecyclerView.ViewHolder(v) {
     protected val toDelay: TextView = v.findViewById(R.id.toDelay)
 
     fun setArrivalTimes(timeView: TextView?, delayView: TextView, stop: Stop) {
-        if (stop.arrivalTime == null) return
+        //if (stop.arrival == null) return
 
-        val time = Date(stop.arrivalTime.time)
+        val time = Date()
 
-        if (stop.isArrivalTimePredicted && stop.arrivalDelay != null) {
-            val delay = stop.arrivalDelay
+        if (stop.isArrivalTimePredicted() && stop.arrivalDelay != null) {
+            val delay = stop.arrivalDelay!!
             time.time -= delay
             formatDelay(delayView.context, delay).let {
                 delayView.apply {
@@ -63,12 +63,12 @@ abstract class BaseViewHolder(v: View) : RecyclerView.ViewHolder(v) {
     }
 
     fun setDepartureTimes(timeView: TextView?, delayView: TextView, stop: Stop) {
-        if (stop.departureTime == null) return
+//        if (stop.departureTime == null) return
 
-        val time = Date(stop.departureTime.time)
+        val time = Date()
 
-        if (stop.isDepartureTimePredicted && stop.departureDelay != null) {
-            val delay = stop.departureDelay
+        if (stop.isDepartureTimePredicted() && stop.departureDelay != null) {
+            val delay = stop.departureDelay!!
             time.time -= delay
             formatDelay(delayView.context, delay).let {
                 delayView.apply {

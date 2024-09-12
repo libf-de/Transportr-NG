@@ -40,9 +40,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -53,12 +51,10 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.map
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import de.grobox.transportr.R
 import de.grobox.transportr.Routes
-import de.grobox.transportr.data.dto.KProduct
-import de.grobox.transportr.data.dto.KTrip
 import de.grobox.transportr.favorites.trips.FavoriteTripType
 import de.grobox.transportr.locations.WrapLocation
 import de.grobox.transportr.ui.directions.composables.DirectionsActions
@@ -69,6 +65,9 @@ import de.grobox.transportr.ui.directions.composables.SearchResultComponent
 import de.grobox.transportr.ui.favorites.SavedSearchesActions
 import de.grobox.transportr.ui.favorites.SavedSearchesComponent
 import de.grobox.transportr.ui.productselector.ProductSelectorDialog
+import de.schildbach.pte.dto.Product
+import de.schildbach.pte.dto.Trip
+import kotlinx.coroutines.flow.map
 
 @Composable
 fun Int.pxToDp() = with(LocalDensity.current) { this@pxToDp.toDp() }
@@ -85,7 +84,7 @@ fun DirectionsScreen(
     search: Boolean,
     onSelectDepartureClicked: () -> Unit = {},
     onSelectDepartureLongClicked: () -> Unit = {},
-    tripClicked: (KTrip) -> Unit = {},
+    tripClicked: (Trip) -> Unit = {},
     changeHome: () -> Unit = {},
     changeWork: () -> Unit = {}
 ) {
@@ -102,7 +101,7 @@ fun DirectionsScreen(
     }
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
-    val isFavorite by viewModel.isFavTrip.observeAsState(false)
+    val isFavorite by viewModel.isFavTrip.collectAsStateWithLifecycle(false)
 
     var viaVisible by remember { mutableStateOf(false) }
     val expandedTopBarHeight by animateDpAsState(
@@ -112,24 +111,29 @@ fun DirectionsScreen(
         ), label = "expandedTopBarHeight"
     )
 
-    val gpsLoading by viewModel.gpsLoading.collectAsState(false)
-    val fromLocation by viewModel.fromLocation.observeAsState()
-    val viaLocation by viewModel.viaLocation.observeAsState()
-    val toLocation by viewModel.toLocation.observeAsState()
+    val gpsLoading by viewModel.gpsLoading.collectAsStateWithLifecycle(false)
+    val fromLocation by viewModel.fromLocation.collectAsStateWithLifecycle(null)
+    val viaLocation by viewModel.viaLocation.collectAsStateWithLifecycle(null)
+    val toLocation by viewModel.toLocation.collectAsStateWithLifecycle(null)
 
-    val suggestions by viewModel.locationSuggestions.observeAsState()
-    val suggestionsLoading by viewModel.suggestionsLoading.observeAsState(false)
+    val suggestions by viewModel.locationSuggestions.collectAsStateWithLifecycle(null)
+    val suggestionsLoading by viewModel.suggestionsLoading.collectAsStateWithLifecycle(false)
 
-    val departureCalendar by viewModel.lastQueryCalendar.observeAsState()
-    val isDeparture by viewModel.isDeparture.observeAsState(true)
+    val departureCalendar by viewModel.lastQueryCalendar.collectAsStateWithLifecycle()
+    val isDeparture by viewModel.isDeparture.collectAsStateWithLifecycle(true)
 
+    val products by viewModel.products.collectAsStateWithLifecycle()
     var showProductSelector by remember { mutableStateOf(false) }
-    val isProductsChanged by viewModel.products.map { KProduct.ALL != it }.observeAsState(false)
+    val isProductsChanged by viewModel.products.map { Product.ALL != it }.collectAsStateWithLifecycle(false)
 
-    val showTrips by viewModel.displayTrips.observeAsState(false)
-    val trips by viewModel.trips.observeAsState()
-    val favoriteTrips by viewModel.favoriteTrips.observeAsState(emptyList())
-    val specialTrips by viewModel.specialLocations.observeAsState(emptyList())
+    val showTrips by viewModel.displayTrips.collectAsStateWithLifecycle(false)
+    val trips by viewModel.trips.collectAsStateWithLifecycle(null)
+    val favoriteTrips by viewModel.favoriteTrips.collectAsStateWithLifecycle(emptyList())
+    val specialTrips by viewModel.specialLocations.collectAsStateWithLifecycle(emptyList())
+
+    val queryError by viewModel.queryError.collectAsStateWithLifecycle(null)
+    val queryPTEError by viewModel.queryPTEError.collectAsStateWithLifecycle(null)
+    val queryMoreError by viewModel.queryMoreError.collectAsStateWithLifecycle(null)
 
     ProductSelectorDialog(
         show = showProductSelector,
@@ -140,7 +144,7 @@ fun DirectionsScreen(
         onDismissRequest = {
             showProductSelector = false
         },
-        selectedProducts = viewModel.products.value?.toList()
+        selectedProducts = products.toList()
     )
 
     Scaffold(
@@ -215,6 +219,17 @@ fun DirectionsScreen(
             //    val queryError by viewModel.queryError.observeAsState()
             //    val queryPTEError by viewModel.queryPTEError.observeAsState()
             //    val queryMoreError by viewModel.queryMoreError.observeAsState()
+
+            if(queryError != null || queryPTEError != null) {
+                Column {
+                    if(queryError != null) {
+                        Text(queryError ?: "error")
+                    }
+                    if(queryPTEError != null) {
+                        Text(queryPTEError?.let { "${it.first} ${it.second}"} ?: "error")
+                    }
+                }
+            }
 
             SearchResultComponent(
                 modifier = Modifier.padding(pv),

@@ -46,7 +46,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
 import de.grobox.transportr.R
-import de.grobox.transportr.data.dto.KLine
+import de.schildbach.pte.dto.Line
 import de.grobox.transportr.locations.WrapLocation
 import de.grobox.transportr.ui.transport.composables.ProductComposable
 import de.grobox.transportr.utils.TransportrUtils.getCoordName
@@ -55,7 +55,7 @@ import de.grobox.transportr.utils.TransportrUtils.getCoordName
 @Composable
 fun LocationComponent(
     location: WrapLocation?,
-    lines: List<KLine>?,
+    lines: List<Line>?,
     modifier: Modifier = Modifier,
     fromHereClicked: () -> Unit = {},
     copyClicked: () -> Unit = {},

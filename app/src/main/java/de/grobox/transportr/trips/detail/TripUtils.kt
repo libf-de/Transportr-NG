@@ -28,14 +28,14 @@ import android.provider.CalendarContract.Events
 import android.widget.Toast
 import android.widget.Toast.LENGTH_LONG
 import de.grobox.transportr.R
-import de.grobox.transportr.data.dto.KFare
-import de.grobox.transportr.data.dto.KLeg
-import de.grobox.transportr.data.dto.KProduct
-import de.grobox.transportr.data.dto.KTrip
 import de.grobox.transportr.utils.DateUtils.formatDate
 import de.grobox.transportr.utils.DateUtils.formatTime
 import de.grobox.transportr.utils.DateUtils.isToday
 import de.grobox.transportr.utils.TransportrUtils.getLocationName
+import de.schildbach.pte.dto.Fare
+import de.schildbach.pte.dto.Leg
+import de.schildbach.pte.dto.Product
+import de.schildbach.pte.dto.Trip
 import java.text.NumberFormat
 import java.util.Calendar
 import java.util.Currency
@@ -44,7 +44,7 @@ import java.util.Date
 internal object TripUtils {
 
     @JvmStatic
-    fun share(context: Context, trip: KTrip?) {
+    fun share(context: Context, trip: Trip?) {
         if (trip == null) throw IllegalStateException()
         val sendIntent = Intent()
                 .setAction(Intent.ACTION_SEND)
@@ -56,7 +56,7 @@ internal object TripUtils {
     }
 
     @JvmStatic
-    fun intoCalendar(context: Context, trip: KTrip?) {
+    fun intoCalendar(context: Context, trip: Trip?) {
         if (trip == null) throw IllegalStateException()
         val intent = Intent(Intent.ACTION_INSERT).apply {
             type = "vnd.android.cursor.item/event"
@@ -73,7 +73,7 @@ internal object TripUtils {
         }
     }
 
-    private fun tripToSubject(context: Context, trip: KTrip): String {
+    private fun tripToSubject(context: Context, trip: Trip): String {
         var str = "[${context.resources.getString(R.string.app_name)}] "
 
         str += "${formatTime(context, trip.firstDepartureTime?.let(::Date))} "
@@ -84,7 +84,7 @@ internal object TripUtils {
         return str
     }
 
-    private fun tripToString(context: Context, trip: KTrip): String {
+    private fun tripToString(context: Context, trip: Trip): String {
         val sb = StringBuilder()
 
         // show date first, if trip doesn't start today
@@ -108,7 +108,7 @@ internal object TripUtils {
     }
 
     @JvmStatic
-    fun legToString(context: Context, leg: KLeg): String {
+    fun legToString(context: Context, leg: Leg): String {
         var str = "${formatTime(context, leg.departureTime?.let(::Date))} ${getLocationName(leg.departure)}"
 
         if (leg.isPublicLeg) {
@@ -137,26 +137,26 @@ internal object TripUtils {
         return str
     }
 
-    private fun getEmojiForProduct(p: KProduct?): String = when (p) {
-        KProduct.HIGH_SPEED_TRAIN -> "🚄"
-        KProduct.REGIONAL_TRAIN -> "🚆"
-        KProduct.SUBURBAN_TRAIN -> "🚈"
-        KProduct.SUBWAY -> "🚇"
-        KProduct.TRAM -> "🚊"
-        KProduct.BUS -> "🚌"
-        KProduct.FERRY -> "⛴️"
-        KProduct.CABLECAR -> "🚡"
-        KProduct.ON_DEMAND -> "🚖"
+    private fun getEmojiForProduct(p: Product?): String = when (p) {
+        Product.HIGH_SPEED_TRAIN -> "🚄"
+        Product.REGIONAL_TRAIN -> "🚆"
+        Product.SUBURBAN_TRAIN -> "🚈"
+        Product.SUBWAY -> "🚇"
+        Product.TRAM -> "🚊"
+        Product.BUS -> "🚌"
+        Product.FERRY -> "⛴️"
+        Product.CABLECAR -> "🚡"
+        Product.ON_DEMAND -> "🚖"
         else -> ""
     }
 
 
-    fun KTrip.hasFare(): Boolean {
+    fun Trip.hasFare(): Boolean {
         return fares?.isNotEmpty() ?: false
     }
 
-    fun KTrip.getStandardFare(): String? {
-        fares?.find { fare -> fare.type == KFare.Type.ADULT }?.let {
+    fun Trip.getStandardFare(): String? {
+        fares?.find { fare -> fare.type == Fare.Type.ADULT }?.let {
             val format = NumberFormat.getCurrencyInstance()
             format.currency = Currency.getInstance(it.currency)
             return format.format(it.fare)

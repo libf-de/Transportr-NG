@@ -22,36 +22,36 @@ package de.grobox.transportr.data.locations
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.Index
-import de.grobox.transportr.data.dto.KLocation
-import de.grobox.transportr.data.dto.KPoint
-import de.grobox.transportr.data.dto.KProduct
+import de.schildbach.pte.dto.Location
+import de.schildbach.pte.dto.Point
+import de.schildbach.pte.dto.Product
 import de.schildbach.pte.NetworkId
 
 @Entity(tableName = "genericLocations", indices = [Index("networkId"), Index("id"), Index(value = ["networkId", "id"], unique = true)])
 class GenericLocation(
     uid: Long,
     networkId: NetworkId?,
-    type: KLocation.Type?,
+    type: Location.Type?,
     id: String?,
     lat: Int,
     lon: Int,
     place: String?,
     name: String?,
-    products: Set<KProduct>?
+    products: Set<Product>?
 ) : StoredLocation(uid, networkId!!, type, id, lat, lon, place, name, products) {
     @Ignore
-    fun toKLocation(): KLocation {
-        return KLocation(
+    fun toLocation(): Location {
+        return Location(
             locId = id,
             type = type,
-            coord = KPoint.from1E6(lat, lon),
+            coord = Point.from1E6(lat, lon),
             place = place,
             name = name,
             products = products
         )
     }
 
-    constructor(networkId: NetworkId, l: KLocation) : this(
+    constructor(networkId: NetworkId, l: Location) : this(
         0,
         networkId,
         l.type,

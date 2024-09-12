@@ -25,7 +25,7 @@ import de.grobox.transportr.data.locations.FavoriteLocation
 import de.grobox.transportr.data.locations.GenericLocation
 import de.grobox.transportr.data.locations.HomeLocation
 import de.grobox.transportr.data.locations.LocationDao
-import de.grobox.transportr.data.locations.WorkLocation
+import de.grobox.transportr.data.locations.WorLocation
 import de.grobox.transportr.data.searches.SearchesDao
 import de.grobox.transportr.data.searches.StoredSearch
 import de.grobox.transportr.data.trips.LineEntity
@@ -40,7 +40,7 @@ import de.grobox.transportr.data.trips.TripsDao
     entities = [
         FavoriteLocation::class,
         HomeLocation::class,
-        WorkLocation::class,
+        WorLocation::class,
         StoredSearch::class,
 
         GenericLocation::class,

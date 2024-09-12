@@ -18,14 +18,16 @@
  */
 package de.grobox.transportr.locations
 
-import androidx.lifecycle.LiveData
+import androidx.lifecycle.viewModelScope
 import de.grobox.transportr.TransportrApplication
 import de.grobox.transportr.data.locations.FavoriteLocation
 import de.grobox.transportr.data.locations.HomeLocation
 import de.grobox.transportr.data.locations.LocationRepository
-import de.grobox.transportr.data.locations.WorkLocation
+import de.grobox.transportr.data.locations.WorLocation
 import de.grobox.transportr.networks.TransportNetworkManager
 import de.grobox.transportr.networks.TransportNetworkViewModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 
 abstract class LocationsViewModel protected constructor(
     application: TransportrApplication?,
@@ -34,15 +36,19 @@ abstract class LocationsViewModel protected constructor(
 ) : TransportNetworkViewModel(
     application!!, transportNetworkManager!!
 ) {
-    val home: LiveData<HomeLocation> = locationRepository.homeLocation
-    val work: LiveData<WorkLocation> = locationRepository.workLocation
-    val locations: LiveData<List<FavoriteLocation>> = locationRepository.favoriteLocations
+    val home: Flow<HomeLocation> = locationRepository.homeLocation
+    val work: Flow<WorLocation> = locationRepository.worLocation
+    val locations: Flow<List<FavoriteLocation>> = locationRepository.favoriteLocations
 
     fun setHome(wrapLocation: WrapLocation?) {
-        locationRepository.setHomeLocation(wrapLocation!!)
+        viewModelScope.launch {
+            locationRepository.setHomeLocation(wrapLocation!!)
+        }
     }
 
     fun setWork(wrapLocation: WrapLocation?) {
-        locationRepository.setWorkLocation(wrapLocation!!)
+        viewModelScope.launch {
+            locationRepository.setWorLocation(wrapLocation!!)
+        }
     }
 }

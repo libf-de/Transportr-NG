@@ -24,7 +24,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import de.grobox.transportr.data.dto.KPosition
+import de.schildbach.pte.dto.Position
 import de.grobox.transportr.data.locations.GenericLocation
 
 @Entity(
@@ -39,14 +39,14 @@ data class StopEntity(
     @ColumnInfo(name = "legId") val legId: Long? = null,
     val plannedArrivalTime: Long? = null,
     val predictedArrivalTime: Long? = null,
-    val plannedArrivalPosition: KPosition? = null,
-    val predictedArrivalPosition: KPosition? = null,
+    val plannedArrivalPosition: Position? = null,
+    val predictedArrivalPosition: Position? = null,
     val arrivalCancelled: Boolean = false,
 
     val plannedDepartureTime: Long? = null,
     val predictedDepartureTime: Long? = null,
-    val plannedDeparturePosition: KPosition? = null,
-    val predictedDeparturePosition: KPosition? = null,
+    val plannedDeparturePosition: Position? = null,
+    val predictedDeparturePosition: Position? = null,
     val departureCancelled: Boolean = false
 )
 

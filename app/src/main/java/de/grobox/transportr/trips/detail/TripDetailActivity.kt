@@ -82,22 +82,22 @@ class TripDetailActivity : TransportrActivity() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
                     if (bottomSheetBehavior.isMiddle) {
-                        viewModel.sheetState.setValue(TripDetailViewModel.SheetState.MIDDLE)
+//                        viewModel.sheetState.setValue(TripDetailViewModel.SheetState.MIDDLE)
                     } else if (bottomSheetBehavior.isBottom) {
-                        viewModel.sheetState.setValue(TripDetailViewModel.SheetState.BOTTOM)
+//                        viewModel.sheetState.setValue(TripDetailViewModel.SheetState.BOTTOM)
                     }
                 } else if (newState == BottomSheetBehavior.STATE_EXPANDED) {
-                    viewModel.sheetState.setValue(TripDetailViewModel.SheetState.EXPANDED)
+//                    viewModel.sheetState.setValue(TripDetailViewModel.SheetState.EXPANDED)
                 }
             }
 
             override fun onSlide(bottomSheet: View, slideOffset: Float) { /* do nothing */ }
         })
 
-        viewModel.sheetState.observe(this) { sheetState: TripDetailViewModel.SheetState? -> this.onSheetStateChanged(sheetState) }
+//        viewModel.sheetState.observe(this) { sheetState: TripDetailViewModel.SheetState? -> this.onSheetStateChanged(sheetState) }
 
         if (savedInstanceState == null) {
-            viewModel.sheetState.setValue(TripDetailViewModel.SheetState.MIDDLE)
+//            viewModel.sheetState.setValue(TripDetailViewModel.SheetState.MIDDLE)
             supportFragmentManager.beginTransaction()
                 .add(R.id.topContainer, TripMapFragment(), TripMapFragment.TAG)
                 .add(R.id.bottomContainer, TripDetailFragment(), "WAT")

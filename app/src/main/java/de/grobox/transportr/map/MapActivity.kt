@@ -51,7 +51,6 @@ import de.grobox.transportr.locations.WrapLocation.WrapType
 import de.grobox.transportr.networks.PickTransportNetworkActivity
 import de.grobox.transportr.networks.TransportNetwork
 import de.grobox.transportr.settings.SettingsActivity
-import de.grobox.transportr.ui.TransportrChangeLog
 import de.grobox.transportr.ui.map.MapViewModel
 import de.grobox.transportr.ui.trips.search.DirectionsActivity
 import de.grobox.transportr.utils.Constants
@@ -104,7 +103,7 @@ class MapActivity : TransportrActivity(), LocationViewListener, NavigationView.O
                 if (newState == BottomSheetBehavior.STATE_HIDDEN) {
                     binding.search.clearLocation()
                     binding.search.reset()
-                    viewModel.setPeekHeight(0)
+//                    viewModel.setPeekHeight(0)
                 }
             }
 
@@ -114,19 +113,19 @@ class MapActivity : TransportrActivity(), LocationViewListener, NavigationView.O
         })
 
         // get view model and observe data
-        viewModel.transportNetwork.observe(this, this::onTransportNetworkChanged)
-        viewModel.home.observe(this, binding.search::setHomeLocation)
-        viewModel.work.observe(this, binding.search::setWorkLocation)
-        viewModel.locations.observe(this, binding.search::setFavoriteLocations)
+//        viewModel.transportNetwork.observe(this, this::onTransportNetworkChanged)
+//        viewModel.home.observe(this, binding.search::setHomeLocation)
+//        viewModel.work.observe(this, binding.search::setWorLocation)
+//        viewModel.locations.observe(this, binding.search::setFavoriteLocations)
         viewModel.mapClicked.observe(this) {
             onMapClicked()
         }
         viewModel.markerClicked.observe(this) {
             onMarkerClicked()
         }
-        viewModel.getSelectedLocation().observe(this, this::onLocationSelected)
-        viewModel.getSelectedLocationClicked().observe(this, this::onSelectedLocationClicked)
-        viewModel.getPeekHeight().observe(this, bottomSheetBehavior::setPeekHeight)
+//        viewModel.selectedLocation.collect(this, this::onLocationSelected)
+//        viewModel.getSelectedLocationClicked().observe(this, this::onSelectedLocationClicked)
+//        viewModel.getPeekHeight().observe(this, bottomSheetBehavior::setPeekHeight)
 
         binding.directionsFab.setOnClickListener {
             val from = WrapLocation(WrapType.GPS)
@@ -151,7 +150,7 @@ class MapActivity : TransportrActivity(), LocationViewListener, NavigationView.O
             .replace(R.id.bottomSheet, f, SavedSearchesFragment::class.java.simpleName)
             .commitNow() // otherwise takes some time and empty bottomSheet will not be shown
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        viewModel.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO)
+//        viewModel.setPeekHeight(BottomSheetBehavior.PEEK_HEIGHT_AUTO)
     }
 
     private fun onTransportNetworkChanged(network: TransportNetwork?) {
@@ -299,10 +298,10 @@ class MapActivity : TransportrActivity(), LocationViewListener, NavigationView.O
     }
 
     private fun checkAndShowChangelog() {
-        val cl = TransportrChangeLog(this, settingsManager)
-        if (cl.isFirstRun && !cl.isFirstRunEver) {
-            cl.getMaterialDialog(cl.isFirstRunEver).show()
-        }
+//        val cl = TransportrChangeLog(this, settingsManager)
+//        if (cl.isFirstRun && !cl.isFirstRunEver) {
+//            cl.getMaterialDialog(cl.isFirstRunEver).show()
+//        }
     }
 
     private fun enableStrictMode() {
@@ -323,9 +322,9 @@ class MapActivity : TransportrActivity(), LocationViewListener, NavigationView.O
                 startActivity(Intent(this, SettingsActivity::class.java))
             }
 
-            R.id.changelog -> {
-                TransportrChangeLog(this, settingsManager).getMaterialDialog(true).show()
-            }
+//            R.id.changelog -> {
+//                TransportrChangeLog(this, settingsManager).getMaterialDialog(true).show()
+//            }
 
             R.id.about -> {
                 startActivity(Intent(this, AboutActivity::class.java))

@@ -20,24 +20,26 @@
 package de.grobox.transportr.ui.trips
 
 import android.app.Application
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import de.grobox.transportr.R
 import de.grobox.transportr.TransportrApplication
-import de.grobox.transportr.data.dto.KTrip
+import de.schildbach.pte.dto.Trip
 import de.grobox.transportr.data.trips.TripsRepository
 import de.grobox.transportr.locations.WrapLocation
-import de.grobox.transportr.ui.map.GpsMapViewModel
-import de.grobox.transportr.ui.map.GpsMapViewModelImpl
 import de.grobox.transportr.map.PositionController
 import de.grobox.transportr.networks.TransportNetworkManager
 import de.grobox.transportr.networks.TransportNetworkViewModel
 import de.grobox.transportr.settings.SettingsManager
-import de.grobox.transportr.ui.trips.detail.TripReloader
-import de.grobox.transportr.utils.SingleLiveEvent
+import de.grobox.transportr.ui.map.GpsMapViewModel
+import de.grobox.transportr.ui.map.GpsMapViewModelImpl
+import de.grobox.transportr.ui.trips.detail.reload
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.geometry.LatLngBounds
-import java.util.Date
 
 class TripDetailViewModel internal constructor(
     application: TransportrApplication,
@@ -51,55 +53,66 @@ class TripDetailViewModel internal constructor(
         BOTTOM, MIDDLE, EXPANDED
     }
 
-    private val trip = MutableLiveData<KTrip>()
-    private val zoomLeg = SingleLiveEvent<LatLngBounds>()
-    private val zoomLocation = SingleLiveEvent<LatLng>()
+    private val _trip = MutableStateFlow<Trip?>(null)
+    val trip = _trip.asStateFlow()
 
-    val tripReloadError = SingleLiveEvent<String>()
-    val sheetState = MutableLiveData<SheetState>()
-    val isFreshStart = MutableLiveData<Boolean>()
+    private val _zoomLeg = MutableSharedFlow<LatLngBounds>(extraBufferCapacity = 1)
+    val zoomLeg = _zoomLeg.asSharedFlow()
+    private val _zoomLocation = MutableSharedFlow<LatLng>(extraBufferCapacity = 1)
+    val zoomLocation = _zoomLocation.asSharedFlow()
+
+
+    private val _tripReloadError = MutableSharedFlow<String?>(extraBufferCapacity = 1)
+    val tripReloadError = _tripReloadError.asSharedFlow()
+//    val tripReloadError = SingleLiveEvent<String>()
+    val sheetState = MutableStateFlow<SheetState>(SheetState.MIDDLE)
+    val isFreshStart = MutableStateFlow<Boolean>(true)
     var from: WrapLocation? = null
     var via: WrapLocation? = null
     var to: WrapLocation? = null
 
-    init {
-        isFreshStart.value = true
-    }
+//    override fun onLocationClick(location: Location) {
+//        if (!location.hasLocation()) return
+//        val latLng = LatLng(location.latAsDouble, location.lonAsDouble)
+//        zoomLocation.value = latLng
+//        sheetState.value = MIDDLE
+//    }
 
     fun showWhenLocked(): Boolean {
         return settingsManager.showWhenLocked()
     }
 
     fun getTripById(id: String) {
-        trip.value = tripsRepository.findTripById(id)
+        _trip.value = tripsRepository.findTripById(id)
     }
 
-    fun getTrip(): LiveData<KTrip> {
-        return trip
+    fun setTrip(trip: Trip) {
+        this._trip.value = trip
     }
 
-    fun setTrip(trip: KTrip) {
-        this.trip.value = trip
-    }
 
-    fun getZoomLocation(): LiveData<LatLng> {
-        return zoomLocation
-    }
-
-    fun getZoomLeg(): LiveData<LatLngBounds> {
-        return zoomLeg
-    }
 
     fun reloadTrip() {
-        val network = transportNetwork.value ?: throw IllegalStateException()
+        viewModelScope.launch {
+            val network = transportNetwork.value ?: throw IllegalStateException()
 
-        val oldTrip = trip.value ?: throw IllegalStateException()
+            val oldTrip = _trip.value ?: throw IllegalStateException()
 
-        if (from == null || to == null) throw IllegalStateException()
+            if (from == null || to == null) throw IllegalStateException()
 
-        val errorString = getApplication<Application>().getString(R.string.error_trip_refresh_failed)
-        val query = TripQuery(from!!, via, to!!, oldTrip.firstDepartureTime!!.let(::Date), true, oldTrip.products)
-        TripReloader(network.networkProvider, settingsManager, query, trip, errorString, tripReloadError)
-                .reload()
+            val errorString = getApplication<Application>().getString(R.string.error_trip_refresh_failed)
+            val query = TripQuery(from!!, via, to!!, oldTrip.firstDepartureTime!!, true, oldTrip.products)
+
+            val reloadError = _trip.reload(
+                networkProvider = network.networkProvider,
+                settingsManager = settingsManager,
+                query = query,
+                errorString = errorString
+            )
+
+            _tripReloadError.emit(reloadError)
+        }
     }
 }
+
+

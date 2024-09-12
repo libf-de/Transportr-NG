@@ -118,7 +118,7 @@ class PickTransportNetworkActivity : TransportrActivity(), ISelectionListener<II
             return
         }
 
-        val (continentPos, countryPos, networkPos) = getTransportNetworkPositions(this, network)
+        val (continentPos, countryPos, networkPos) = getTransportNetworPositions(this, network)
 
         if (continentPos != -1) {
             expandableExtension.expand(continentPos)

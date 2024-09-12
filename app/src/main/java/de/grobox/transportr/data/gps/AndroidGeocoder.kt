@@ -21,8 +21,8 @@ package de.grobox.transportr.data.gps
 
 import android.content.Context
 import android.location.Geocoder
-import de.grobox.transportr.data.dto.KLocation
-import de.grobox.transportr.data.dto.KPoint
+import de.schildbach.pte.dto.Location
+import de.schildbach.pte.dto.Point
 import de.grobox.transportr.locations.WrapLocation
 import java.io.IOException
 import java.util.Locale
@@ -42,10 +42,10 @@ class AndroidGeocoder(private val context: Context) : GeocodeProvider {
             if (address.featureName != null) name += " " + address.featureName
             val place = address.locality
 
-            val point = KPoint.fromDouble(lat, lon)
+            val point = Point.fromDouble(lat, lon)
             return Result.success(
                 WrapLocation(
-                    KLocation(null, KLocation.Type.ADDRESS, point, place, name)
+                    Location(null, Location.Type.ADDRESS, point, place, name)
                 )
             )
         } catch (e: IOException) {

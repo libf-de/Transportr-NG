@@ -24,33 +24,21 @@ import android.content.Intent
 import android.view.MenuItem
 import android.view.View
 import de.grobox.transportr.R
-import de.grobox.transportr.data.dto.toKLeg
-import de.grobox.transportr.data.dto.toKLocation
 import de.grobox.transportr.locations.WrapLocation
 import de.grobox.transportr.ui.BasePopupMenu
-import de.grobox.transportr.ui.trips.detail.TripUtils.legToString
-import de.grobox.transportr.utils.DateUtils.formatTime
 import de.grobox.transportr.utils.IntentUtils.findDepartures
 import de.grobox.transportr.utils.IntentUtils.findNearbyStations
 import de.grobox.transportr.utils.IntentUtils.presetDirections
 import de.grobox.transportr.utils.IntentUtils.startGeoIntent
 import de.grobox.transportr.utils.TransportrUtils.copyToClipboard
-import de.grobox.transportr.utils.TransportrUtils.getLocationName
 import de.schildbach.pte.dto.Location
-import de.schildbach.pte.dto.Stop
-import de.schildbach.pte.dto.Trip.Leg
 
 @Deprecated("Use Composables")
 class LegPopupMenu private constructor(context: Context, anchor: View, location: Location, private val text: String) :
     BasePopupMenu(context, anchor) {
 
-    private val loc1: WrapLocation = WrapLocation(location.toKLocation())
+    private val loc1: WrapLocation = WrapLocation(location)
 
-    internal constructor(context: Context, anchor: View, leg: Leg, isLast: Boolean) :
-            this(context, anchor, if (isLast) leg.arrival else leg.departure, legToString(context, leg.toKLeg()))
-
-    internal constructor(context: Context, anchor: View, stop: Stop) :
-            this(context, anchor, stop.location, "${formatTime(context, stop.arrivalTime)} ${getLocationName(stop.location.toKLocation())}")
 
     init {
         this.menuInflater.inflate(R.menu.leg_location_actions, menu)

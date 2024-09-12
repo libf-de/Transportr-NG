@@ -21,72 +21,133 @@ package de.grobox.transportr.data.locations
 
 
 import androidx.annotation.WorkerThread
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.switchMap
 import de.grobox.transportr.AbstractManager
-import de.grobox.transportr.data.dto.KLocation
+import de.schildbach.pte.dto.Location
 import de.grobox.transportr.data.locations.FavoriteLocation.FavLocationType
 import de.grobox.transportr.locations.WrapLocation
 import de.grobox.transportr.locations.WrapLocation.WrapType.NORMAL
 import de.grobox.transportr.networks.TransportNetworkManager
 import de.schildbach.pte.NetworkId
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.mapLatest
 
 class LocationRepository
 constructor(private val locationDao: LocationDao, transportNetworkManager: TransportNetworkManager) : AbstractManager() {
 
-    private val networkId: LiveData<NetworkId?> = transportNetworkManager.networkId
-    val homeLocation: LiveData<HomeLocation> = networkId.switchMap(locationDao::getHomeLocation)
-    val workLocation: LiveData<WorkLocation> = networkId.switchMap(locationDao::getWorkLocation)
-    val favoriteLocations: LiveData<List<FavoriteLocation>> = networkId.switchMap(locationDao::getFavoriteLocations)
-    val allLocations: LiveData<List<GenericLocation>> = networkId.switchMap(locationDao::getAllLocations)
+    private val networkId: Flow<NetworkId?> = transportNetworkManager.networkId
 
-    fun setHomeLocation(location: WrapLocation) {
-        runOnBackgroundThread {
-            // add also as favorite location if it doesn't exist already
-            val favoriteLocation = getFavoriteLocation(networkId.value, location)
-            if (favoriteLocation == null) locationDao.addFavoriteLocation(FavoriteLocation(networkId.value, location))
+    val homeLocation: Flow<HomeLocation> = networkId.flatMapLatest { networkId ->
+        locationDao.getHomeLocationAsFlow(networkId)
+    }
+    val worLocation: Flow<WorLocation> = networkId.flatMapLatest { networkId ->
+        locationDao.getWorLocationAsFlow(networkId)
+    }
+    val favoriteLocations: Flow<List<FavoriteLocation>> = networkId.flatMapLatest { networkId ->
+        locationDao.getFavoriteLocationsAsFlow(networkId)
+    }
+    val allLocations: Flow<List<GenericLocation>> = networkId.flatMapLatest { networkId ->
+        locationDao.getAllLocationsAsFlow(networkId)
+    }
 
-            locationDao.addHomeLocation(HomeLocation(networkId.value!!, location))
+    suspend fun setHomeLocation(l: WrapLocation) {
+        networkId.collectLatest { networkId ->
+            val favLocation = locationDao.getFavoriteLocation(networkId!!, l.type, l.id, l.lat, l.lon, l.place, l.name)
+            if(favLocation == null) locationDao.addFavoriteLocation(FavoriteLocation(networkId, l))
+
+            locationDao.addHomeLocation(HomeLocation(networkId, l))
         }
     }
 
-    fun setWorkLocation(location: WrapLocation) {
-        runOnBackgroundThread {
-            // add also as favorite location if it doesn't exist already
-            val favoriteLocation = getFavoriteLocation(networkId.value, location)
-            if (favoriteLocation == null) locationDao.addFavoriteLocation(FavoriteLocation(networkId.value, location))
+//    fun setHomeLocation(location: WrapLocation) {
+//        runOnBackgroundThread {
+//            // add also as favorite location if it doesn't exist already
+//            val favoriteLocation = getFavoriteLocation(networkId, location)
+//            if (favoriteLocation == null) locationDao.addFavoriteLocation(FavoriteLocation(networkId.value, location))
+//
+//            locationDao.addHomeLocation(HomeLocation(networkId.value!!, location))
+//        }
+//    }
 
-            locationDao.addWorkLocation(WorkLocation(networkId.value!!, location))
+    suspend fun setWorLocation(l: WrapLocation) {
+        networkId.collectLatest { networkId ->
+            val favLocation = locationDao.getFavoriteLocation(networkId!!, l.type, l.id, l.lat, l.lon, l.place, l.name)
+            if(favLocation == null) locationDao.addFavoriteLocation(FavoriteLocation(networkId, l))
+
+            locationDao.addWorLocation(WorLocation(networkId, l))
         }
     }
 
-    @WorkerThread
-    fun addFavoriteLocation(wrapLocation: WrapLocation, type: FavLocationType): FavoriteLocation? {
-        if (wrapLocation.type == KLocation.Type.COORD || wrapLocation.wrapType != NORMAL) return null
+//    fun setWorLocation(location: WrapLocation) {
+//        runOnBackgroundThread {
+//            // add also as favorite location if it doesn't exist already
+//            val favoriteLocation = getFavoriteLocation(networkId.value, location)
+//            if (favoriteLocation == null) locationDao.addFavoriteLocation(FavoriteLocation(networkId.value, location))
+//
+//            locationDao.addWorLocation(WorLocation(networkId.value!!, location))
+//        }
+//    }
 
-        val favoriteLocation = if (wrapLocation is FavoriteLocation) {
-            wrapLocation
-        } else {
-            val location = findExistingLocation(wrapLocation)
-            location as? FavoriteLocation ?: FavoriteLocation(networkId.value, wrapLocation)
-        }
-        favoriteLocation.add(type)
+    suspend fun addFavoriteLocation(l: WrapLocation, type: FavLocationType): FavoriteLocation? {
+        if (l.type == Location.Type.COORD || l.wrapType != NORMAL) return null
 
-        return if (favoriteLocation.uid != 0L) {
-            locationDao.addFavoriteLocation(favoriteLocation)
-            favoriteLocation
-        } else {
-            val existingLocation = getFavoriteLocation(networkId.value, favoriteLocation)
-            if (existingLocation != null) {
-                existingLocation.add(type)
-                locationDao.addFavoriteLocation(existingLocation)
-                existingLocation
+        return networkId.mapLatest { networkId ->
+            val favoriteLocation = if (l is FavoriteLocation) {
+                l
             } else {
-                val uid = locationDao.addFavoriteLocation(favoriteLocation)
-                FavoriteLocation(uid, networkId.value, favoriteLocation)
+                val location = findExistingLocation(l)
+                location as? FavoriteLocation ?: FavoriteLocation(networkId, l)
             }
-        }
+            favoriteLocation.add(type)
+
+            return@mapLatest if (favoriteLocation.uid != 0L) {
+                locationDao.addFavoriteLocation(favoriteLocation)
+                favoriteLocation
+            } else {
+                val existingLocation = getFavoriteLocation(networkId, favoriteLocation)
+                if (existingLocation != null) {
+                    existingLocation.add(type)
+                    locationDao.addFavoriteLocation(existingLocation)
+                    existingLocation
+                } else {
+                    val uid = locationDao.addFavoriteLocation(favoriteLocation)
+                    FavoriteLocation(uid, networkId, favoriteLocation)
+                }
+            }
+        }.first()
+
+
     }
+
+//    @WorkerThread
+//    fun addFavoriteLocation(wrapLocation: WrapLocation, type: FavLocationType): FavoriteLocation? {
+//        if (wrapLocation.type == Location.Type.COORD || wrapLocation.wrapType != NORMAL) return null
+//
+//        val favoriteLocation = if (wrapLocation is FavoriteLocation) {
+//            wrapLocation
+//        } else {
+//            val location = findExistingLocation(wrapLocation)
+//            location as? FavoriteLocation ?: FavoriteLocation(networkId.value, wrapLocation)
+//        }
+//        favoriteLocation.add(type)
+//
+//        return if (favoriteLocation.uid != 0L) {
+//            locationDao.addFavoriteLocation(favoriteLocation)
+//            favoriteLocation
+//        } else {
+//            val existingLocation = getFavoriteLocation(networkId.value, favoriteLocation)
+//            if (existingLocation != null) {
+//                existingLocation.add(type)
+//                locationDao.addFavoriteLocation(existingLocation)
+//                existingLocation
+//            } else {
+//                val uid = locationDao.addFavoriteLocation(favoriteLocation)
+//                FavoriteLocation(uid, networkId.value, favoriteLocation)
+//            }
+//        }
+//    }
 
     @WorkerThread
     private fun getFavoriteLocation(networkId: NetworkId?, l: WrapLocation?): FavoriteLocation? {
@@ -100,11 +161,21 @@ constructor(private val locationDao: LocationDao, transportNetworkManager: Trans
      *
      * @return The given {@link WrapLocation} or if found, the existing one
      */
-    private fun findExistingLocation(location: WrapLocation): WrapLocation {
-        favoriteLocations.value?.filter {
-            it.type == KLocation.Type.ADDRESS && it.name != null && it.name == location.name && it.isSamePlace(location)
-        }?.forEach { return it }
-        return location
+    private suspend fun findExistingLocation(location: WrapLocation): WrapLocation {
+        return favoriteLocations.mapLatest { favoriteLocations ->
+            favoriteLocations.filter {
+                it.type == Location.Type.ADDRESS && it.name != null && it.name == location.name && it.isSamePlace(location)
+            }?.forEach { return@mapLatest it }
+
+            return@mapLatest location
+        }.first()
     }
+
+//    private fun findExistingLocation(location: WrapLocation): WrapLocation {
+//        favoriteLocations.value?.filter {
+//            it.type == Location.Type.ADDRESS && it.name != null && it.name == location.name && it.isSamePlace(location)
+//        }?.forEach { return it }
+//        return location
+//    }
 
 }

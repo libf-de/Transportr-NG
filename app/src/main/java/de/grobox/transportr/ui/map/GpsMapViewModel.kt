@@ -19,21 +19,29 @@
 
 package de.grobox.transportr.ui.map
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
 import de.grobox.transportr.map.PositionController
 import de.grobox.transportr.ui.map.GpsMapViewModel.GpsFabState
 import de.grobox.transportr.map.PositionController.PositionState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.lastOrNull
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.transformLatest
+import kotlinx.coroutines.launch
 
 interface GpsMapViewModel {
 
     val positionController: PositionController
 
     //todo: change to LiveData
-    val isCameraTracking: MutableLiveData<Boolean>
-    val isPositionStale: MutableLiveData<Boolean>
-    val gpsFabState: LiveData<GpsFabState>
+    val isCameraTracking: MutableStateFlow<Boolean>
+    val isPositionStale: MutableStateFlow<Boolean>
+    val gpsFabState: Flow<GpsFabState?>
 
     enum class GpsFabState {
         DISABLED,
@@ -43,31 +51,18 @@ interface GpsMapViewModel {
 }
 
 class GpsMapViewModelImpl(override val positionController: PositionController) : GpsMapViewModel {
-    override val isCameraTracking = MutableLiveData<Boolean>()
-    override val isPositionStale = MutableLiveData<Boolean>()
-    override val gpsFabState = MediatorLiveData<GpsFabState>().apply {
-        var state = PositionState.DISABLED
-        var isTracking = false
-        var isStale = false
-        fun update() {
-            value = when {
-                state == PositionState.DENIED || state == PositionState.DISABLED || isStale -> GpsFabState.DISABLED
-                state == PositionState.ENABLED && !isTracking -> GpsFabState.ENABLED
-                state == PositionState.ENABLED && isTracking -> GpsFabState.TRACKING
-                else -> value
-            }
-        }
-        addSource(positionController.positionState) {
-            state = it
-            update()
-        }
-        addSource(isCameraTracking) {
-            isTracking = it
-            update()
-        }
-        addSource(isPositionStale) {
-            isStale = it
-            update()
+    override val isCameraTracking = MutableStateFlow(false)
+    override val isPositionStale = MutableStateFlow(false)
+    override val gpsFabState: Flow<GpsFabState?> = combine(
+        positionController.positionState,
+        isCameraTracking,
+        isPositionStale
+    ) { positionState, isTracking, isStale ->
+        when {
+            positionState == PositionState.DENIED || positionState == PositionState.DISABLED || isStale -> GpsFabState.DISABLED
+            positionState == PositionState.ENABLED && !isTracking -> GpsFabState.ENABLED
+            positionState == PositionState.ENABLED && isTracking -> GpsFabState.TRACKING
+            else -> null
         }
     }
 }

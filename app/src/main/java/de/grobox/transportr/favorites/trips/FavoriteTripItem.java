@@ -28,7 +28,7 @@ import java.util.Date;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import de.grobox.transportr.data.locations.HomeLocation;
-import de.grobox.transportr.data.locations.WorkLocation;
+import de.grobox.transportr.data.locations.WorLocation;
 import de.grobox.transportr.data.searches.StoredSearch;
 import de.grobox.transportr.locations.WrapLocation;
 
@@ -70,7 +70,7 @@ public class FavoriteTripItem extends StoredSearch implements Comparable<Favorit
 		this.favorite = false;
 	}
 
-	public FavoriteTripItem(@Nullable WorkLocation to) {
+	public FavoriteTripItem(@Nullable WorLocation to) {
 		this.type = WORK;
 		this.from = new WrapLocation(GPS);
 		this.via = null;

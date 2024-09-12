@@ -28,13 +28,13 @@ import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat.getDrawable
 import de.grobox.transportr.R
-import de.grobox.transportr.data.dto.KLine
+import de.schildbach.pte.dto.Line
 import de.grobox.transportr.utils.TransportrUtils.dpToPx
 import de.grobox.transportr.utils.TransportrUtils.getDrawableForProduct
 
 class LineView(context: Context, attr: AttributeSet?) : AppCompatTextView(context, attr) {
 
-    fun setLine(line: KLine) {
+    fun setLine(line: Line) {
         // get colors
         val foregroundColor = line.style?.foregroundColor
         val backgroundColor = line.style?.backgroundColor

@@ -20,64 +20,116 @@
 package de.grobox.transportr.ui.trips.detail
 
 import androidx.annotation.WorkerThread
-import androidx.lifecycle.MutableLiveData
-import de.grobox.transportr.data.dto.KTrip
-import de.grobox.transportr.data.dto.toKTrip
-import de.grobox.transportr.data.dto.toLocation
-import de.grobox.transportr.data.dto.toProduct
 import de.grobox.transportr.settings.SettingsManager
 import de.grobox.transportr.ui.trips.TripQuery
 import de.grobox.transportr.utils.SingleLiveEvent
 import de.schildbach.pte.NetworkProvider
 import de.schildbach.pte.dto.QueryTripsResult
 import de.schildbach.pte.dto.QueryTripsResult.Status.OK
+import de.schildbach.pte.dto.Trip
 import de.schildbach.pte.dto.TripOptions
+import kotlinx.coroutines.flow.MutableStateFlow
 import java.util.Date
 
+suspend fun MutableStateFlow<Trip?>.reload(
+    networkProvider: NetworkProvider,
+    settingsManager: SettingsManager,
+    query: TripQuery,
+    errorString: String
+): String? {
+    val newDate = Date()
+    newDate.time = query.date - 5000
+
+    try {
+        val queryTripsResult = networkProvider.queryTrips(
+            query.from.location, query.via?.location, query.to.location, newDate.time, true,
+            TripOptions(query.products.toSet(), settingsManager.optimize, settingsManager.walkSpeed, null, null)
+        )!!
+        if (queryTripsResult.status == OK && queryTripsResult.trips.size > 0) {
+            val oldTrip = this.value ?: throw IllegalStateException()
+
+            for (newTrip in queryTripsResult.trips) {
+                if (oldTrip.isTheSame(newTrip)) {
+                    this.emit(newTrip)
+                    return null
+                }
+            }
+
+            return errorString
+        } else {
+            return errorString + "\n" + queryTripsResult.status.name
+        }
+    } catch (e: Exception) {
+        return errorString + "\n" + e.toString()
+    }
+}
+
+private fun Trip.isTheSame(newTrip: Trip): Boolean {
+    // we can not rely on the trip ID as it is too generic with some providers
+    if (numChanges != newTrip.numChanges) return false
+    if (legs.size != newTrip.legs.size) return false
+    if (getPlannedDuration() != newTrip.getPlannedDuration()) return false
+    if (firstPublicLeg?.getDepartureTime(true) != newTrip.firstPublicLeg?.getDepartureTime(true)) return false
+    if (lastPublicLeg?.getArrivalTime(true) != newTrip.lastPublicLeg?.getArrivalTime(true)) return false
+    if (firstPublicLeg?.line?.label != newTrip.firstPublicLeg?.line?.label) return false
+    if (lastPublicLeg?.line?.label != newTrip.lastPublicLeg?.line?.label) return false
+    if (firstPublicLeg == null && firstDepartureTime != newTrip.firstDepartureTime) return false
+    if (lastPublicLeg == null && lastArrivalTime != newTrip.lastArrivalTime) return false
+    return true
+}
+
+private fun Trip.getPlannedDuration(): Long {
+    val first = firstPublicLeg?.getDepartureTime(true) ?: firstDepartureTime
+    val last = lastPublicLeg?.getDepartureTime(true) ?: lastArrivalTime
+
+    if (first == null || last == null) return -1
+
+    return last - first
+}
+
+@Deprecated("use extension function MutableStateFlow<Trip?>.reload(..) instead")
 class TripReloader(
     private val networkProvider: NetworkProvider,
     private val settingsManager: SettingsManager,
     private val query: TripQuery,
-    private val trip: MutableLiveData<KTrip>,
+    private val trip: MutableStateFlow<Trip>,
     private val errorString: String,
     private val tripReloadError: SingleLiveEvent<String>) {
 
-    fun reload() {
+    suspend fun reload() {
         // use a new date slightly earlier to avoid missing the right trip
         val newDate = Date()
-        newDate.time = query.date.time - 5000
+        newDate.time = query.date - 5000
 
-        Thread {
-            try {
-                val queryTripsResult = networkProvider.queryTrips(
-                    query.from.location.toLocation(), query.via?.location?.toLocation(), query.to.location.toLocation(), newDate, true,
-                    TripOptions(query.products.map { it.toProduct() }.toSet(), settingsManager.optimize, settingsManager.walkSpeed, null, null)
-                )
-                if (queryTripsResult.status == OK && queryTripsResult.trips.size > 0) {
-                    onTripReloaded(queryTripsResult)
-                } else {
-                    tripReloadError.postValue(errorString + "\n" + queryTripsResult.status.name)
-                }
-            } catch (e: Exception) {
-                tripReloadError.postValue(errorString + "\n" + e.toString())
+        try {
+            val queryTripsResult = networkProvider.queryTrips(
+                query.from.location, query.via?.location, query.to.location, newDate.time, true,
+                TripOptions(query.products.toSet(), settingsManager.optimize, settingsManager.walkSpeed, null, null)
+            )!!
+            if (queryTripsResult.status == OK && queryTripsResult.trips.size > 0) {
+                onTripReloaded(queryTripsResult)
+            } else {
+                tripReloadError.postValue(errorString + "\n" + queryTripsResult.status.name)
             }
-        }.start()
+        } catch (e: Exception) {
+            tripReloadError.postValue(errorString + "\n" + e.toString())
+        }
     }
 
     @WorkerThread
-    private fun onTripReloaded(result: QueryTripsResult) {
+    private suspend fun onTripReloaded(result: QueryTripsResult) {
         val oldTrip = this.trip.value ?: throw IllegalStateException()
 
-        for (newTrip in result.trips.map { it.toKTrip() } ) {
+        for (newTrip in result.trips ) {
             if (oldTrip.isTheSame(newTrip)) {
-                trip.postValue(newTrip)
+                trip.emit(newTrip)
                 return
             }
         }
         tripReloadError.postValue(errorString)
     }
 
-    private fun KTrip.isTheSame(newTrip: KTrip): Boolean {
+    private fun Trip.isTheSame(newTrip: Trip): Boolean {
         // we can not rely on the trip ID as it is too generic with some providers
         if (numChanges != newTrip.numChanges) return false
         if (legs.size != newTrip.legs.size) return false
@@ -91,7 +143,7 @@ class TripReloader(
         return true
     }
 
-    private fun KTrip.getPlannedDuration(): Long {
+    private fun Trip.getPlannedDuration(): Long {
         val first = firstPublicLeg?.getDepartureTime(true) ?: firstDepartureTime
         val last = lastPublicLeg?.getDepartureTime(true) ?: lastArrivalTime
 

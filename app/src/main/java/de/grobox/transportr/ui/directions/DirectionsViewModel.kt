@@ -18,96 +18,112 @@
  */
 package de.grobox.transportr.ui.directions
 
-import android.util.Pair
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import de.grobox.transportr.TransportrApplication
-import de.grobox.transportr.data.dto.KProduct
-import de.grobox.transportr.data.dto.KTrip
+import de.schildbach.pte.dto.Product
+import de.schildbach.pte.dto.Trip
 import de.grobox.transportr.data.gps.GpsRepository
 import de.grobox.transportr.data.gps.ReverseGeocoderV2
 import de.grobox.transportr.data.locations.FavoriteLocation.FavLocationType
 import de.grobox.transportr.data.locations.LocationRepository
 import de.grobox.transportr.data.searches.SearchesRepository
 import de.grobox.transportr.data.trips.TripsRepository
-import de.grobox.transportr.data.trips.TripsRepository.QueryMoreState
 import de.grobox.transportr.favorites.trips.SavedSearchesViewModel
 import de.grobox.transportr.locations.CombinedSuggestionRepository
 import de.grobox.transportr.locations.LocationView.LocationViewListener
 import de.grobox.transportr.locations.WrapLocation
-import de.grobox.transportr.map.PositionController
 import de.grobox.transportr.networks.TransportNetworkManager
-import de.grobox.transportr.networks.getTransportNetwork
 import de.grobox.transportr.settings.SettingsManager
 import de.grobox.transportr.ui.TimeDateFragment.TimeDateListener
 import de.grobox.transportr.ui.trips.TripQuery
 import de.grobox.transportr.utils.DateUtils
 import de.grobox.transportr.utils.LiveTrigger
-import de.grobox.transportr.utils.SingleLiveEvent
-import de.schildbach.pte.NetworkId
 import de.schildbach.pte.NetworkProvider
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.EnumSet
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class DirectionsViewModel internal constructor(
     application: TransportrApplication,
     transportNetworkManager: TransportNetworkManager,
     private val  settingsManager: SettingsManager,
     locationRepository: LocationRepository,
     searchesRepository: SearchesRepository,
-    positionController: PositionController,
     private val combinedSuggestionRepository: CombinedSuggestionRepository,
     private val tripsRepository: TripsRepository,
     private val gpsRepository: GpsRepository,
     private val geocoder: ReverseGeocoderV2
 ) : SavedSearchesViewModel(application, transportNetworkManager, locationRepository, searchesRepository), TimeDateListener, LocationViewListener {
 
-    private val _fromLocation = MutableLiveData<WrapLocation?>()
-    private val _viaLocation = MutableLiveData<WrapLocation?>()
-    val viaSupported: LiveData<Boolean>
-    private val _toLocation = MutableLiveData<WrapLocation?>()
-    val locationLiveData = positionController.positionName
-    val findGpsLocation = MutableLiveData<FavLocationType?>()
+//    private val _fromLocation = MutableLiveData<WrapLocation?>()
+//    private val _viaLocation = MutableLiveData<WrapLocation?>()
+//    val viaSupported: LiveData<Boolean>
+//    private val _toLocation = MutableLiveData<WrapLocation?>()
+    private val _fromLocation = MutableStateFlow<WrapLocation?>(null)
+    private val _viaLocation = MutableStateFlow<WrapLocation?>(null)
+    val viaSupported: Flow<Boolean> = transportNetwork.mapLatest {
+        it?.networkProvider?.hasCapabilities(NetworkProvider.Capability.TRIPS_VIA) ?: false
+    }
+    private val _toLocation = MutableStateFlow<WrapLocation?>(null)
+
+
+    private val gpsLocationFor = MutableStateFlow<FavLocationType?>(null)
+//    val findGpsLocation = MutableLiveData<FavLocationType?>()
     val timeUpdate = LiveTrigger()
-    private val _now = MutableLiveData(true)
-    private val _calendar = MutableLiveData(Calendar.getInstance())
-    private val _products = MutableLiveData<EnumSet<KProduct>>(EnumSet.copyOf(settingsManager.getPreferredProducts()))
-    private val _isDeparture = MutableLiveData(true)
-    private val _isExpanded = MutableLiveData(false)
 
-    private val _displayTrips = MutableLiveData(false)
-    val displayTrips: LiveData<Boolean> = _displayTrips
+    private val _now = MutableStateFlow(true)
 
-    @Deprecated("use displayTrips")
-    val showTrips = SingleLiveEvent<Void>()
-    val topSwipeEnabled = MutableLiveData(false)
+    private val _calendar = MutableStateFlow(Calendar.getInstance())
+    val lastQueryCalendar: StateFlow<Calendar?> = _calendar.asStateFlow()
 
-    val fromLocation: LiveData<WrapLocation?> = _fromLocation
-    val viaLocation: LiveData<WrapLocation?> = _viaLocation
-    val toLocation: LiveData<WrapLocation?> = _toLocation
+    private val _products = MutableStateFlow(EnumSet.copyOf(settingsManager.getPreferredProducts()))
+    val products: StateFlow<EnumSet<Product>> = _products.asStateFlow()
 
-    val locationSuggestions: LiveData<Set<WrapLocation>> = combinedSuggestionRepository.suggestions
-    val suggestionsLoading: LiveData<Boolean> = combinedSuggestionRepository.isLoading
+    private val _isDeparture = MutableStateFlow(true)
+    val isDeparture: StateFlow<Boolean> = _isDeparture.asStateFlow()
+
+    private val _isExpanded = MutableStateFlow(false)
+    val isExpanded: StateFlow<Boolean> = _isExpanded
+
+    private val _displayTrips = MutableStateFlow(false)
+    val displayTrips: Flow<Boolean> = _displayTrips.asStateFlow()
+
+    val topSwipeEnabled = MutableStateFlow(false)
+
+    val fromLocation: Flow<WrapLocation?> = _fromLocation
+    val viaLocation: Flow<WrapLocation?> = _viaLocation
+    val toLocation: Flow<WrapLocation?> = _toLocation
+
+    val locationSuggestions: Flow<Set<WrapLocation>> = combinedSuggestionRepository.suggestions
+    val suggestionsLoading: Flow<Boolean> = combinedSuggestionRepository.isLoading
 
     private var gpsJob: Job? = null
     private val currentLocation = gpsRepository.getLocationFlow()
     private val _gpsLoading = MutableStateFlow(false)
     val gpsLoading = _gpsLoading.asStateFlow()
 
-    suspend fun fetchFromLocationFromGps() {
+    suspend fun fetchLocationFromGps() {
         _gpsLoading.value = true
 
         currentLocation.first().let { loc ->
             loc.onSuccess {
                 geocoder.findLocation(it)
                     .onSuccess { location ->
-                        _fromLocation.value = location
+                        when(gpsLocationFor.value) {
+                            FavLocationType.FROM -> _fromLocation.value = location
+                            FavLocationType.VIA -> _viaLocation.value = location
+                            FavLocationType.TO -> _toLocation.value = location
+                            else -> {}
+                        }
                         _gpsLoading.value = false
                     }
                     .onFailure { fail ->
@@ -145,11 +161,13 @@ class DirectionsViewModel internal constructor(
         _fromLocation.value = location
 
         if(location?.wrapType == WrapLocation.WrapType.GPS) {
+            gpsLocationFor.value = FavLocationType.FROM
             gpsJob = viewModelScope.launch {
-                fetchFromLocationFromGps()
+                fetchLocationFromGps()
             }
+        } else if(gpsLocationFor.value == FavLocationType.FROM) {
+            gpsLocationFor.value = null
         }
-
 
         maybeSearch()
     }
@@ -173,7 +191,7 @@ class DirectionsViewModel internal constructor(
     fun swapFromAndToLocations() {
         val tmp = _toLocation.value
         if (_fromLocation.value?.wrapType == WrapLocation.WrapType.GPS) {
-            findGpsLocation.value = null
+            gpsLocationFor.value = null
             // TODO: GPS currently only supports from location, so don't swap it for now
             _toLocation.value = null
         } else {
@@ -182,7 +200,7 @@ class DirectionsViewModel internal constructor(
         _fromLocation.value = tmp
     }
 
-    val lastQueryCalendar: LiveData<Calendar?> = _calendar
+
 
     override fun onTimeAndDateSet(calendar: Calendar) {
         setCalendar(calendar)
@@ -204,22 +222,22 @@ class DirectionsViewModel internal constructor(
         _now.value = DateUtils.isNow(calendar)
     }
 
-    val products: LiveData<EnumSet<KProduct>> = _products
 
-    fun setProducts(newProducts: EnumSet<KProduct>) {
+
+    fun setProducts(newProducts: EnumSet<Product>) {
         _products.value = newProducts
         search()
         settingsManager.setPreferredProducts(newProducts)
     }
 
-    val isDeparture: LiveData<Boolean> = _isDeparture
+
 
     fun setIsDeparture(departure: Boolean) {
         _isDeparture.value = departure
         search()
     }
 
-    val isExpanded: LiveData<Boolean> = _isExpanded
+
 
     fun setIsExpanded(expanded: Boolean) {
         _isExpanded.value = expanded
@@ -229,8 +247,7 @@ class DirectionsViewModel internal constructor(
         _isExpanded.value = !_isExpanded.value!!
     }
 
-    val isFavTrip: MutableLiveData<Boolean>
-        get() = tripsRepository.isFavTrip
+    val isFavTrip = tripsRepository.isFavTrip
 
     fun toggleFavTrip() {
         tripsRepository.toggleFavState()
@@ -244,7 +261,7 @@ class DirectionsViewModel internal constructor(
         }
         search()
         // clear finding GPS location request
-        if (findGpsLocation.value == type) findGpsLocation.value = null
+        if (gpsLocationFor.value == type) gpsLocationFor.value
     }
 
     override fun onLocationCleared(type: FavLocationType) {
@@ -257,28 +274,31 @@ class DirectionsViewModel internal constructor(
             FavLocationType.TO -> setToLocation(null)
         }
         // clear finding GPS location request
-        if (findGpsLocation.value == type) findGpsLocation.value = null
+        if (gpsLocationFor.value == type) gpsLocationFor.value = null
     }
 
     /* Trip Queries */
     fun search() {
-        val from = _fromLocation.value; val to = _toLocation.value
-        val via = if (_isExpanded.value != null && _isExpanded.value!!)
-            _viaLocation.value else null
-        val calendar = if (_now.value != null && _now.value!!)
-            Calendar.getInstance() else _calendar.value
-        if (from == null || to == null || calendar == null) return
-        _calendar.value = calendar
+        viewModelScope.launch {
+            val from = _fromLocation.value; val to = _toLocation.value
+            val via = if (_isExpanded.value != null && _isExpanded.value!!)
+                _viaLocation.value else null
+            val calendar = if (_now.value != null && _now.value!!)
+                Calendar.getInstance() else _calendar.value
+            if (from == null || to == null || calendar == null) return@launch
+            _calendar.value = calendar
 
-        val tripQuery = TripQuery(from, via, to, calendar.time, _isDeparture.value, _products.value)
-        tripsRepository.search(tripQuery)
+            val tripQuery = TripQuery(from, via, to, calendar.time.time, _isDeparture.value, _products.value)
+            tripsRepository.search(tripQuery, viewModelScope)
 
-        _displayTrips.postValue(true)
-        showTrips.call()
+            _displayTrips.emit(true)
+        }
     }
 
     fun searchMore(later: Boolean) {
-        tripsRepository.searchMore(later)
+        viewModelScope.launch {
+            tripsRepository.searchMore(later)
+        }
     }
 
     fun cancelGps() {
@@ -286,20 +306,9 @@ class DirectionsViewModel internal constructor(
         _gpsLoading.value = false
     }
 
-    val queryMoreState: LiveData<QueryMoreState>
-        get() = tripsRepository.queryMoreState
-    val trips: LiveData<Set<KTrip>>
-        get() = tripsRepository.trips
-    val queryError: LiveData<String>
-        get() = tripsRepository.queryError
-    val queryPTEError: LiveData<Pair<String, String>>
-        get() = tripsRepository.queryPTEError
-    val queryMoreError: LiveData<String>
-        get() = tripsRepository.queryMoreError
-
-    init {
-        var network = transportNetwork.value
-        if (network == null) network = getTransportNetwork(NetworkId.DB)!!
-        viaSupported = MutableLiveData(network.networkProvider.hasCapabilities(NetworkProvider.Capability.TRIPS_VIA))
-    }
+    val queryMoreState = tripsRepository.queryMoreState
+    val trips: Flow<Set<Trip>> = tripsRepository.trips
+    val queryError = tripsRepository.queryError
+    val queryPTEError = tripsRepository.queryPTEError
+    val queryMoreError = tripsRepository.queryMoreError
 }

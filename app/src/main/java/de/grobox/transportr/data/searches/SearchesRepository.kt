@@ -20,63 +20,73 @@
 package de.grobox.transportr.data.searches
 
 import androidx.annotation.WorkerThread
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.switchMap
 import de.grobox.transportr.AbstractManager
-import de.grobox.transportr.data.dto.KLocation
+import de.schildbach.pte.dto.Location
 import de.grobox.transportr.data.locations.FavoriteLocation
 import de.grobox.transportr.data.locations.LocationDao
 import de.grobox.transportr.favorites.trips.FavoriteTripItem
 import de.grobox.transportr.networks.TransportNetworkManager
 import de.schildbach.pte.NetworkId
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.mapLatest
 
 class SearchesRepository constructor(
         private val searchesDao: SearchesDao,
         private val locationDao: LocationDao,
-        transportNetworkManager: TransportNetworkManager) : AbstractManager() {
+        transportNetworkManager: TransportNetworkManager
+) : AbstractManager() {
 
-    private val networkId: LiveData<NetworkId?> = transportNetworkManager.networkId
-    private val favoriteTripItems: MediatorLiveData<List<FavoriteTripItem>> = MediatorLiveData()
+    private val networkId: Flow<NetworkId?> = transportNetworkManager.networkId
 
-    val favoriteTrips: LiveData<List<FavoriteTripItem>>
-        get() = favoriteTripItems
-
-    init {
-        val storedSearches = networkId.switchMap(searchesDao::getStoredSearches)
-        this.favoriteTripItems.addSource(storedSearches, this::fetchFavoriteTrips)
+    private val storedSearches = networkId.flatMapLatest { networkId ->
+        searchesDao.getStoredSearchesAsFlow(networkId)
     }
 
-    private fun fetchFavoriteTrips(storedSearches: List<StoredSearch>?) {
-        if (storedSearches == null) return
-        runOnBackgroundThread {
-            val favoriteTrips = ArrayList<FavoriteTripItem>()
-            for (storedSearch in storedSearches) {
-                val from = locationDao.getFavoriteLocation(storedSearch.fromId)
-                val via = storedSearch.viaId?.let { locationDao.getFavoriteLocation(it) }
-                val to = locationDao.getFavoriteLocation(storedSearch.toId)
-                if (from == null || to == null) throw RuntimeException("Start or Destination was null")
-                val item = FavoriteTripItem(storedSearch, from, via, to)
-                favoriteTrips.add(item)
-            }
-            favoriteTripItems.postValue(favoriteTrips)
+    private val favoriteTripItems: MutableStateFlow<List<FavoriteTripItem>> = MutableStateFlow(emptyList())
+
+    val favoriteTrips: Flow<List<FavoriteTripItem>> = storedSearches.mapLatest { searches ->
+        searches.mapNotNull {
+            val from = locationDao.getFavoriteLocation(it.fromId)
+            val via = it.viaId?.let { locationDao.getFavoriteLocation(it) }
+            val to = locationDao.getFavoriteLocation(it.toId)
+            if(from == null || to == null) return@mapNotNull null
+            return@mapNotNull FavoriteTripItem(it, from, via, to)
         }
     }
 
-    @WorkerThread
-    fun storeSearch(from: FavoriteLocation?, via: FavoriteLocation?, to: FavoriteLocation?): Long {
+    suspend fun storeSearch(from: FavoriteLocation?, via: FavoriteLocation?, to: FavoriteLocation?): Long {
         if (from == null || to == null) return 0L
-        if (from.type == KLocation.Type.COORD || via != null && via.type == KLocation.Type.COORD || to.type == KLocation.Type.COORD) throw IllegalStateException("COORD made it through")
+        if (from.type == Location.Type.COORD || via != null && via.type == Location.Type.COORD || to.type == Location.Type.COORD) throw IllegalStateException("COORD made it through")
         if (from.uid == 0L || to.uid == 0L) throw IllegalStateException("From or To wasn't saved properly :(")
 
-        // try to find existing stored search
-        var storedSearch = searchesDao.getStoredSearch(networkId.value!!, from.uid, via?.uid, to.uid)
-        if (storedSearch == null) {
-            // no search was found, so create a new one
-            storedSearch = StoredSearch(networkId.value!!, from, via, to)
-        }
-        return searchesDao.storeSearch(storedSearch)
+        return networkId.mapLatest { networkId ->
+            // try to find existing stored search
+            var storedSearch = searchesDao.getStoredSearch(networkId!!, from.uid, via?.uid, to.uid)
+            if (storedSearch == null) {
+                // no search was found, so create a new one
+                storedSearch = StoredSearch(networkId!!, from, via, to)
+            }
+            return@mapLatest searchesDao.storeSearch(storedSearch)
+        }.first()
     }
+
+//    @WorkerThread
+//    fun storeSearch(from: FavoriteLocation?, via: FavoriteLocation?, to: FavoriteLocation?): Long {
+//        if (from == null || to == null) return 0L
+//        if (from.type == Location.Type.COORD || via != null && via.type == Location.Type.COORD || to.type == Location.Type.COORD) throw IllegalStateException("COORD made it through")
+//        if (from.uid == 0L || to.uid == 0L) throw IllegalStateException("From or To wasn't saved properly :(")
+//
+//        // try to find existing stored search
+//        var storedSearch = searchesDao.getStoredSearch(networkId.value!!, from.uid, via?.uid, to.uid)
+//        if (storedSearch == null) {
+//            // no search was found, so create a new one
+//            storedSearch = StoredSearch(networkId.value!!, from, via, to)
+//        }
+//        return searchesDao.storeSearch(storedSearch)
+//    }
 
     @WorkerThread
     fun isFavorite(uid: Long): Boolean {

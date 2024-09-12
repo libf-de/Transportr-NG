@@ -22,8 +22,8 @@ package de.grobox.transportr.map
 import android.content.Context
 import androidx.core.content.ContextCompat
 import de.grobox.transportr.R
-import de.grobox.transportr.data.dto.KLocation
-import de.grobox.transportr.data.dto.KProduct
+import de.schildbach.pte.dto.Location
+import de.schildbach.pte.dto.Product
 import de.grobox.transportr.locations.WrapLocation
 import org.maplibre.android.annotations.Icon
 import org.maplibre.android.annotations.Marker
@@ -33,16 +33,16 @@ import org.maplibre.android.maps.MapLibreMap
 
 class NearbyStationsDrawer(context: Context) : MapDrawer(context) {
 
-    private val nearbyLocations = HashMap<Marker, KLocation>()
+    private val nearbyLocations = HashMap<Marker, Location>()
 
-    fun draw(map: MapLibreMap, nearbyStations: List<KLocation>) {
+    fun draw(map: MapLibreMap, nearbyStations: List<Location>) {
         val builder = LatLngBounds.Builder()
         for (location in nearbyStations) {
             val icon = getIconForProduct(location.products)
             if (!location.hasLocation) continue
             if (nearbyLocations.containsValue(location)) continue
             if (icon == null) continue
-            val marker = markLocation(map, location, icon, location.uniqueShortName ?: "???")
+            val marker = marLocation(map, location, icon, location.uniqueShortName ?: "???")
             marker?.let {
                 nearbyLocations.put(marker, location)
                 builder.include(marker.position)
@@ -62,18 +62,18 @@ class NearbyStationsDrawer(context: Context) : MapDrawer(context) {
         nearbyLocations.clear()
     }
 
-    private fun getIconForProduct(p: Set<KProduct>?): Icon? {
+    private fun getIconForProduct(p: Set<Product>?): Icon? {
         val firstProduct = if (p.isNullOrEmpty()) null else p.iterator().next()
         val res = when (firstProduct) {
-            KProduct.HIGH_SPEED_TRAIN -> R.drawable.product_high_speed_train_marker
-            KProduct.REGIONAL_TRAIN -> R.drawable.product_regional_train_marker
-            KProduct.SUBURBAN_TRAIN -> R.drawable.product_suburban_train_marker
-            KProduct.SUBWAY -> R.drawable.product_subway_marker
-            KProduct.TRAM -> R.drawable.product_tram_marker
-            KProduct.BUS -> R.drawable.product_bus_marker
-            KProduct.FERRY -> R.drawable.product_ferry_marker
-            KProduct.CABLECAR -> R.drawable.product_cablecar_marker
-            KProduct.ON_DEMAND -> R.drawable.product_on_demand_marker
+            Product.HIGH_SPEED_TRAIN -> R.drawable.product_high_speed_train_marker
+            Product.REGIONAL_TRAIN -> R.drawable.product_regional_train_marker
+            Product.SUBURBAN_TRAIN -> R.drawable.product_suburban_train_marker
+            Product.SUBWAY -> R.drawable.product_subway_marker
+            Product.TRAM -> R.drawable.product_tram_marker
+            Product.BUS -> R.drawable.product_bus_marker
+            Product.FERRY -> R.drawable.product_ferry_marker
+            Product.CABLECAR -> R.drawable.product_cablecar_marker
+            Product.ON_DEMAND -> R.drawable.product_on_demand_marker
             else -> R.drawable.product_bus_marker
         }
         val drawable = ContextCompat.getDrawable(context, res) ?: throw RuntimeException()

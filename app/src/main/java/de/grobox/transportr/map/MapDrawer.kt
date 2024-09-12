@@ -24,7 +24,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import de.grobox.transportr.R
-import de.grobox.transportr.data.dto.KLocation
+import de.schildbach.pte.dto.Location
 import org.maplibre.android.annotations.Icon
 import org.maplibre.android.annotations.IconFactory
 import org.maplibre.android.annotations.Marker
@@ -46,7 +46,7 @@ abstract class MapDrawer(protected val context: Context) {
         }
     }
 
-    protected fun markLocation(map: MapLibreMap, location: KLocation, icon: Icon, title: String, snippet: String? = null): Marker? {
+    protected fun marLocation(map: MapLibreMap, location: Location, icon: Icon, title: String, snippet: String? = null): Marker? {
         if (!location.hasLocation) return null
         return map.addMarker(MarkerOptions()
                 .icon(icon)

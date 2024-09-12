@@ -31,45 +31,41 @@ import android.location.LocationManager.NETWORK_PROVIDER
 import android.os.Bundle
 import android.os.Looper
 import androidx.annotation.RequiresPermission
-import androidx.annotation.WorkerThread
 import androidx.core.content.ContextCompat
 import androidx.core.location.LocationManagerCompat
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
 import de.grobox.transportr.AbstractManager
-import de.grobox.transportr.locations.ReverseGeocoder
-import de.grobox.transportr.locations.WrapLocation
-import de.grobox.transportr.utils.NotifyingLiveData
+import de.grobox.transportr.data.gps.ReverseGeocoderV2
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.lastOrNull
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
- class PositionController(val context: Context)
-    : AbstractManager(), NotifyingLiveData.OnActivationCallback, ReverseGeocoder.ReverseGeocoderCallback, LocationListener {
+class PositionController(
+     val context: Context,
+     val geoCoder: ReverseGeocoderV2
+ ) : AbstractManager(), LocationListener {
 
     private val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-    private val geoCoder = ReverseGeocoder(context, this)
 
-    private val _position = NotifyingLiveData<Location>(this)
-    private val _positionState = MutableLiveData<PositionState>()
-    private val _positionName = MediatorLiveData<WrapLocation>().apply {
-        addSource(_position) {
-            geoCoder.findLocation(it)
-        }
-    }
+     private val _position = MutableStateFlow<Location?>(null)
+     val position = _position.asStateFlow()
 
-    val position: LiveData<Location> = _position
-    val positionState: LiveData<PositionState> = _positionState
-    val positionName: LiveData<WrapLocation> = _positionName
+     val positionName = position.mapLatest { it?.let { geoCoder.findLocation(it.latitude, it.longitude).getOrNull() } }
 
-    init {
-        _positionState.value = when {
-            ContextCompat.checkSelfPermission(context, ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ->
-                PositionState.DENIED
-            LocationManagerCompat.isLocationEnabled(locationManager) ->
-                PositionState.ENABLED
-            else -> PositionState.DISABLED
-        }
-    }
+    private val _positionState: MutableStateFlow<PositionState> = MutableStateFlow(when {
+        ContextCompat.checkSelfPermission(context, ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ->
+            PositionState.DENIED
+        LocationManagerCompat.isLocationEnabled(locationManager) ->
+            PositionState.ENABLED
+        else -> PositionState.DISABLED
+    })
+
+    val positionState: StateFlow<PositionState> = _positionState.asStateFlow()
 
     fun permissionGranted() {
         _positionState.value = if (LocationManagerCompat.isLocationEnabled(locationManager))
@@ -79,21 +75,41 @@ import java.util.concurrent.TimeUnit
     }
 
     @RequiresPermission(ACCESS_FINE_LOCATION)
-    override fun onActive() {
+    fun onActive() {
         for (provider in LOCATION_PROVIDERS.filter(locationManager::isProviderEnabled)) {
             locationManager.requestLocationUpdates(provider, MIN_UPDATE_INTERVAL, MIN_UPDATE_DISTANCE, this, Looper.getMainLooper())
         }
     }
 
     @RequiresPermission(ACCESS_FINE_LOCATION)
-    override fun onInactive() {
+    fun onInactive() {
         locationManager.removeUpdates(this)
     }
 
+     init {
+         CoroutineScope(Dispatchers.IO).launch {
+             _position.subscriptionCount.collect {
+                 try {
+                     if(it > 0)
+                         onActive()
+                     else
+                         onInactive()
+                 } catch(e: SecurityException) {
+                     e.printStackTrace()
+                 }
+             }
+         }
+
+
+     }
+
     override fun onLocationChanged(location: Location) {
-        if (isBetterPosition(location, _position.value)) {
-            _position.value = location
+        CoroutineScope(Dispatchers.IO).launch {
+            if (isBetterPosition(location, _position.lastOrNull())) {
+                _position.emit(location)
+            }
         }
+
     }
 
     @Deprecated("Deprecated in Java")
@@ -109,11 +125,6 @@ import java.util.concurrent.TimeUnit
         if (provider == GPS_PROVIDER && !LocationManagerCompat.isLocationEnabled(locationManager)) {
             _positionState.value = PositionState.DISABLED
         }
-    }
-
-    @WorkerThread
-    override fun onLocationRetrieved(location: WrapLocation) {
-        _positionName.postValue(location)
     }
 
     companion object {

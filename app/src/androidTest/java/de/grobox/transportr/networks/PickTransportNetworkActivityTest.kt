@@ -74,7 +74,7 @@ class PickTransportNetworkActivityTest : ScreengrabTest() {
 
         // find network position in list
         val context = getTargetContext()
-        val (continentIndex, countryIndex, networkIndex) = getTransportNetworkPositions(context, getTransportNetwork(NetworkId.DB)!!)
+        val (continentIndex, countryIndex, networkIndex) = getTransportNetworPositions(context, getTransportNetwork(NetworkId.DB)!!)
         val countryPos = continentIndex + countryIndex + 1
         val networkPos = countryPos + networkIndex + 1
 

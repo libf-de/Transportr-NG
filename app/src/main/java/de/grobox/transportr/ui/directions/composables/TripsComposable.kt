@@ -28,24 +28,24 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import de.grobox.transportr.data.dto.KTrip
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import de.schildbach.pte.dto.Trip
 import de.grobox.transportr.ui.directions.DirectionsViewModel
 
 @Composable
 fun TripsComposable(
     viewModel: DirectionsViewModel,
-    tripClicked: (trip: KTrip) -> Unit
+    tripClicked: (trip: Trip) -> Unit
 ) {
-    val topSwipeEnabled by viewModel.topSwipeEnabled.observeAsState(false)
-    val queryMoreState by viewModel.queryMoreState.observeAsState()
-    val trips by viewModel.trips.observeAsState()
-    val queryError by viewModel.queryError.observeAsState()
-    val queryPTEError by viewModel.queryPTEError.observeAsState()
-    val queryMoreError by viewModel.queryMoreError.observeAsState()
+    val topSwipeEnabled by viewModel.topSwipeEnabled.collectAsStateWithLifecycle(false)
+    val queryMoreState by viewModel.queryMoreState.collectAsStateWithLifecycle()
+    val trips by viewModel.trips.collectAsStateWithLifecycle(null)
+    val queryError by viewModel.queryError.collectAsStateWithLifecycle(null)
+    val queryPTEError by viewModel.queryPTEError.collectAsStateWithLifecycle(null)
+    val queryMoreError by viewModel.queryMoreError.collectAsStateWithLifecycle(null)
 
     if(!queryError.isNullOrBlank()) {
         Column(
