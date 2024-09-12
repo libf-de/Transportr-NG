@@ -43,7 +43,7 @@ import de.grobox.transportr.ui.trips.detail.TripUtils.intoCalendar
 import de.grobox.transportr.ui.trips.detail.TripUtils.share
 import de.grobox.transportr.utils.DateUtils.formatRelativeTime
 import de.grobox.transportr.utils.FullScreenUtil
-import de.schildbach.pte.dto.Trip
+import de.libf.ptek.dto.Trip
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import java.util.Date
 

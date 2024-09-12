@@ -49,10 +49,11 @@ import de.grobox.transportr.map.BaseMapFragment.MapPadding
 import de.grobox.transportr.map.NearbyStationsDrawer
 import de.grobox.transportr.ui.map.drawable.createSpeechBubbleDrawable
 import de.grobox.transportr.utils.DateUtils.formatTime
-import de.schildbach.pte.dto.Leg
-import de.schildbach.pte.dto.Location
-import de.schildbach.pte.dto.Stop
-import de.schildbach.pte.dto.Trip
+import de.libf.ptek.dto.Leg
+import de.libf.ptek.dto.Location
+import de.libf.ptek.dto.PublicLeg
+import de.libf.ptek.dto.Stop
+import de.libf.ptek.dto.Trip
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeout
 import org.maplibre.android.camera.CameraUpdateFactory
@@ -306,24 +307,24 @@ class MapViewState {
 
     private fun getStationText(context: Context, leg: Leg, type: MarkerType): String {
         return when (type) {
-            MarkerType.BEGIN -> leg.getDepartureTime(false)?.let {
+            MarkerType.BEGIN -> leg.departureTime.let {
                 "${context.getString(R.string.trip_dep)}: ${formatTime(context, Date(it))}"
             }
 
-            MarkerType.END -> leg.getArrivalTime(false)?.let {
+            MarkerType.END -> leg.arrivalTime.let {
                 "${context.getString(R.string.trip_arr)}: ${formatTime(context, Date(it))}"
             }
 
             else -> ""
-        } ?: ""
+        }
     }
 
     private fun getStationText(context: Context, leg1: Leg, leg2: Leg): String {
         var text = ""
-        leg1.arrivalTime?.let {
+        leg1.arrivalTime.let {
             text += "${context.getString(R.string.trip_arr)}: ${formatTime(context, Date(it))}"
         }
-        leg2.departureTime?.let {
+        leg2.departureTime.let {
             if (text.isNotEmpty()) text += "\n"
             text += "${context.getString(R.string.trip_dep)}: ${formatTime(context, Date(it))}"
         }
@@ -405,16 +406,16 @@ class MapViewState {
                 var i = 1
                 trip.legs.forEachIndexed { j, leg ->
                     // get colors
-                    val backgroundColor = leg.getBackgroundColor(ctx).let(::Color).takeIf { leg.isPublicLeg } ?: Color(0xFFFED21B)
+                    val backgroundColor = leg.getBackgroundColor(ctx).let(::Color).takeIf { leg is PublicLeg } ?: Color(0xFFFED21B)
                     //val foregroundColor = leg.getForegroundColor(ctx).let(::Color)
                     val foregroundColor = Color.White
 
                     lineManager?.let { lineMgr ->
-                        val points = ArrayList<LatLng>(leg.path.size)
+                        val points = ArrayList<LatLng>(leg.path?.size ?: 0)
 
                         val colorHex = backgroundColor.toHexString()
 
-                        leg.path.mapTo(points) { LatLng(it.lat, it.lon) }
+                        leg.path?.mapTo(points) { LatLng(it.lat, it.lon) }
                         val lineOptions = LineOptions()
                             .withLineJoin("round")
                             .withLatLngs(points)
@@ -429,7 +430,7 @@ class MapViewState {
                     }
 
                     symbolManager?.let { symMgr ->
-                        if (leg.isPublicLeg) {
+                        if (leg is PublicLeg) {
                             leg.intermediateStops?.forEach { stop ->
                                 val stopIconId = stop.hashCode().toString()
                                 val stopIcon = getMarkerIcon(ctx, MarkerType.STOP, backgroundColor, foregroundColor)
@@ -447,7 +448,7 @@ class MapViewState {
                             val startId = leg.departure.hashCode().toString()
                             val icon: Drawable
                             var text: String = ""
-                            if (i == 1 || i == 2 && !trip.legs[0].isPublicLeg) {
+                            if (i == 1 || i == 2 && trip.legs[0] !is PublicLeg) {
                                 icon = getMarkerIcon(ctx, MarkerType.BEGIN, backgroundColor, foregroundColor)
                                 text = getStationText(ctx, leg, MarkerType.BEGIN)
                             } else {
@@ -464,7 +465,7 @@ class MapViewState {
                             )
 
                             // Draw final station only at the end or if end is walking
-                            if (i == trip.legs.size || i == trip.legs.size - 1 && !trip.legs[i].isPublicLeg) {
+                            if (i == trip.legs.size || i == trip.legs.size - 1 && trip.legs[i] !is PublicLeg) {
                                 val endId = leg.arrival.hashCode().toString()
                                 val endIcon = getMarkerIcon(ctx, MarkerType.END, backgroundColor, foregroundColor)
 
@@ -578,27 +579,19 @@ data class CompassMargins(
 }
 
 @ColorInt
-private fun Leg.getBackgroundColor(ctx: Context): Int {
-    if (isPublicLeg) {
-        return if (line?.style != null && line!!.style!!.backgroundColor != 0) {
-            line!!.style!!.backgroundColor
-        } else {
-            MaterialColors.getColor(ctx, R.attr.colorPrimary, Color.Transparent.toArgb())
-        }
+fun Leg.getBackgroundColor(context: Context): Int {
+    if (this is PublicLeg) {
+        return line.style?.backgroundColor?.takeIf { it != 0} ?: MaterialColors.getColor(context, R.attr.colorPrimary, android.graphics.Color.TRANSPARENT)
     }
-    return MaterialColors.getColor(ctx, R.attr.colorSecondary, Color.Transparent.toArgb())
+    return MaterialColors.getColor(context, R.attr.colorSecondary, android.graphics.Color.TRANSPARENT)
 }
 
 @ColorInt
-private fun Leg.getForegroundColor(ctx: Context): Int {
-    if (isPublicLeg) {
-        return if (line?.style != null && line!!.style!!.foregroundColor != 0) {
-            line!!.style!!.foregroundColor
-        } else {
-            ContextCompat.getColor(ctx, android.R.color.white)
-        }
+fun Leg.getForegroundColor(context: Context): Int {
+    if (this is PublicLeg) {
+        return line.style?.foregroundColor?.takeIf { it != 0 } ?: ContextCompat.getColor(context, android.R.color.white)
     }
-    return ContextCompat.getColor(ctx, android.R.color.black)
+    return ContextCompat.getColor(context, android.R.color.black)
 }
 
 fun Color.toHexString(): String {

@@ -32,10 +32,10 @@ import androidx.core.content.ContextCompat
 import com.russhwolf.settings.Settings
 import com.russhwolf.settings.get
 import de.grobox.transportr.R
-import de.schildbach.pte.dto.Product
-import de.schildbach.pte.NetworkId
-import de.schildbach.pte.NetworkProvider.Optimize
-import de.schildbach.pte.NetworkProvider.WalkSpeed
+import de.libf.ptek.dto.Product
+import de.libf.ptek.NetworkId
+import de.libf.ptek.NetworkProvider.Optimize
+import de.libf.ptek.NetworkProvider.WalkSpeed
 import java.util.Locale
 
 

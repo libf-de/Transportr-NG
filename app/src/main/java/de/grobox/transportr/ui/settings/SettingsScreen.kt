@@ -64,7 +64,7 @@ import com.alorma.compose.settings.ui.SettingsRadioButton
 import com.alorma.compose.settings.ui.SettingsSlider
 import com.alorma.compose.settings.ui.SettingsSwitch
 import de.grobox.transportr.R
-import de.schildbach.pte.NetworkProvider
+import de.libf.ptek.NetworkProvider
 import org.koin.androidx.compose.koinViewModel
 
 enum class Dialogs {

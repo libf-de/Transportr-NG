@@ -24,7 +24,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import de.schildbach.pte.dto.Position
+import de.libf.ptek.dto.Position
 import de.grobox.transportr.data.locations.GenericLocation
 
 @Entity(

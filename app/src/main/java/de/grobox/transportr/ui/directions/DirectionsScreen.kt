@@ -65,8 +65,8 @@ import de.grobox.transportr.ui.directions.composables.SearchResultComponent
 import de.grobox.transportr.ui.favorites.SavedSearchesActions
 import de.grobox.transportr.ui.favorites.SavedSearchesComponent
 import de.grobox.transportr.ui.productselector.ProductSelectorDialog
-import de.schildbach.pte.dto.Product
-import de.schildbach.pte.dto.Trip
+import de.libf.ptek.dto.Product
+import de.libf.ptek.dto.Trip
 import kotlinx.coroutines.flow.map
 
 @Composable

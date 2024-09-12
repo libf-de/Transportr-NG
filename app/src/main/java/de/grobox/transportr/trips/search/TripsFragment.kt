@@ -42,7 +42,7 @@ import de.grobox.transportr.ui.LceAnimator
 import de.grobox.transportr.ui.directions.DirectionsViewModel
 import de.grobox.transportr.utils.Linkify
 import de.grobox.transportr.utils.TransportrUtils.getDragDistance
-import de.schildbach.pte.dto.Trip
+import de.libf.ptek.dto.Trip
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import java.util.regex.Pattern
 

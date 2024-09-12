@@ -30,7 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import de.schildbach.pte.dto.Trip
+import de.libf.ptek.dto.Trip
 
 @Composable
 fun SearchResultComponent(

@@ -46,7 +46,7 @@ import de.grobox.transportr.data.locations.FavoriteLocation;
 import de.grobox.transportr.data.locations.FavoriteLocation.FavLocationType;
 import de.grobox.transportr.data.locations.HomeLocation;
 import de.grobox.transportr.data.locations.WorLocation;
-import de.schildbach.pte.dto.SuggestedLocation;
+import de.libf.ptek.dto.SuggestedLocation;
 
 import static de.grobox.transportr.data.locations.FavoriteLocation.FavLocationType.FROM;
 import static de.grobox.transportr.data.locations.FavoriteLocation.FromComparator;

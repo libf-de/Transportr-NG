@@ -19,14 +19,14 @@
 package de.grobox.transportr.data
 
 import androidx.room.TypeConverter
-import de.schildbach.pte.NetworkId
-import de.schildbach.pte.dto.Line
-import de.schildbach.pte.dto.Location
-import de.schildbach.pte.dto.Point
-import de.schildbach.pte.dto.Position
-import de.schildbach.pte.dto.Product
-import de.schildbach.pte.dto.Product.Companion.toCodes
-import de.schildbach.pte.dto.Style
+import de.libf.ptek.NetworkId
+import de.libf.ptek.dto.Line
+import de.libf.ptek.dto.Location
+import de.libf.ptek.dto.Point
+import de.libf.ptek.dto.Position
+import de.libf.ptek.dto.Product
+import de.libf.ptek.dto.Product.Companion.toCodes
+import de.libf.ptek.dto.Style
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.util.Date

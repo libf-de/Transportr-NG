@@ -20,8 +20,8 @@ package de.grobox.transportr.ui.directions
 
 import androidx.lifecycle.viewModelScope
 import de.grobox.transportr.TransportrApplication
-import de.schildbach.pte.dto.Product
-import de.schildbach.pte.dto.Trip
+import de.libf.ptek.dto.Product
+import de.libf.ptek.dto.Trip
 import de.grobox.transportr.data.gps.GpsRepository
 import de.grobox.transportr.data.gps.ReverseGeocoderV2
 import de.grobox.transportr.data.locations.FavoriteLocation.FavLocationType
@@ -38,7 +38,7 @@ import de.grobox.transportr.ui.TimeDateFragment.TimeDateListener
 import de.grobox.transportr.ui.trips.TripQuery
 import de.grobox.transportr.utils.DateUtils
 import de.grobox.transportr.utils.LiveTrigger
-import de.schildbach.pte.NetworkProvider
+import de.libf.ptek.NetworkProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow

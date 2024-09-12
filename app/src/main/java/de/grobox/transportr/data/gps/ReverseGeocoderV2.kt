@@ -19,7 +19,7 @@
 
 package de.grobox.transportr.data.gps
 
-import de.schildbach.pte.dto.Point
+import de.libf.ptek.dto.Point
 import de.grobox.transportr.locations.WrapLocation
 
 class ReverseGeocoderV2(

@@ -32,7 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import de.schildbach.pte.dto.Trip
+import de.libf.ptek.dto.Trip
 import de.grobox.transportr.ui.directions.DirectionsViewModel
 
 @Composable

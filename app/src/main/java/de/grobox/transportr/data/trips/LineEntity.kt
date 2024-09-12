@@ -22,10 +22,10 @@ package de.grobox.transportr.data.trips
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import de.schildbach.pte.dto.Line
-import de.schildbach.pte.dto.Product
-import de.schildbach.pte.dto.Style
-import de.schildbach.pte.NetworkId
+import de.libf.ptek.dto.Line
+import de.libf.ptek.dto.Product
+import de.libf.ptek.dto.Style
+import de.libf.ptek.NetworkId
 
 @Entity(
     tableName = "lines",

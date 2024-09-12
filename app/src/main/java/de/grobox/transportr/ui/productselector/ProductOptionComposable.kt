@@ -31,7 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import de.schildbach.pte.dto.Product
+import de.libf.ptek.dto.Product
 import de.grobox.transportr.ui.transport.composables.getDrawableRes
 import de.grobox.transportr.ui.transport.composables.getNameRes
 

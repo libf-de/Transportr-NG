@@ -22,6 +22,9 @@ package de.grobox.transportr.ui.departures
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 
+const val MAX_DEPARTURES = 12
+const val SAFETY_MARGIN = 6
+
 @Composable
 fun DeparturesScreen(
     navController: NavController

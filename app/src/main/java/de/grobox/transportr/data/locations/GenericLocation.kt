@@ -22,10 +22,10 @@ package de.grobox.transportr.data.locations
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.Index
-import de.schildbach.pte.dto.Location
-import de.schildbach.pte.dto.Point
-import de.schildbach.pte.dto.Product
-import de.schildbach.pte.NetworkId
+import de.libf.ptek.NetworkId
+import de.libf.ptek.dto.Location
+import de.libf.ptek.dto.Point
+import de.libf.ptek.dto.Product
 
 @Entity(tableName = "genericLocations", indices = [Index("networkId"), Index("id"), Index(value = ["networkId", "id"], unique = true)])
 class GenericLocation(
@@ -42,7 +42,7 @@ class GenericLocation(
     @Ignore
     fun toLocation(): Location {
         return Location(
-            locId = id,
+            id = id,
             type = type,
             coord = Point.from1E6(lat, lon),
             place = place,

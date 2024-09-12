@@ -16,7 +16,7 @@
 	<string name="library_public_transport_enabler_isOpenSource">true</string>
 	<string name="library_public_transport_enabler_repositoryLink">https://github.com/schildbach/public-transport-enabler</string>
 	<!-- ClassPath for autoDetect section -->
-	<string name="library_public_transport_enabler_classPath">de.schildbach.pte</string>
+	<string name="library_public_transport_enabler_classPath">de.libf.ptek</string>
 	<!-- License section -->
 	<string name="libray_public_transport_enabler_licenseVersion">3.0</string>
 	<string name="libray_public_transport_enabler_licenseLink">https://raw.githubusercontent.com/schildbach/public-transport-enabler/master/enabler/COPYING</string>

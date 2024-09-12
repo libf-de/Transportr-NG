@@ -22,8 +22,8 @@ package de.grobox.transportr.map
 import android.content.Context
 import androidx.core.content.ContextCompat
 import de.grobox.transportr.R
-import de.schildbach.pte.dto.Location
-import de.schildbach.pte.dto.Product
+import de.libf.ptek.dto.Location
+import de.libf.ptek.dto.Product
 import de.grobox.transportr.locations.WrapLocation
 import org.maplibre.android.annotations.Icon
 import org.maplibre.android.annotations.Marker

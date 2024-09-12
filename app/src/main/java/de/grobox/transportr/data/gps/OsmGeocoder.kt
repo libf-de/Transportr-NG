@@ -19,8 +19,8 @@
 
 package de.grobox.transportr.data.gps
 
-import de.schildbach.pte.dto.Location
-import de.schildbach.pte.dto.Point
+import de.libf.ptek.dto.Location
+import de.libf.ptek.dto.Point
 import de.grobox.transportr.locations.WrapLocation
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.serialization.SerialName

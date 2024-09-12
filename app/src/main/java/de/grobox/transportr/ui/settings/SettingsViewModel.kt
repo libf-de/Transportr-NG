@@ -33,8 +33,8 @@ import de.grobox.transportr.networks.TransportNetwork
 import de.grobox.transportr.networks.TransportNetworkManager
 import de.grobox.transportr.networks.TransportNetworkViewModel
 import de.grobox.transportr.settings.SettingsManager
-import de.schildbach.pte.NetworkProvider
-import de.schildbach.pte.NetworkProvider.WalkSpeed
+import de.libf.ptek.NetworkProvider
+import de.libf.ptek.NetworkProvider.WalkSpeed
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 

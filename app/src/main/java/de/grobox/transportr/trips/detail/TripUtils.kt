@@ -32,10 +32,13 @@ import de.grobox.transportr.utils.DateUtils.formatDate
 import de.grobox.transportr.utils.DateUtils.formatTime
 import de.grobox.transportr.utils.DateUtils.isToday
 import de.grobox.transportr.utils.TransportrUtils.getLocationName
-import de.schildbach.pte.dto.Fare
-import de.schildbach.pte.dto.Leg
-import de.schildbach.pte.dto.Product
-import de.schildbach.pte.dto.Trip
+import de.libf.ptek.dto.Fare
+import de.libf.ptek.dto.IndividualLeg
+import de.libf.ptek.dto.Leg
+import de.libf.ptek.dto.Product
+import de.libf.ptek.dto.PublicLeg
+import de.libf.ptek.dto.Trip
+import de.libf.ptek.dto.min
 import java.text.NumberFormat
 import java.util.Calendar
 import java.util.Currency
@@ -109,29 +112,29 @@ internal object TripUtils {
 
     @JvmStatic
     fun legToString(context: Context, leg: Leg): String {
-        var str = "${formatTime(context, leg.departureTime?.let(::Date))} ${getLocationName(leg.departure)}"
+        var str = "${formatTime(context, leg.departureTime.let(::Date))} ${getLocationName(leg.departure)}"
 
-        if (leg.isPublicLeg) {
+        if (leg is PublicLeg) {
             // show departure position if existing
             if (leg.departurePosition != null) {
                 str += " " + context.getString(R.string.platform, leg.departurePosition.toString())
             }
-            str += "\n  ${getEmojiForProduct(leg.line?.product)} "
-            leg.line?.label?.let {
+            str += "\n  ${getEmojiForProduct(leg.line.product)} "
+            leg.line.label?.let {
                 str += it
                 leg.destination?.let {
                     str += " → ${getLocationName(it)}"
                 }
             }
-        } else {
+        } else if(leg is IndividualLeg) {
             str += "\n  \uD83D\uDEB6 ${context.getString(R.string.walk)} "
-            leg.distance?.takeIf { it > 0 }?.let { str += context.resources.getString(R.string.meter, it) }
-            leg.min?.takeIf { it > 0 }?.let { str += " ${context.resources.getString(R.string.for_x_min, it)}" }
-        }
+            leg.distance.takeIf { it > 0 }?.let { str += context.resources.getString(R.string.meter, it) }
+            leg.min.takeIf { it > 0 }?.let { str += " ${context.resources.getString(R.string.for_x_min, it)}" }
+        } else throw IllegalStateException("Expected leg to be PublicLeg or IndividualLeg")
         str += "\n${formatTime(context, leg.arrivalTime?.let(::Date))} ${getLocationName(leg.arrival)}"
 
         // add arrival position if existing
-        if (leg.isPublicLeg && leg.arrivalPosition != null) {
+        if (leg is PublicLeg && leg.arrivalPosition != null) {
             str += " ${context.getString(R.string.platform, leg.arrivalPosition.toString())}"
         }
         return str

@@ -22,8 +22,8 @@ package de.grobox.transportr.locations
 import android.content.Context
 import android.location.Geocoder
 import androidx.annotation.WorkerThread
-import de.schildbach.pte.dto.Location
-import de.schildbach.pte.dto.Point
+import de.libf.ptek.dto.Location
+import de.libf.ptek.dto.Point
 import okhttp3.*
 import org.json.JSONException
 import org.json.JSONObject

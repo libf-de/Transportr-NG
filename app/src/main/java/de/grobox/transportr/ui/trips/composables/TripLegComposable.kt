@@ -79,11 +79,12 @@ import de.grobox.transportr.utils.DateUtils.formatDuration
 import de.grobox.transportr.utils.DateUtils.formatTime
 import de.grobox.transportr.utils.TransportrUtils.getDrawableForProduct
 import de.grobox.transportr.utils.TransportrUtils.getLocationName
-import de.schildbach.pte.dto.Leg
-import de.schildbach.pte.dto.Line
-import de.schildbach.pte.dto.Line.Companion.DEFAULT_LINE_COLOR
-import de.schildbach.pte.dto.Location
-import de.schildbach.pte.dto.Stop
+import de.libf.ptek.dto.Leg
+import de.libf.ptek.dto.Line
+import de.libf.ptek.dto.Line.Companion.DEFAULT_LINE_COLOR
+import de.libf.ptek.dto.Location
+import de.libf.ptek.dto.PublicLeg
+import de.libf.ptek.dto.Stop
 import java.util.Date
 
 
@@ -117,7 +118,7 @@ fun LegListComposable(
         modifier = Modifier
     ) {
         legs.forEachWithNeighbors { prev, current, next ->
-            if(current.isPublicLeg) {
+            if(current is PublicLeg) {
                 val lineName = if(showLineNames) null else getLocationName(current.destination)
                 val collapsed = !expandedLegs.contains(current)
                 item {
@@ -159,7 +160,7 @@ fun LegListComposable(
                     item {
                         IntermediateComponent(
                             leg = current,
-                            duration = formatDuration(prev.arrivalTime?.let(::Date), next.departureTime?.let(::Date))
+                            duration = formatDuration(prev.arrivalTime.let(::Date), next.departureTime.let(::Date))
                         )
                     }
                 }
@@ -254,7 +255,7 @@ fun FirstLegComponent(
                 modifier = Modifier.padding(top = textPad).height(22.dp).wrapContentHeight(align = Alignment.CenterVertically)
             )
 
-            if(leg.isPublicLeg) {
+            if(leg is PublicLeg) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -431,7 +432,7 @@ fun LastLegComponent(
                 .fillMaxHeight()
         ) {
             if(otherLegColor == null)
-                drawLastLeg(thisLegColor, !leg.isPublicLeg)
+                drawLastLeg(thisLegColor, leg !is PublicLeg)
             else
                 drawIntermediaryLastLeg(thisLegColor, false, otherLegColor ?: thisLegColor, true)
         }
@@ -445,7 +446,7 @@ fun LastLegComponent(
             )
         }
 
-        if(leg.isPublicLeg) {
+        if(leg is PublicLeg) {
             CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
                 IconButton(
                     onClick = { /* TODO */ },
@@ -508,7 +509,7 @@ fun IntermediateComponent(
 @Composable
 private fun Leg.getColor(): Color {
     //TODO: Harmonize colors
-    return if(isPublicLeg) Color(this.line?.getColorInt() ?: -0x1000000) else colorResource(R.color.walking)
+    return if(this is PublicLeg) Color(this.line.getColorInt()) else colorResource(R.color.walking)
 }
 
 
@@ -935,17 +936,17 @@ fun DrawScope.drawLastLeg(
 
 
 fun Leg.getDepartureTimes(context: Context): Pair<String, String> {
-    return if(isPublicLeg)
-        this.departureStop?.getDepartureTimes(context) ?: Pair("", "")
+    return if(this is PublicLeg)
+        this.departureStop.getDepartureTimes(context)
     else
-        Pair(formatTime(context, departureTime?.let(::Date)), "")
+        Pair(formatTime(context, departureTime.let(::Date)), "")
 }
 
 fun Leg.getArrivalTimes(context: Context): Pair<String, String> {
-    return if(isPublicLeg)
-        this.arrivalStop?.getArrivalTimes(context) ?: Pair("", "")
+    return if(this is PublicLeg)
+        this.arrivalStop.getArrivalTimes(context)
     else
-        Pair(formatTime(context, arrivalTime?.let(::Date)), "")
+        Pair(formatTime(context, arrivalTime.let(::Date)), "")
 }
 
 

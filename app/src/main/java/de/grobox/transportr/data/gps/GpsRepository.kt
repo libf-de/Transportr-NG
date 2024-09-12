@@ -19,7 +19,7 @@
 
 package de.grobox.transportr.data.gps
 
-import de.schildbach.pte.dto.Point
+import de.libf.ptek.dto.Point
 import kotlinx.coroutines.flow.Flow
 
 interface GpsRepository {

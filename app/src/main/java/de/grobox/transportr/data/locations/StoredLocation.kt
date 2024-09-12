@@ -20,10 +20,10 @@ package de.grobox.transportr.data.locations
 
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
-import de.schildbach.pte.dto.Location
-import de.schildbach.pte.dto.Product
+import de.libf.ptek.dto.Location
+import de.libf.ptek.dto.Product
 import de.grobox.transportr.locations.WrapLocation
-import de.schildbach.pte.NetworkId
+import de.libf.ptek.NetworkId
 
 abstract class StoredLocation internal constructor(
     @JvmField @PrimaryKey(autoGenerate = true) val uid: Long,

@@ -29,12 +29,14 @@ import androidx.room.Query
 import androidx.room.Relation
 import androidx.room.Transaction
 import de.grobox.transportr.data.locations.GenericLocation
-import de.schildbach.pte.NetworkId
-import de.schildbach.pte.dto.Leg
-import de.schildbach.pte.dto.Line
-import de.schildbach.pte.dto.Location
-import de.schildbach.pte.dto.Stop
-import de.schildbach.pte.dto.Trip
+import de.libf.ptek.NetworkId
+import de.libf.ptek.dto.IndividualLeg
+import de.libf.ptek.dto.Line
+import de.libf.ptek.dto.Location
+import de.libf.ptek.dto.PublicLeg
+import de.libf.ptek.dto.Stop
+import de.libf.ptek.dto.Trip
+import de.libf.ptek.dto.min
 
 private fun Stop.toStopEntity(locationId: Long): StopEntity {
     return StopEntity(
@@ -154,7 +156,7 @@ interface TripsDao {
                 to = to.toLocation(),
                 legs = legs.map {
                     if(it.tripLeg.isPublicLeg) {
-                        Leg(
+                        PublicLeg(
                             line = it.line.toLine(),
                             destination = it.destination.toLocation(),
                             departureStop = it.departureStop.toStop(),
@@ -166,14 +168,14 @@ interface TripsDao {
                             message = it.tripLeg.message,
                         )
                     } else {
-                        Leg(
-                            type = it.tripLeg.individualType ?: Leg.IndividualType.WALK,
+                        IndividualLeg(
+                            type = it.tripLeg.individualType!!,
                             departure = it.departureStop.location.toLocation(),
                             departureTime = it.tripLeg.departureTime ?: 0L,
                             arrival = it.arrivalStop.location.toLocation(),
                             arrivalTime = it.tripLeg.arrivalTime ?: 0L,
                             path = it.tripLeg.path,
-                            distance = it.tripLeg.distance
+                            distance = it.tripLeg.distance!!
                         )
                     }
                 },
@@ -251,10 +253,10 @@ interface TripsDao {
         )
 
         trip.legs.forEachIndexed { index, leg ->
-            if(leg.isPublicLeg) {
+            if(leg is PublicLeg) {
                 val stops: MutableList<Long> = mutableListOf()
 
-                val departureStopId = leg.departureStop?.let {
+                val departureStopId = leg.departureStop.let {
                     val stLoc = it.location.toGenericLocation(network)
 
                     val stopLoc = addLocation(
@@ -262,7 +264,7 @@ interface TripsDao {
                     )
 
                     addStop(it.toStopEntity(
-                            locationId = stopLoc
+                        locationId = stopLoc
                     ))
                 }
 
@@ -275,15 +277,15 @@ interface TripsDao {
                 }
 
 
-                val arrivalStopId = leg.arrivalStop?.let {
+                val arrivalStopId = leg.arrivalStop.let {
                     val arrivalLocId = addLocation(it.location.toGenericLocation(network))
 
                     addStop(it.toStopEntity(
-                            locationId = arrivalLocId
+                        locationId = arrivalLocId
                     ))
                 }
 
-                val lineId = leg.line?.let { addLine(it.toLineEntity(network)) }
+                val lineId = addLine(leg.line.toLineEntity(network))
                 val destinationId = leg.destination?.let { addLocation(it.toGenericLocation(network)) }
 
                 val departureId = addLocation(leg.departure.toGenericLocation(network))
@@ -309,15 +311,14 @@ interface TripsDao {
                     arrivalTime = leg.arrivalTime,
                     legNumber = index
                 ))
-            }
-            else {
+            } else if(leg is IndividualLeg) {
                 addTripLeg(
                     TripLegEntity(
                         uid = 0,
                         isPublicLeg = false,
                         tripId = tripId,
 
-                        individualType = leg.individualType!!,
+                        individualType = leg.type,
                         departureId = addLocation(leg.departure.toGenericLocation(network)),
                         departureTime = leg.departureTime,
                         arrivalId = addLocation(leg.arrival.toGenericLocation(network)),

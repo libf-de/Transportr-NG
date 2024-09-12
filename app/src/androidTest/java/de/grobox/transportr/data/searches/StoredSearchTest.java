@@ -30,9 +30,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import de.grobox.transportr.data.DbTest;
 import de.grobox.transportr.data.locations.FavoriteLocation;
 import de.grobox.transportr.data.locations.LocationDao;
-import de.schildbach.pte.dto.Location;
+import de.libf.ptek.dto.Location;
 
-import static de.schildbach.pte.NetworkId.DB;
+import static de.libf.ptek.NetworkId.DB;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;

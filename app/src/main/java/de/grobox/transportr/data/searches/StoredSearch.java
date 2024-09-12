@@ -32,7 +32,7 @@ import androidx.annotation.Nullable;
 import java.util.Date;
 
 import de.grobox.transportr.data.locations.FavoriteLocation;
-import de.schildbach.pte.NetworkId;
+import de.libf.ptek.NetworkId;
 
 @Entity(
 		tableName = "searches",

@@ -21,12 +21,12 @@ package de.grobox.transportr.data.searches
 
 import androidx.annotation.WorkerThread
 import de.grobox.transportr.AbstractManager
-import de.schildbach.pte.dto.Location
+import de.libf.ptek.dto.Location
 import de.grobox.transportr.data.locations.FavoriteLocation
 import de.grobox.transportr.data.locations.LocationDao
 import de.grobox.transportr.favorites.trips.FavoriteTripItem
 import de.grobox.transportr.networks.TransportNetworkManager
-import de.schildbach.pte.NetworkId
+import de.libf.ptek.NetworkId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first

@@ -24,7 +24,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import de.grobox.transportr.R
-import de.schildbach.pte.dto.Location
+import de.libf.ptek.dto.Location
 import org.maplibre.android.annotations.Icon
 import org.maplibre.android.annotations.IconFactory
 import org.maplibre.android.annotations.Marker

@@ -24,7 +24,7 @@ plugins {
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.serialization)
-    //kotlin("kapt")
+    kotlin("kapt")
     //id("witness")
 }
 
@@ -149,7 +149,7 @@ dependencies {
     //kapt(libs.androidx.lifecycle.compiler)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
-    //kapt(libs.androidx.room.compiler)
+    kapt(libs.androidx.room.compiler)
     implementation(libs.androidx.localbroadcastmanager)
 
     implementation(libs.okhttp)
@@ -194,7 +194,7 @@ dependencies {
 //        exclude(group = "org.json", module = "json")
 //        exclude(group = "net.sf.kxml", module = "kxml2")
 //    }
-    implementation("de.schildbach.pte:public-transport-enabler-ktx-jvm:unspecified")
+    implementation("de.libf.ptek:public-transport-enabler-ktx-jvm:0.0.2")
     debugImplementation(libs.slf4j)
     debugImplementation(libs.logback.android)
 

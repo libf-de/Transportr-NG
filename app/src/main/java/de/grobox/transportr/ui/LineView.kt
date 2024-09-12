@@ -28,7 +28,7 @@ import androidx.annotation.DrawableRes
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat.getDrawable
 import de.grobox.transportr.R
-import de.schildbach.pte.dto.Line
+import de.libf.ptek.dto.Line
 import de.grobox.transportr.utils.TransportrUtils.dpToPx
 import de.grobox.transportr.utils.TransportrUtils.getDrawableForProduct
 

@@ -43,8 +43,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import de.grobox.transportr.R
-import de.schildbach.pte.dto.Line
-import de.schildbach.pte.dto.Product
+import de.libf.ptek.dto.Line
+import de.libf.ptek.dto.Product
 
 @Composable
 fun ProductComposable(

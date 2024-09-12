@@ -31,7 +31,7 @@ import de.grobox.transportr.utils.IntentUtils.findNearbyStations
 import de.grobox.transportr.utils.IntentUtils.presetDirections
 import de.grobox.transportr.utils.IntentUtils.startGeoIntent
 import de.grobox.transportr.utils.TransportrUtils.copyToClipboard
-import de.schildbach.pte.dto.Location
+import de.libf.ptek.dto.Location
 
 @Deprecated("Use Composables")
 class LegPopupMenu private constructor(context: Context, anchor: View, location: Location, private val text: String) :

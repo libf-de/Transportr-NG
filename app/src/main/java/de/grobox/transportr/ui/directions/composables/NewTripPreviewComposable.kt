@@ -66,8 +66,15 @@ import de.grobox.transportr.ui.trips.search.getDepartureTimes
 import de.grobox.transportr.ui.trips.search.hasProblem
 import de.grobox.transportr.utils.DateUtils.formatDuration
 import de.grobox.transportr.utils.TransportrUtils.getLocationName
-import de.schildbach.pte.dto.Leg
-import de.schildbach.pte.dto.Trip
+import de.libf.ptek.dto.IndividualLeg
+import de.libf.ptek.dto.Leg
+import de.libf.ptek.dto.Line
+import de.libf.ptek.dto.PublicLeg
+import de.libf.ptek.dto.Trip
+import de.libf.ptek.dto.min
+
+private val Leg.line: Line?
+    get() = if(this is PublicLeg) this.line else null
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -104,9 +111,9 @@ fun NewTripPreviewComposable(
 
     //val busIcon = painterResource(R.drawable.product_bus)
     val tripIcons = trip.legs.mapNotNull {
-        it.line?.let { line ->
-            line.product to painterResource(line.product.getDrawableRes())
-        }
+        if(it is PublicLeg)
+            it.line.product to painterResource(it.line.product.getDrawableRes())
+        else null
     }.plus(null to painterResource(R.drawable.ic_walk)).toMap()
 
     val textMeasurer = rememberTextMeasurer()
@@ -159,9 +166,9 @@ fun NewTripPreviewComposable(
                         val next = trip.legs.getOrNull(index + 1)
 
                         previous?.let { prev ->
-                            if(prev.arrivalTime != null && leg.departureTime != null && prev.arrivalTime != leg.departureTime) {
-                                val diffMins = (leg.departureTime!! - prev.arrivalTime!!).toMins()
-                                val diffTimeFraction = trip.duration?.toMins()?.let { totalMin -> diffMins / totalMin.toFloat() } ?: .1f
+                            if(prev.arrivalTime != leg.departureTime) {
+                                val diffMins = (leg.departureTime - prev.arrivalTime).toMins()
+                                val diffTimeFraction = trip.duration.toMins().let { totalMin -> diffMins / totalMin.toFloat() }
                                 val diffWidth = diffTimeFraction * size.width
 
                                 curPos = centerSegment(
@@ -201,7 +208,7 @@ fun NewTripPreviewComposable(
                             },
                             startColor = previous?.line?.style?.backgroundColor?.let(::Color) ?: legColor,
                             endColor = next?.line?.style?.backgroundColor?.let(::Color) ?: legColor,
-                            walk = !leg.isPublicLeg,
+                            walk = leg is IndividualLeg,
                             attrs = TripPreviewAttrs()
                         )
                     }
@@ -229,8 +236,8 @@ fun NewTripPreviewComposable(
 }
 
 private fun Leg.getLineLabelOrNull(): String? {
-    return if(this.isPublicLeg) this.line?.label
-    else ""
+    return if(this is PublicLeg) this.line.label
+    else null
 }
 
 private fun Long.toMins(): Long = (this / 1000 / 60)

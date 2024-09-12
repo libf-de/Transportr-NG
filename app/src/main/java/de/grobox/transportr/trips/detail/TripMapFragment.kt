@@ -23,7 +23,7 @@ import androidx.annotation.LayoutRes
 import de.grobox.transportr.R
 import de.grobox.transportr.map.GpsMapFragment
 import de.grobox.transportr.ui.trips.TripDetailViewModel
-import de.schildbach.pte.dto.Trip
+import de.libf.ptek.dto.Trip
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.maps.MapLibreMap

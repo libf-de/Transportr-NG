@@ -21,7 +21,7 @@ package de.grobox.transportr.networks
 
 import androidx.annotation.VisibleForTesting
 import de.grobox.transportr.settings.SettingsManager
-import de.schildbach.pte.NetworkId
+import de.libf.ptek.NetworkId
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.mapLatest

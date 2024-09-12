@@ -21,7 +21,6 @@ package de.grobox.transportr.utils
 
 
 import android.content.ActivityNotFoundException
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -29,10 +28,7 @@ import android.os.Build
 import android.util.Log
 import android.widget.Toast
 import de.grobox.transportr.R
-import de.grobox.transportr.departures.DeparturesActivity
 import de.grobox.transportr.locations.WrapLocation
-import de.grobox.transportr.map.MapActivity
-import de.grobox.transportr.ui.trips.search.DirectionsActivity.Companion.ACTION_SEARCH
 import org.maplibre.android.geometry.LatLng
 import java.io.UnsupportedEncodingException
 import java.net.URLEncoder
@@ -69,19 +65,19 @@ object IntentUtils {
 
     @JvmStatic
     fun findDepartures(context: Context, location: WrapLocation) {
-        val intent = Intent(context, DeparturesActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-        //intent.putExtra(WRAP_LOCATION, location)
-        context.startActivity(intent)
+//        val intent = Intent(context, DeparturesActivity::class.java)
+//        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+//        //intent.putExtra(WRAP_LOCATION, location)
+//        context.startActivity(intent)
     }
 
     @JvmStatic
     fun findNearbyStations(context: Context, location: WrapLocation) {
-        val intent = Intent(context, MapActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-        intent.action = ACTION_SEARCH
-        //intent.putExtra(WRAP_LOCATION, location)
-        context.startActivity(intent)
+//        val intent = Intent(context, MapActivity::class.java)
+//        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+//        intent.action = ACTION_SEARCH
+//        //intent.putExtra(WRAP_LOCATION, location)
+//        context.startActivity(intent)
     }
 
     @JvmStatic
@@ -102,7 +98,7 @@ object IntentUtils {
         val intentChooser = Intent.createChooser(intent,  context.getString(R.string.show_location_in))
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
             // exclude Transportr from list on Android >= 7
-            intentChooser.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, arrayOf(ComponentName(context, MapActivity::class.java)))
+//            intentChooser.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, arrayOf(ComponentName(context, MapActivity::class.java)))
         try {
             Log.d(context.javaClass.simpleName, "Starting geo intent: $geo")
             context.startActivity(intentChooser)

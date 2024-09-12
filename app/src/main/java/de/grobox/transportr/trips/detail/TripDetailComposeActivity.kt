@@ -32,7 +32,7 @@ import de.grobox.transportr.ui.ThreeStateBottomSheetBehavior
 import de.grobox.transportr.ui.trips.TripDetailViewModel
 import de.grobox.transportr.utils.FullScreenUtil.Companion.applyTopInset
 import de.grobox.transportr.utils.FullScreenUtil.Companion.drawBehindStatusbar
-import de.schildbach.pte.dto.Trip
+import de.libf.ptek.dto.Trip
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import javax.annotation.ParametersAreNonnullByDefault
 
@@ -131,9 +131,9 @@ class TripDetailComposeActivity : ComponentActivity() {
     }
 
     companion object {
-        const val TRIP: String = "de.schildbach.pte.dto.Trip"
-        const val FROM: String = "de.schildbach.pte.dto.Trip.from"
-        const val VIA: String = "de.schildbach.pte.dto.Trip.via"
-        const val TO: String = "de.schildbach.pte.dto.Trip.to"
+        const val TRIP: String = "de.libf.ptek.dto.Trip"
+        const val FROM: String = "de.libf.ptek.dto.Trip.from"
+        const val VIA: String = "de.libf.ptek.dto.Trip.via"
+        const val TO: String = "de.libf.ptek.dto.Trip.to"
     }
 }

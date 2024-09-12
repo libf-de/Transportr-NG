@@ -40,8 +40,8 @@
 -dontwarn afu.org.checkerframework.checker.**
 -dontwarn org.checkerframework.checker.**
 
--keep class de.schildbach.pte.dto.**
--dontwarn de.schildbach.pte.**
+-keep class de.libf.ptek.dto.**
+-dontwarn de.libf.ptek.**
 
 -keepclassmembers class * implements java.io.Serializable {
 	private void writeObject(java.io.ObjectOutputStream);

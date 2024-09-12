@@ -34,7 +34,7 @@ import de.grobox.transportr.ui.settings.SettingsScreen
 import de.grobox.transportr.ui.settings.SettingsViewModel
 import de.grobox.transportr.ui.transportnetworkselector.TransportNetworkSelectorScreen
 import de.grobox.transportr.ui.trips.TripDetailScreen
-import de.schildbach.pte.dto.Trip
+import de.libf.ptek.dto.Trip
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString

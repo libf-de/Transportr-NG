@@ -21,6 +21,7 @@ package de.grobox.transportr.locations
 
 import de.grobox.transportr.networks.TransportNetwork
 import de.grobox.transportr.networks.TransportNetworkManager
+import de.libf.ptek.dto.Location
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -31,30 +32,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class SuggestLocationsRepository(
     private val manager: TransportNetworkManager,
     private val dispatcher: CoroutineDispatcher = Dispatchers.Default,
     private val autoCompletionDelay: Long = 300L
 ) {
-
     private val scope = CoroutineScope(dispatcher + SupervisorJob())
-
-//    private val _suggestedLocations = MediatorLiveData<Set<WrapLocation>>()
-//    val suggestedLocations: LiveData<Set<WrapLocation>> = _suggestedLocations
-//
-//    private val _isLoading: MutableLiveData<Boolean> = MutableLiveData(false)
-//    val isLoading: LiveData<Boolean> = _isLoading
-//
-//    private var suggestLocationsJob: Job? = null
-//    private var suggestLocationsTask: SuggestLocationsTask? = null
-//    private var transportNetwork: TransportNetwork? = null
-
-
-
-
-
 
     private val _suggestedLocations = MutableStateFlow<Set<WrapLocation>>(emptySet())
     val suggestedLocations: StateFlow<Set<WrapLocation>> = _suggestedLocations.asStateFlow()
@@ -63,7 +47,6 @@ class SuggestLocationsRepository(
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     private var suggestLocationsJob: Job? = null
-    private var suggestLocationsTask: SuggestLocationsTask? = null
     private var transportNetwork: TransportNetwork? = null
 
     init {
@@ -76,7 +59,6 @@ class SuggestLocationsRepository(
 
     fun suggestLocations(query: String) {
         suggestLocationsJob?.cancel()
-        suggestLocationsTask?.cancel(true)
 
         if(query.isEmpty()) {
             _suggestedLocations.value = emptySet()
@@ -88,37 +70,24 @@ class SuggestLocationsRepository(
             delay(autoCompletionDelay)
 
             transportNetwork?.let {
-                withContext(Dispatchers.Main) {
-                    _suggestLocations(query)
-                }
+                _suggestedLocations.value = (it.networkProvider
+                    .suggestLocations(constraint = query, types = setOf(Location.Type.STATION), maxLocations = 99)
+                    .suggestedLocations
+                    ?.map { sl -> WrapLocation(sl.location) }
+                    ?.toSet() ?: emptySet())
+                    .also { _isLoading.value = false }
             }
-        }
-    }
-
-    private fun _suggestLocations(query: String) {
-        _isLoading.value = true
-        transportNetwork?.let {
-            if (suggestLocationsTask != null && suggestLocationsTask?.isCancelled == false) return@let null
-
-            suggestLocationsTask = SuggestLocationsTask(it) { suggestLocationsResult ->
-                _suggestedLocations.value = suggestLocationsResult?.suggestedLocations?.map { sl ->
-                    WrapLocation(sl.location)
-                }?.toSet() ?: emptySet()
-            }
-            suggestLocationsTask?.execute(query)
-        }.let {
-            if(it == null) _isLoading.value = false
+                .also { if(it == null) _isLoading.value = false }
         }
     }
 
     fun cancelSuggestLocations() {
-        suggestLocationsTask?.cancel(true)
+        suggestLocationsJob?.cancel()
         _isLoading.value = false
     }
 
     fun reset() {
         suggestLocationsJob?.cancel()
-        suggestLocationsTask?.cancel(true)
         _isLoading.value = false
         _suggestedLocations.value = emptySet()
     }

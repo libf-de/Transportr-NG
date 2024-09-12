@@ -39,7 +39,7 @@ import com.mikepenz.fastadapter.select.SelectExtension
 import de.grobox.transportr.R
 import de.grobox.transportr.databinding.FragmentProductDialogBinding
 import de.grobox.transportr.ui.directions.DirectionsViewModel
-import de.schildbach.pte.dto.Product
+import de.libf.ptek.dto.Product
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import java.util.EnumSet
 import javax.annotation.ParametersAreNonnullByDefault

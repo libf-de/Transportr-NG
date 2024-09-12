@@ -22,7 +22,6 @@ package de.grobox.transportr.locations
 import android.content.Context
 import android.content.Context.INPUT_METHOD_SERVICE
 import android.content.Context.LAYOUT_INFLATER_SERVICE
-import android.os.AsyncTask.Status.FINISHED
 import android.os.Bundle
 import android.os.Parcelable
 import android.text.Editable
@@ -50,12 +49,10 @@ import de.grobox.transportr.data.locations.FavoriteLocation.FavLocationType
 import de.grobox.transportr.data.locations.HomeLocation
 import de.grobox.transportr.data.locations.WorLocation
 import de.grobox.transportr.locations.LocationAdapter.TYPING_THRESHOLD
-import de.grobox.transportr.locations.SuggestLocationsTask.SuggestLocationsTaskCallback
 import de.grobox.transportr.networks.TransportNetwork
-import de.schildbach.pte.dto.SuggestLocationsResult
+import de.libf.ptek.dto.SuggestLocationsResult
 
-open class LocationView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : LinearLayout(context, attrs),
-    SuggestLocationsTaskCallback {
+open class LocationView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : LinearLayout(context, attrs) {
 
     companion object {
         private const val LOCATION = "location"
@@ -66,7 +63,7 @@ open class LocationView @JvmOverloads constructor(context: Context, attrs: Attri
     }
 
     private lateinit var adapter: LocationAdapter
-    private var task: SuggestLocationsTask? = null
+//    private var task: SuggestLocationsTask? = null
     private var transportNetwork: TransportNetwork? = null
     private var location: WrapLocation? = null
     private var suggestLocationsTaskPending = false
@@ -243,14 +240,14 @@ open class LocationView @JvmOverloads constructor(context: Context, attrs: Attri
         if (suggestLocationsTaskPending) return
         suggestLocationsTaskPending = true
         postDelayed({
-            if (task != null && task!!.status != FINISHED) task!!.cancel(true)
-            task = SuggestLocationsTask(transportNetwork!!, this@LocationView)
-            task!!.execute(text)
+//            if (task != null && task!!.status != FINISHED) task!!.cancel(true)
+            //task = SuggestLocationsTask(transportNetwork!!, this@LocationView)
+            //task!!.execute(text)
             suggestLocationsTaskPending = false
         }, AUTO_COMPLETION_DELAY.toLong())
     }
 
-    override fun onSuggestLocationsResult(suggestLocationsResult: SuggestLocationsResult?) {
+    fun onSuggestLocationsResult(suggestLocationsResult: SuggestLocationsResult?) {
         ui.progress.visibility = GONE
         if (suggestLocationsResult == null) return
 
@@ -258,7 +255,7 @@ open class LocationView @JvmOverloads constructor(context: Context, attrs: Attri
     }
 
     private fun stopSuggestLocationsTask() {
-        if (task != null) task!!.cancel(true)
+//        if (task != null) task!!.cancel(true)
         ui.progress.visibility = GONE
     }
 

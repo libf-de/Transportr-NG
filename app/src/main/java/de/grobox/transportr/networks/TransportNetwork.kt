@@ -24,8 +24,8 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.google.common.base.Preconditions.checkArgument
 import de.grobox.transportr.R
-import de.schildbach.pte.NetworkId
-import de.schildbach.pte.NetworkProvider
+import de.libf.ptek.NetworkId
+import de.libf.ptek.NetworkProvider
 import java.lang.ref.SoftReference
 import javax.annotation.concurrent.Immutable
 

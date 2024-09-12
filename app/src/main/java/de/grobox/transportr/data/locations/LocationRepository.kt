@@ -22,12 +22,12 @@ package de.grobox.transportr.data.locations
 
 import androidx.annotation.WorkerThread
 import de.grobox.transportr.AbstractManager
-import de.schildbach.pte.dto.Location
+import de.libf.ptek.dto.Location
 import de.grobox.transportr.data.locations.FavoriteLocation.FavLocationType
 import de.grobox.transportr.locations.WrapLocation
 import de.grobox.transportr.locations.WrapLocation.WrapType.NORMAL
 import de.grobox.transportr.networks.TransportNetworkManager
-import de.schildbach.pte.NetworkId
+import de.libf.ptek.NetworkId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first

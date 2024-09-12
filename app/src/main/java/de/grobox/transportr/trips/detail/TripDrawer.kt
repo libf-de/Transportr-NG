@@ -21,21 +21,21 @@ package de.grobox.transportr.ui.trips.detail
 
 
 import android.content.Context
-import android.graphics.Color
 import android.graphics.PorterDuff.Mode.MULTIPLY
 import android.graphics.PorterDuff.Mode.SRC_IN
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.LayerDrawable
-import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
-import com.google.android.material.color.MaterialColors
 import de.grobox.transportr.R
 import de.grobox.transportr.map.MapDrawer
+import de.grobox.transportr.ui.map.getBackgroundColor
+import de.grobox.transportr.ui.map.getForegroundColor
 import de.grobox.transportr.utils.DateUtils.formatTime
-import de.schildbach.pte.dto.Leg
-import de.schildbach.pte.dto.Location
-import de.schildbach.pte.dto.Stop
-import de.schildbach.pte.dto.Trip
+import de.libf.ptek.dto.Leg
+import de.libf.ptek.dto.Location
+import de.libf.ptek.dto.PublicLeg
+import de.libf.ptek.dto.Stop
+import de.libf.ptek.dto.Trip
 import org.maplibre.android.annotations.Icon
 import org.maplibre.android.annotations.PolylineOptions
 import org.maplibre.android.geometry.LatLng
@@ -55,12 +55,12 @@ class TripDrawer(context: Context) : MapDrawer(context) {
         val builder = LatLngBounds.Builder()
         for (leg in trip.legs) {
             // get colors
-            val backgroundColor = leg.getBackgroundColor()
-            val foregroundColor = leg.getForegroundColor()
+            val backgroundColor = leg.getBackgroundColor(context)
+            val foregroundColor = leg.getForegroundColor(context)
 
             // draw leg path first, so it is always at the bottom
-            val points = ArrayList<LatLng>(leg.path.size)
-            leg.path.mapTo(points) { LatLng(it.lat, it.lon) }
+            val points = ArrayList<LatLng>(leg.path?.size ?: 0)
+            leg.path?.mapTo(points) { LatLng(it.lat, it.lon) }
             map.addPolyline(PolylineOptions()
                     .color(backgroundColor)
                     .addAll(points)
@@ -68,7 +68,7 @@ class TripDrawer(context: Context) : MapDrawer(context) {
             )
 
             // Only draw marker icons for public transport legs
-            if (leg.isPublicLeg) {
+            if (leg is PublicLeg) {
                 // Draw intermediate stops below all others
                 leg.intermediateStops?.let {
                     for (stop in it) {
@@ -79,7 +79,7 @@ class TripDrawer(context: Context) : MapDrawer(context) {
                 }
 
                 // Draw first station or change station
-                if (i == 1 || i == 2 && !trip.legs[0].isPublicLeg) {
+                if (i == 1 || i == 2 && trip.legs[0] !is PublicLeg) {
                     val icon = getMarkerIcon(MarkerType.BEGIN, backgroundColor, foregroundColor) ?: continue
                     marLocation(map, leg.departure, icon, getStationText(leg, MarkerType.BEGIN))
                 } else {
@@ -88,7 +88,7 @@ class TripDrawer(context: Context) : MapDrawer(context) {
                 }
 
                 // Draw final station only at the end or if end is walking
-                if (i == trip.legs.size || i == trip.legs.size - 1 && !trip.legs[i].isPublicLeg) {
+                if (i == trip.legs.size || i == trip.legs.size - 1 && trip.legs[i] !is PublicLeg) {
                     val icon = getMarkerIcon(MarkerType.END, backgroundColor, foregroundColor) ?: continue
                     marLocation(map, leg.arrival, icon, getStationText(leg, MarkerType.END))
                 }
@@ -105,30 +105,6 @@ class TripDrawer(context: Context) : MapDrawer(context) {
         if (zoom) {
             zoomToBounds(map, builder, false)
         }
-    }
-
-    @ColorInt
-    private fun Leg.getBackgroundColor(): Int {
-        if (isPublicLeg) {
-            return if (line?.style != null && line!!.style!!.backgroundColor != 0) {
-                line!!.style!!.backgroundColor
-            } else {
-                MaterialColors.getColor(context, R.attr.colorPrimary, Color.TRANSPARENT)
-            }
-        }
-        return MaterialColors.getColor(context, R.attr.colorSecondary, Color.TRANSPARENT)
-    }
-
-    @ColorInt
-    private fun Leg.getForegroundColor(): Int {
-        if (isPublicLeg) {
-            return if (line?.style != null && line!!.style!!.foregroundColor != 0) {
-                line!!.style!!.foregroundColor
-            } else {
-                ContextCompat.getColor(context, android.R.color.white)
-            }
-        }
-        return ContextCompat.getColor(context, android.R.color.black)
     }
 
     private fun marLocation(map: MapLibreMap, location: Location, icon: Icon, text: String) {
@@ -170,10 +146,10 @@ class TripDrawer(context: Context) : MapDrawer(context) {
 
     private fun getStationText(leg: Leg, type: MarkerType): String {
         return when (type) {
-            MarkerType.BEGIN -> leg.getDepartureTime(false)?.let {
+            MarkerType.BEGIN -> leg.departureTime.let {
                 "${context.getString(R.string.trip_dep)}: ${formatTime(context, Date(it))}"
             }
-            MarkerType.END -> leg.getArrivalTime(false)?.let {
+            MarkerType.END -> leg.arrivalTime.let {
                 "${context.getString(R.string.trip_arr)}: ${formatTime(context, Date(it))}"
             }
             else -> ""
@@ -182,10 +158,10 @@ class TripDrawer(context: Context) : MapDrawer(context) {
 
     private fun getStationText(leg1: Leg, leg2: Leg): String {
         var text = ""
-        leg1.arrivalTime?.let {
+        leg1.arrivalTime.let {
             text += "${context.getString(R.string.trip_arr)}: ${formatTime(context, Date(it))}"
         }
-        leg2.departureTime?.let {
+        leg2.departureTime.let {
             if (text.isNotEmpty()) text += "\n"
             text += "${context.getString(R.string.trip_dep)}: ${formatTime(context, Date(it))}"
         }

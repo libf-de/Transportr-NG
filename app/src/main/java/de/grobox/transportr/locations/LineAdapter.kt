@@ -24,7 +24,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import de.grobox.transportr.R
 import de.grobox.transportr.ui.LineView
-import de.schildbach.pte.dto.Line
+import de.libf.ptek.dto.Line
 
 
 class LineAdapter : RecyclerView.Adapter<LineViewHolder>() {

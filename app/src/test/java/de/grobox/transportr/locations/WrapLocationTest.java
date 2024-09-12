@@ -21,7 +21,7 @@ package de.grobox.transportr.locations;
 
 import org.junit.Test;
 
-import de.schildbach.pte.dto.Location;
+import de.libf.ptek.dto.Location;
 
 import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertTrue;

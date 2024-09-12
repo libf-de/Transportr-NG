@@ -19,7 +19,6 @@
 
 package de.grobox.transportr.networks
 
-import android.content.Intent
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.view.MenuItem
@@ -34,7 +33,6 @@ import com.mikepenz.fastadapter.commons.adapters.FastItemAdapter
 import com.mikepenz.fastadapter.expandable.ExpandableExtension
 import de.grobox.transportr.R
 import de.grobox.transportr.TransportrActivity
-import de.grobox.transportr.map.MapActivity
 
 class PickTransportNetworkActivity : TransportrActivity(), ISelectionListener<IItem<*, *>> {
 
@@ -105,8 +103,8 @@ class PickTransportNetworkActivity : TransportrActivity(), ISelectionListener<II
         manager.setTransportNetwork(networkItem.transportNetwork)
         setResult(RESULT_OK)
         if (firstStart) { // MapActivity was closed
-            val intent = Intent(this, MapActivity::class.java)
-            startActivity(intent)
+//            val intent = Intent(this, MapActivity::class.java)
+//            startActivity(intent)
         }
         supportFinishAfterTransition()
     }

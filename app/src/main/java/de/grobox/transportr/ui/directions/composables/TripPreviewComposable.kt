@@ -49,13 +49,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import de.grobox.transportr.R
-import de.schildbach.pte.dto.Leg
-import de.schildbach.pte.dto.Line
-import de.schildbach.pte.dto.Location
-import de.schildbach.pte.dto.Product
-import de.schildbach.pte.dto.Stop
-import de.schildbach.pte.dto.Style
-import de.schildbach.pte.dto.Trip
 import de.grobox.transportr.ui.transport.composables.ProductComposable
 import de.grobox.transportr.ui.transport.composables.WalkComposable
 import de.grobox.transportr.ui.trips.detail.TripUtils.getStandardFare
@@ -64,6 +57,14 @@ import de.grobox.transportr.utils.DateUtils.formatTime
 import de.grobox.transportr.utils.DateUtils.getDifferenceInMinutes
 import de.grobox.transportr.utils.DateUtils.millisToMinutes
 import de.grobox.transportr.utils.TransportrUtils.getLocationName
+import de.libf.ptek.dto.Line
+import de.libf.ptek.dto.Location
+import de.libf.ptek.dto.Product
+import de.libf.ptek.dto.PublicLeg
+import de.libf.ptek.dto.Stop
+import de.libf.ptek.dto.Style
+import de.libf.ptek.dto.Trip
+import de.libf.ptek.dto.min
 import kotlinx.coroutines.delay
 import java.util.Date
 
@@ -145,32 +146,28 @@ fun Stop.getArrivalTimes(context: Context): Pair<String, String> {
 
 fun getDepartureTimes(trip: Trip, context: Context): Pair<String, String> {
     val firstLeg = trip.legs[0]
-    return if (firstLeg.isPublicLeg) {
-        firstLeg.departureStop?.getDepartureTimes(context)
+    return if (firstLeg is PublicLeg) {
+        firstLeg.departureStop.getDepartureTimes(context)
     } else {
-        firstLeg.getDepartureTime()?.let { firstLegDepartureTime ->
-            Pair(formatTime(context, Date(firstLegDepartureTime)), trip.firstPublicLeg.let {
-                if (it?.departureDelay != null && it.departureDelay != 0L)
-                    it.departureStop?.getDepartureTimes(context)?.second ?: ""
-                else ""
-            })
-        }
-    } ?: Pair("", "")
+        Pair(formatTime(context, Date(firstLeg.departureTime)), trip.firstPublicLeg.let {
+            if (it?.departureDelay != null && it.departureDelay != 0L)
+                it.departureStop.getDepartureTimes(context).second ?: ""
+            else ""
+        })
+    }
 }
 
 fun getArrivalTimes(trip: Trip, context: Context): Pair<String, String> {
     val lastLeg = trip.legs[trip.legs.size - 1]
-    return if (lastLeg.isPublicLeg) {
-        lastLeg.arrivalStop?.getArrivalTimes(context)
+    return if (lastLeg is PublicLeg) {
+        lastLeg.arrivalStop.getArrivalTimes(context)
     } else {
-        lastLeg.getArrivalTime()?.let { lastLegArrivalTime ->
-            Pair(formatTime(context, Date(lastLegArrivalTime)), trip.lastPublicLeg.let {
-                if (it?.arrivalDelay != null && it.arrivalDelay != 0L)
-                    it.arrivalStop?.getArrivalTimes(context)?.second ?: ""
-                else ""
-            })
-        }
-    } ?: Pair("", "")
+        Pair(formatTime(context, Date(lastLeg.arrivalTime)), trip.lastPublicLeg.let {
+            if (it?.arrivalDelay != null && it.arrivalDelay != 0L)
+                it.arrivalStop.getArrivalTimes(context).second
+            else ""
+        })
+    }
 }
 
 
@@ -273,8 +270,8 @@ fun TripPreviewComposable(
                             modifier = Modifier.padding(vertical = 4.dp)
                         ) {
                             trip.legs.forEach {
-                                if(it.isPublicLeg) {
-                                    ProductComposable(line = it.line!!)
+                                if(it is PublicLeg) {
+                                    ProductComposable(line = it.line)
                                 } else if(it.min.largerThan(5)) {
                                     WalkComposable()
                                 }
@@ -310,16 +307,16 @@ fun TripPreviewComposable(
     }
 }
 
-private fun Long?.largerThan(i: Int): Boolean {
+private fun Int?.largerThan(i: Int): Boolean {
     return this?.let { it > i } ?: false
 }
 
 fun Trip.hasProblem(): Boolean {
     if (!isTravelable) return true
     for (leg in legs) {
-        if (!leg.isPublicLeg) continue
+        if (leg !is PublicLeg) continue
         if (!leg.message.isNullOrEmpty()) return true
-        if (!leg.line?.message.isNullOrEmpty()) return true
+        if (!leg.line.message.isNullOrEmpty()) return true
     }
     return false
 }
@@ -334,7 +331,7 @@ fun TripPreviewComposablePreview() {
             from = Location("", Location.Type.STATION, null, "StPlace A", "Station A"),
             to = Location("", Location.Type.STATION, null, "StPlace B", "Station B"),
             legs = listOf(
-                Leg(
+                PublicLeg(
                     line = Line(
                         "3_800755_28",
                         "DB Regio AG Bayern",

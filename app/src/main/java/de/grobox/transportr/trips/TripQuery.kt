@@ -19,7 +19,7 @@
 
 package de.grobox.transportr.ui.trips
 
-import de.schildbach.pte.dto.Product
+import de.libf.ptek.dto.Product
 import de.grobox.transportr.locations.WrapLocation
 import java.util.EnumSet
 

@@ -46,7 +46,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
 import de.grobox.transportr.R
-import de.schildbach.pte.dto.Line
+import de.libf.ptek.dto.Line
 import de.grobox.transportr.locations.WrapLocation
 import de.grobox.transportr.ui.transport.composables.ProductComposable
 import de.grobox.transportr.utils.TransportrUtils.getCoordName

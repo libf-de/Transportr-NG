@@ -32,7 +32,8 @@ import de.grobox.transportr.ui.trips.BaseViewHolder
 import de.grobox.transportr.utils.DateUtils.formatDuration
 import de.grobox.transportr.utils.DateUtils.formatRelativeTime
 import de.grobox.transportr.utils.DateUtils.formatTime
-import de.schildbach.pte.dto.Trip
+import de.libf.ptek.dto.PublicLeg
+import de.libf.ptek.dto.Trip
 import java.util.Date
 
 class TripViewHolder(private val v: View) : BaseViewHolder(v) {
@@ -60,13 +61,13 @@ class TripViewHolder(private val v: View) : BaseViewHolder(v) {
 
         // Departure Time and Delay
         val firstLeg = trip.legs[0]
-        if (firstLeg.isPublicLeg) {
-            setDepartureTimes(fromTime, fromDelay, firstLeg.departureStop!!)
+        if (firstLeg is PublicLeg) {
+            setDepartureTimes(fromTime, fromDelay, firstLeg.departureStop)
         } else {
-            fromTime.text = formatTime(context, Date(firstLeg.departureTime!!))
+            fromTime.text = formatTime(context, Date(firstLeg.departureTime))
             val firstPublicLeg = trip.firstPublicLeg
-            if (firstPublicLeg != null && firstPublicLeg.departureDelay != null && firstPublicLeg.departureDelay != 0L) {
-                setDepartureTimes(null, toDelay, firstPublicLeg.departureStop!!)
+            if (firstPublicLeg?.departureDelay != null && firstPublicLeg.departureDelay != 0L) {
+                setDepartureTimes(null, toDelay, firstPublicLeg.departureStop)
             }
         }
         //fromLocation.text = getLocationName(trip.from)
@@ -91,13 +92,13 @@ class TripViewHolder(private val v: View) : BaseViewHolder(v) {
 
         // Arrival Time and Delay
         val lastLeg = trip.legs[trip.legs.size - 1]
-        if (lastLeg.isPublicLeg) {
-            setArrivalTimes(toTime, toDelay, lastLeg.arrivalStop!!)
+        if (lastLeg is PublicLeg) {
+            setArrivalTimes(toTime, toDelay, lastLeg.arrivalStop)
         } else {
-            toTime.text = formatTime(context, Date(lastLeg.arrivalTime!!))
+            toTime.text = formatTime(context, Date(lastLeg.arrivalTime))
             val lastPublicLeg = trip.lastPublicLeg
-            if (lastPublicLeg != null && lastPublicLeg.arrivalDelay != null && lastPublicLeg.arrivalDelay != 0L) {
-                setArrivalTimes(null, toDelay, lastPublicLeg.arrivalStop!!)
+            if (lastPublicLeg?.arrivalDelay != null && lastPublicLeg.arrivalDelay != 0L) {
+                setArrivalTimes(null, toDelay, lastPublicLeg.arrivalStop)
             }
         }
 //        toLocation.text = getLocationName(trip.to)
@@ -109,9 +110,9 @@ class TripViewHolder(private val v: View) : BaseViewHolder(v) {
     private fun Trip.hasProblem(): Boolean {
         if (!isTravelable) return true
         for (leg in legs) {
-            if (!leg.isPublicLeg) continue
+            if (leg !is PublicLeg) continue
             if (!isNullOrEmpty(leg.message)) return true
-            if (!isNullOrEmpty(leg.line?.message)) return true
+            if (!isNullOrEmpty(leg.line.message)) return true
         }
         return false
     }

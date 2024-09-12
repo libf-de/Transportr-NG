@@ -35,7 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import de.grobox.transportr.R
-import de.schildbach.pte.dto.Product
+import de.libf.ptek.dto.Product
 import java.util.EnumSet
 
 @Composable

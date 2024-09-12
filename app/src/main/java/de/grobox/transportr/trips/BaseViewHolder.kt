@@ -29,8 +29,8 @@ import androidx.recyclerview.widget.RecyclerView
 import de.grobox.transportr.R
 import de.grobox.transportr.utils.DateUtils.formatDelay
 import de.grobox.transportr.utils.DateUtils.formatTime
-import de.schildbach.pte.dto.Position
-import de.schildbach.pte.dto.Stop
+import de.libf.ptek.dto.Position
+import de.libf.ptek.dto.Stop
 import java.util.Date
 
 abstract class BaseViewHolder(v: View) : RecyclerView.ViewHolder(v) {

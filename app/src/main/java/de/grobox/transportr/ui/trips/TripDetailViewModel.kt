@@ -23,7 +23,7 @@ import android.app.Application
 import androidx.lifecycle.viewModelScope
 import de.grobox.transportr.R
 import de.grobox.transportr.TransportrApplication
-import de.schildbach.pte.dto.Trip
+import de.libf.ptek.dto.Trip
 import de.grobox.transportr.data.trips.TripsRepository
 import de.grobox.transportr.locations.WrapLocation
 import de.grobox.transportr.map.PositionController

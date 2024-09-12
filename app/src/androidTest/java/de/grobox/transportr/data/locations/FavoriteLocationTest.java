@@ -27,16 +27,16 @@ import java.util.List;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import de.grobox.transportr.data.DbTest;
-import de.schildbach.pte.dto.Location;
-import de.schildbach.pte.dto.Point;
-import de.schildbach.pte.dto.Product;
+import de.libf.ptek.dto.Location;
+import de.libf.ptek.dto.Point;
+import de.libf.ptek.dto.Product;
 
-import static de.schildbach.pte.NetworkId.BVG;
-import static de.schildbach.pte.NetworkId.DB;
-import static de.schildbach.pte.dto.LocationType.ADDRESS;
-import static de.schildbach.pte.dto.LocationType.ANY;
-import static de.schildbach.pte.dto.LocationType.POI;
-import static de.schildbach.pte.dto.LocationType.STATION;
+import static de.libf.ptek.NetworkId.BVG;
+import static de.libf.ptek.NetworkId.DB;
+import static de.libf.ptek.dto.LocationType.ADDRESS;
+import static de.libf.ptek.dto.LocationType.ANY;
+import static de.libf.ptek.dto.LocationType.POI;
+import static de.libf.ptek.dto.LocationType.STATION;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;

@@ -25,8 +25,8 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import de.grobox.transportr.data.locations.GenericLocation
-import de.schildbach.pte.dto.Leg
-import de.schildbach.pte.dto.Point
+import de.libf.ptek.dto.IndividualLeg
+import de.libf.ptek.dto.Point
 
 @Entity(
     tableName = "tripLegs",
@@ -59,9 +59,9 @@ data class TripLegEntity(
     //intermediateStops
     val message: String? = null,
 
-    val individualType: Leg.IndividualType? = null,
+    val individualType: IndividualLeg.Type? = null,
     val departureTime: Long?,
     val arrivalTime: Long?,
-    val min: Long? = null,
+    val min: Int? = null,
     val distance: Int? = null
 )

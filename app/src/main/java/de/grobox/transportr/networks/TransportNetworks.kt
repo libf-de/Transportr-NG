@@ -23,8 +23,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Base64
 import de.grobox.transportr.R
-import de.schildbach.pte.DbProvider
-import de.schildbach.pte.NetworkId
+import de.libf.ptek.DbProvider
+import de.libf.ptek.NetworkId
 
 @SuppressLint("ConstantLocale")
 val networks = arrayOf(

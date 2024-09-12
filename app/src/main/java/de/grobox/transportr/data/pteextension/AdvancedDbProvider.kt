@@ -17,10 +17,10 @@
 //package de.grobox.transportr.data.pteextension
 //
 //import com.google.common.base.Strings
-//import de.schildbach.pte.NetworkId
-//import de.schildbach.pte.dto.Line
-//import de.schildbach.pte.dto.Product
-//import de.schildbach.pte.dto.Style
+//import de.libf.ptek.NetworkId
+//import de.libf.ptek.dto.Line
+//import de.libf.ptek.dto.Product
+//import de.libf.ptek.dto.Style
 //import okhttp3.HttpUrl
 //import okhttp3.HttpUrl.Companion.toHttpUrl
 //import org.json.JSONArray

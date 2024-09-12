@@ -22,8 +22,8 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import de.schildbach.pte.dto.Location
-import de.schildbach.pte.NetworkId
+import de.libf.ptek.dto.Location
+import de.libf.ptek.NetworkId
 import kotlinx.coroutines.flow.Flow
 
 @Dao

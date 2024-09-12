@@ -18,7 +18,6 @@
  */
 package de.grobox.transportr.locations
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -30,32 +29,27 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.annotation.WorkerThread
 import androidx.core.content.ContextCompat
-import androidx.loader.app.LoaderManager
-import androidx.loader.content.Loader
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.common.base.Strings
 import de.grobox.transportr.TransportrFragment
-import de.schildbach.pte.dto.Location
 import de.grobox.transportr.databinding.FragmentLocationBinding
-import de.grobox.transportr.departures.DeparturesActivity
-import de.grobox.transportr.departures.DeparturesLoader
 import de.grobox.transportr.locations.ReverseGeocoder.ReverseGeocoderCallback
 import de.grobox.transportr.ui.map.MapViewModel
 import de.grobox.transportr.utils.Constants
 import de.grobox.transportr.utils.IntentUtils.findNearbyStations
 import de.grobox.transportr.utils.IntentUtils.startGeoIntent
 import de.grobox.transportr.utils.TransportrUtils.getCoordName
-import de.schildbach.pte.dto.Line
-import de.schildbach.pte.dto.QueryDeparturesResult
+import de.libf.ptek.dto.Line
+import de.libf.ptek.dto.Location
+import de.libf.ptek.dto.QueryDeparturesResult
 import org.koin.androidx.viewmodel.ext.android.activityViewModel
-import java.util.Date
 import java.util.SortedSet
 import java.util.TreeSet
 import javax.annotation.ParametersAreNonnullByDefault
 
 @ParametersAreNonnullByDefault
-class LocationFragment : TransportrFragment(), LoaderManager.LoaderCallbacks<QueryDeparturesResult?>, ReverseGeocoderCallback,
+class LocationFragment : TransportrFragment(), ReverseGeocoderCallback,
     OnGlobalLayoutListener {
 
     private val viewModel: MapViewModel by activityViewModel<MapViewModel>()
@@ -113,9 +107,9 @@ class LocationFragment : TransportrFragment(), LoaderManager.LoaderCallbacks<Que
         val departuresButton: Button = binding.departuresButton
         if (location.hasId()) {
             departuresButton.setOnClickListener {
-                val intent = Intent(context, DeparturesActivity::class.java)
+//                val intent = Intent(context, DeparturesActivity::class.java)
                 //intent.putExtra(Constants.WRAP_LOCATION, location)
-                startActivity(intent)
+//                startActivity(intent)
             }
         } else {
             departuresButton.visibility = View.GONE
@@ -172,19 +166,11 @@ class LocationFragment : TransportrFragment(), LoaderManager.LoaderCallbacks<Que
         viewModel.selectedLocationClicked(location.latLng)
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        if (location.hasId()) {
-            val args = DeparturesLoader.getBundle(location.id, Date(), DeparturesActivity.MAX_DEPARTURES)
-            loaderManager.initLoader(Constants.LOADER_DEPARTURES, args, this).forceLoad()
-        }
-    }
 
-    override fun onCreateLoader(id: Int, args: Bundle?): DeparturesLoader {
-        return DeparturesLoader(context, viewModel.transportNetwork.value, args)
-    }
 
-    override fun onLoadFinished(loader: Loader<QueryDeparturesResult?>, data: QueryDeparturesResult?) {
+    fun onLoadFinished(loader: Any, data: QueryDeparturesResult?) {
+        //return np.queryDepartures(stationId!!, date!!.time, maxDepartures, false)
+
         if (data != null && data.status == QueryDeparturesResult.Status.OK) {
             val lines: SortedSet<Line> = TreeSet()
             for (s in data.stationDepartures) {
@@ -200,8 +186,6 @@ class LocationFragment : TransportrFragment(), LoaderManager.LoaderCallbacks<Que
             linesLayout.animate().setDuration(750).alpha(1f).start()
         }
     }
-
-    override fun onLoaderReset(loader: Loader<QueryDeparturesResult?>) { /* do nothing */ }
 
     @WorkerThread
     override fun onLocationRetrieved(location: WrapLocation) {

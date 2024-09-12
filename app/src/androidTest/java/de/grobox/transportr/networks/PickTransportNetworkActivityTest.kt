@@ -33,8 +33,7 @@ import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
 import de.grobox.transportr.R
 import de.grobox.transportr.ScreengrabTest
-import de.grobox.transportr.map.MapActivity
-import de.schildbach.pte.NetworkId
+import de.libf.ptek.NetworkId
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test

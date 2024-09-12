@@ -25,20 +25,20 @@ import androidx.lifecycle.viewModelScope
 import de.grobox.transportr.TransportrApplication
 import de.grobox.transportr.data.locations.LocationRepository
 import de.grobox.transportr.data.searches.SearchesRepository
-import de.grobox.transportr.departures.DeparturesActivity
 import de.grobox.transportr.favorites.trips.SavedSearchesViewModel
 import de.grobox.transportr.locations.CombinedSuggestionRepository
 import de.grobox.transportr.locations.WrapLocation
 import de.grobox.transportr.map.PositionController
 import de.grobox.transportr.networks.TransportNetwork
 import de.grobox.transportr.networks.TransportNetworkManager
+import de.grobox.transportr.ui.departures.MAX_DEPARTURES
 import de.grobox.transportr.utils.IntentUtils
 import de.grobox.transportr.utils.IntentUtils.presetDirections
 import de.grobox.transportr.utils.SingleLiveEvent
-import de.schildbach.pte.dto.Line
-import de.schildbach.pte.dto.Location
-import de.schildbach.pte.dto.NearbyLocationsResult
-import de.schildbach.pte.dto.QueryDeparturesResult
+import de.libf.ptek.dto.Line
+import de.libf.ptek.dto.Location
+import de.libf.ptek.dto.NearbyLocationsResult
+import de.libf.ptek.dto.QueryDeparturesResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -141,7 +141,7 @@ class MapViewModel internal constructor(
                 ?.networkProvider
                 ?.queryDepartures(location.id!!,
                                     Date().time,
-                                    DeparturesActivity.MAX_DEPARTURES,
+                                    MAX_DEPARTURES,
                                     false)
                 ?.takeIf { it.status == QueryDeparturesResult.Status.OK }
                 ?.let { dep ->

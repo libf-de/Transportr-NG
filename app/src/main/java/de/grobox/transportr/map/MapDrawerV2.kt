@@ -19,7 +19,7 @@
 
 package de.grobox.transportr.map
 
-import de.schildbach.pte.dto.Location
+import de.libf.ptek.dto.Location
 import org.maplibre.android.annotations.Icon
 import org.maplibre.android.annotations.Marker
 import org.maplibre.android.annotations.MarkerOptions

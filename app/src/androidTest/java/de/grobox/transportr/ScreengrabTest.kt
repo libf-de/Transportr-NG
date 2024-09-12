@@ -23,8 +23,8 @@ import android.util.Log
 import androidx.annotation.CallSuper
 import androidx.test.core.app.ApplicationProvider
 import de.grobox.transportr.locations.WrapLocation
-import de.schildbach.pte.NetworkId
-import de.schildbach.pte.dto.LocationType.STATION
+import de.libf.ptek.NetworkId
+import de.libf.ptek.dto.LocationType.STATION
 import org.junit.Before
 import org.junit.ClassRule
 import tools.fastlane.screengrab.Screengrab

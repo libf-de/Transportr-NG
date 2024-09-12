@@ -25,7 +25,7 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import de.grobox.transportr.data.locations.GenericLocation
-import de.schildbach.pte.NetworkId
+import de.libf.ptek.NetworkId
 
 @Entity(
     tableName = "trips",

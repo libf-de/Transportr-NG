@@ -20,8 +20,6 @@
 package de.grobox.transportr.settings
 
 import android.content.Intent
-import android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
-import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
@@ -34,7 +32,6 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import de.grobox.transportr.R
-import de.grobox.transportr.map.MapActivity
 import de.grobox.transportr.networks.PickTransportNetworkActivity
 import de.grobox.transportr.networks.TransportNetwork
 import de.grobox.transportr.networks.TransportNetworkManager
@@ -98,10 +95,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
         // getActivity().recreate() does only recreate SettingActivity
 
         activity?.let {
-            val intent = Intent(context, MapActivity::class.java)
-            intent.flags = FLAG_ACTIVITY_CLEAR_TASK or FLAG_ACTIVITY_NEW_TASK
-            it.startActivity(intent)
-            it.finish()
+//            val intent = Intent(context, MapActivity::class.java)
+//            intent.flags = FLAG_ACTIVITY_CLEAR_TASK or FLAG_ACTIVITY_NEW_TASK
+//            it.startActivity(intent)
+//            it.finish()
         }
     }
 
