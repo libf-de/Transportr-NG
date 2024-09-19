@@ -1,22 +1,32 @@
-rootProject.name = "Transportr"
+rootProject.name = "Transportr-NG"
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
     repositories {
-        google()
-        jcenter()
+        google {
+            mavenContent {
+                includeGroupAndSubgroups("androidx")
+                includeGroupAndSubgroups("com.android")
+                includeGroupAndSubgroups("com.google")
+            }
+        }
         mavenCentral()
-        maven(url = "https://jitpack.io")
+        gradlePluginPortal()
     }
 }
 
 dependencyResolutionManagement {
     repositories {
-        google()
-        jcenter()
+        google {
+            mavenContent {
+                includeGroupAndSubgroups("androidx")
+                includeGroupAndSubgroups("com.android")
+                includeGroupAndSubgroups("com.google")
+            }
+        }
         mavenCentral()
-        maven(url = "https://jitpack.io")
         maven(url = uri("../public-transport-enabler-ktx/build/repo"))
     }
 }
 
-include(":app")
+include(":composeApp")

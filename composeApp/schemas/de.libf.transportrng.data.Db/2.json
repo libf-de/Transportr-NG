@@ -1,0 +1,1014 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 2,
+    "identityHash": "8c43d8fb847ecacfb82aa3f8b6c6ddc9",
+    "entities": [
+      {
+        "tableName": "locations",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uid` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `networkId` TEXT NOT NULL, `type` TEXT NOT NULL, `id` TEXT, `lat` INTEGER NOT NULL, `lon` INTEGER NOT NULL, `place` TEXT, `name` TEXT, `products` TEXT, `fromCount` INTEGER NOT NULL, `viaCount` INTEGER NOT NULL, `toCount` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "uid",
+            "columnName": "uid",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "networkId",
+            "columnName": "networkId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "lat",
+            "columnName": "lat",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lon",
+            "columnName": "lon",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "place",
+            "columnName": "place",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "products",
+            "columnName": "products",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "fromCount",
+            "columnName": "fromCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "viaCount",
+            "columnName": "viaCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "toCount",
+            "columnName": "toCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "uid"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_locations_networkId",
+            "unique": false,
+            "columnNames": [
+              "networkId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_locations_networkId` ON `${TABLE_NAME}` (`networkId`)"
+          },
+          {
+            "name": "index_locations_id",
+            "unique": false,
+            "columnNames": [
+              "id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_locations_id` ON `${TABLE_NAME}` (`id`)"
+          },
+          {
+            "name": "index_locations_networkId_id",
+            "unique": true,
+            "columnNames": [
+              "networkId",
+              "id"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_locations_networkId_id` ON `${TABLE_NAME}` (`networkId`, `id`)"
+          }
+        ]
+      },
+      {
+        "tableName": "home_locations",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uid` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `networkId` TEXT NOT NULL, `type` TEXT NOT NULL, `id` TEXT, `lat` INTEGER NOT NULL, `lon` INTEGER NOT NULL, `place` TEXT, `name` TEXT, `products` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "uid",
+            "columnName": "uid",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "networkId",
+            "columnName": "networkId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "lat",
+            "columnName": "lat",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lon",
+            "columnName": "lon",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "place",
+            "columnName": "place",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "products",
+            "columnName": "products",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "uid"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_home_locations_networkId",
+            "unique": true,
+            "columnNames": [
+              "networkId"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_home_locations_networkId` ON `${TABLE_NAME}` (`networkId`)"
+          }
+        ]
+      },
+      {
+        "tableName": "work_locations",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uid` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `networkId` TEXT NOT NULL, `type` TEXT NOT NULL, `id` TEXT, `lat` INTEGER NOT NULL, `lon` INTEGER NOT NULL, `place` TEXT, `name` TEXT, `products` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "uid",
+            "columnName": "uid",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "networkId",
+            "columnName": "networkId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "lat",
+            "columnName": "lat",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lon",
+            "columnName": "lon",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "place",
+            "columnName": "place",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "products",
+            "columnName": "products",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "uid"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_work_locations_networkId",
+            "unique": true,
+            "columnNames": [
+              "networkId"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_work_locations_networkId` ON `${TABLE_NAME}` (`networkId`)"
+          }
+        ]
+      },
+      {
+        "tableName": "searches",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uid` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `networkId` TEXT, `from_id` INTEGER NOT NULL, `via_id` INTEGER, `to_id` INTEGER NOT NULL, `count` INTEGER NOT NULL, `lastUsed` INTEGER NOT NULL, `favorite` INTEGER NOT NULL, FOREIGN KEY(`from_id`) REFERENCES `locations`(`uid`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`via_id`) REFERENCES `locations`(`uid`) ON UPDATE NO ACTION ON DELETE NO ACTION , FOREIGN KEY(`to_id`) REFERENCES `locations`(`uid`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "uid",
+            "columnName": "uid",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "networkId",
+            "columnName": "networkId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "fromId",
+            "columnName": "from_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "viaId",
+            "columnName": "via_id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "toId",
+            "columnName": "to_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "count",
+            "columnName": "count",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastUsed",
+            "columnName": "lastUsed",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "favorite",
+            "columnName": "favorite",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "uid"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_searches_networkId",
+            "unique": false,
+            "columnNames": [
+              "networkId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_searches_networkId` ON `${TABLE_NAME}` (`networkId`)"
+          },
+          {
+            "name": "index_searches_from_id",
+            "unique": false,
+            "columnNames": [
+              "from_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_searches_from_id` ON `${TABLE_NAME}` (`from_id`)"
+          },
+          {
+            "name": "index_searches_via_id",
+            "unique": false,
+            "columnNames": [
+              "via_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_searches_via_id` ON `${TABLE_NAME}` (`via_id`)"
+          },
+          {
+            "name": "index_searches_to_id",
+            "unique": false,
+            "columnNames": [
+              "to_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_searches_to_id` ON `${TABLE_NAME}` (`to_id`)"
+          },
+          {
+            "name": "index_searches_from_id_via_id_to_id",
+            "unique": true,
+            "columnNames": [
+              "from_id",
+              "via_id",
+              "to_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_searches_from_id_via_id_to_id` ON `${TABLE_NAME}` (`from_id`, `via_id`, `to_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "locations",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "from_id"
+            ],
+            "referencedColumns": [
+              "uid"
+            ]
+          },
+          {
+            "table": "locations",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "via_id"
+            ],
+            "referencedColumns": [
+              "uid"
+            ]
+          },
+          {
+            "table": "locations",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "to_id"
+            ],
+            "referencedColumns": [
+              "uid"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "genericLocations",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uid` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `networkId` TEXT NOT NULL, `type` TEXT NOT NULL, `id` TEXT, `lat` INTEGER NOT NULL, `lon` INTEGER NOT NULL, `place` TEXT, `name` TEXT, `products` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "uid",
+            "columnName": "uid",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "networkId",
+            "columnName": "networkId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "lat",
+            "columnName": "lat",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lon",
+            "columnName": "lon",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "place",
+            "columnName": "place",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "products",
+            "columnName": "products",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "uid"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_genericLocations_networkId",
+            "unique": false,
+            "columnNames": [
+              "networkId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_genericLocations_networkId` ON `${TABLE_NAME}` (`networkId`)"
+          },
+          {
+            "name": "index_genericLocations_id",
+            "unique": false,
+            "columnNames": [
+              "id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_genericLocations_id` ON `${TABLE_NAME}` (`id`)"
+          },
+          {
+            "name": "index_genericLocations_networkId_id",
+            "unique": true,
+            "columnNames": [
+              "networkId",
+              "id"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_genericLocations_networkId_id` ON `${TABLE_NAME}` (`networkId`, `id`)"
+          }
+        ]
+      },
+      {
+        "tableName": "trips",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uid` INTEGER NOT NULL, `id` TEXT NOT NULL, `fromId` INTEGER NOT NULL, `toId` INTEGER NOT NULL, `capacity` TEXT NOT NULL, `changes` INTEGER NOT NULL, `networkId` TEXT, PRIMARY KEY(`uid`), FOREIGN KEY(`fromId`) REFERENCES `genericLocations`(`uid`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`toId`) REFERENCES `genericLocations`(`uid`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "uid",
+            "columnName": "uid",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fromId",
+            "columnName": "fromId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "toId",
+            "columnName": "toId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "capacity",
+            "columnName": "capacity",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "changes",
+            "columnName": "changes",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "networkId",
+            "columnName": "networkId",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "uid"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_trips_id",
+            "unique": true,
+            "columnNames": [
+              "id"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_trips_id` ON `${TABLE_NAME}` (`id`)"
+          },
+          {
+            "name": "index_trips_uid_id",
+            "unique": true,
+            "columnNames": [
+              "uid",
+              "id"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_trips_uid_id` ON `${TABLE_NAME}` (`uid`, `id`)"
+          },
+          {
+            "name": "index_trips_fromId",
+            "unique": false,
+            "columnNames": [
+              "fromId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_trips_fromId` ON `${TABLE_NAME}` (`fromId`)"
+          },
+          {
+            "name": "index_trips_toId",
+            "unique": false,
+            "columnNames": [
+              "toId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_trips_toId` ON `${TABLE_NAME}` (`toId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "genericLocations",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "fromId"
+            ],
+            "referencedColumns": [
+              "uid"
+            ]
+          },
+          {
+            "table": "genericLocations",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "toId"
+            ],
+            "referencedColumns": [
+              "uid"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "lines",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uid` INTEGER NOT NULL, `id` TEXT NOT NULL, `networkId` TEXT, `product` TEXT NOT NULL, `label` TEXT, `name` TEXT, `style` TEXT, `attributes` TEXT, `message` TEXT, `altName` TEXT, PRIMARY KEY(`uid`))",
+        "fields": [
+          {
+            "fieldPath": "uid",
+            "columnName": "uid",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "networkId",
+            "columnName": "networkId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "product",
+            "columnName": "product",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "label",
+            "columnName": "label",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "style",
+            "columnName": "style",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "attributes",
+            "columnName": "attributes",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "message",
+            "columnName": "message",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "altName",
+            "columnName": "altName",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "uid"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_lines_id",
+            "unique": true,
+            "columnNames": [
+              "id"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_lines_id` ON `${TABLE_NAME}` (`id`)"
+          },
+          {
+            "name": "index_lines_uid_id",
+            "unique": true,
+            "columnNames": [
+              "uid",
+              "id"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_lines_uid_id` ON `${TABLE_NAME}` (`uid`, `id`)"
+          }
+        ]
+      },
+      {
+        "tableName": "stops",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uid` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `locationId` INTEGER NOT NULL, `legId` INTEGER, `plannedArrivalTime` INTEGER, `predictedArrivalTime` INTEGER, `plannedArrivalPosition` TEXT, `predictedArrivalPosition` TEXT, `arrivalCancelled` INTEGER NOT NULL, `plannedDepartureTime` INTEGER, `predictedDepartureTime` INTEGER, `plannedDeparturePosition` TEXT, `predictedDeparturePosition` TEXT, `departureCancelled` INTEGER NOT NULL, FOREIGN KEY(`locationId`) REFERENCES `genericLocations`(`uid`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "uid",
+            "columnName": "uid",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "locationId",
+            "columnName": "locationId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "legId",
+            "columnName": "legId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "plannedArrivalTime",
+            "columnName": "plannedArrivalTime",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "predictedArrivalTime",
+            "columnName": "predictedArrivalTime",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "plannedArrivalPosition",
+            "columnName": "plannedArrivalPosition",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "predictedArrivalPosition",
+            "columnName": "predictedArrivalPosition",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "arrivalCancelled",
+            "columnName": "arrivalCancelled",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "plannedDepartureTime",
+            "columnName": "plannedDepartureTime",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "predictedDepartureTime",
+            "columnName": "predictedDepartureTime",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "plannedDeparturePosition",
+            "columnName": "plannedDeparturePosition",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "predictedDeparturePosition",
+            "columnName": "predictedDeparturePosition",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "departureCancelled",
+            "columnName": "departureCancelled",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "uid"
+          ]
+        },
+        "foreignKeys": [
+          {
+            "table": "genericLocations",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "locationId"
+            ],
+            "referencedColumns": [
+              "uid"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "tripLegToStopsCrossRef",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`tripLegId` INTEGER NOT NULL, `stopId` INTEGER NOT NULL, PRIMARY KEY(`tripLegId`, `stopId`))",
+        "fields": [
+          {
+            "fieldPath": "tripLegId",
+            "columnName": "tripLegId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "stopId",
+            "columnName": "stopId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "tripLegId",
+            "stopId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_tripLegToStopsCrossRef_tripLegId_stopId",
+            "unique": false,
+            "columnNames": [
+              "tripLegId",
+              "stopId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_tripLegToStopsCrossRef_tripLegId_stopId` ON `${TABLE_NAME}` (`tripLegId`, `stopId`)"
+          }
+        ]
+      },
+      {
+        "tableName": "tripLegs",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uid` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `tripId` INTEGER NOT NULL, `legNumber` INTEGER NOT NULL, `isPublicLeg` INTEGER NOT NULL, `departureId` INTEGER, `arrivalId` INTEGER, `path` TEXT, `lineId` INTEGER, `destinationId` INTEGER, `departureStopId` INTEGER, `arrivalStopId` INTEGER, `intermediateStops` TEXT, `message` TEXT, `individualType` TEXT, `departureTime` INTEGER, `arrivalTime` INTEGER, `min` INTEGER, `distance` INTEGER, FOREIGN KEY(`tripId`) REFERENCES `trips`(`uid`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`lineId`) REFERENCES `lines`(`uid`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`destinationId`) REFERENCES `genericLocations`(`uid`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`departureStopId`) REFERENCES `stops`(`uid`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`arrivalStopId`) REFERENCES `stops`(`uid`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "uid",
+            "columnName": "uid",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tripId",
+            "columnName": "tripId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "legNumber",
+            "columnName": "legNumber",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isPublicLeg",
+            "columnName": "isPublicLeg",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "departureId",
+            "columnName": "departureId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "arrivalId",
+            "columnName": "arrivalId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "path",
+            "columnName": "path",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "lineId",
+            "columnName": "lineId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "destinationId",
+            "columnName": "destinationId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "departureStopId",
+            "columnName": "departureStopId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "arrivalStopId",
+            "columnName": "arrivalStopId",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "intermediateStops",
+            "columnName": "intermediateStops",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "message",
+            "columnName": "message",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "individualType",
+            "columnName": "individualType",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "departureTime",
+            "columnName": "departureTime",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "arrivalTime",
+            "columnName": "arrivalTime",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "min",
+            "columnName": "min",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "distance",
+            "columnName": "distance",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "uid"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_tripLegs_tripId_departureTime_departureStopId_arrivalTime_arrivalStopId",
+            "unique": true,
+            "columnNames": [
+              "tripId",
+              "departureTime",
+              "departureStopId",
+              "arrivalTime",
+              "arrivalStopId"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_tripLegs_tripId_departureTime_departureStopId_arrivalTime_arrivalStopId` ON `${TABLE_NAME}` (`tripId`, `departureTime`, `departureStopId`, `arrivalTime`, `arrivalStopId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "trips",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "tripId"
+            ],
+            "referencedColumns": [
+              "uid"
+            ]
+          },
+          {
+            "table": "lines",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "lineId"
+            ],
+            "referencedColumns": [
+              "uid"
+            ]
+          },
+          {
+            "table": "genericLocations",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "destinationId"
+            ],
+            "referencedColumns": [
+              "uid"
+            ]
+          },
+          {
+            "table": "stops",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "departureStopId"
+            ],
+            "referencedColumns": [
+              "uid"
+            ]
+          },
+          {
+            "table": "stops",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "arrivalStopId"
+            ],
+            "referencedColumns": [
+              "uid"
+            ]
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8c43d8fb847ecacfb82aa3f8b6c6ddc9')"
+    ]
+  }
+}

@@ -1,3 +1,0 @@
-* Added Portuguese (Brazil) translation. Thanks to Gislene Kucker Arantes!
-* Show place names in location auto-completion to prevent ambiguities.
-* Fix three crashes.

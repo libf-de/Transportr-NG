@@ -1,2 +1,0 @@
-* Fix app crash at startup when no network-backed location provider was available (thanks Altonss!)
-* Make sure all parts of the app follow theme settings consistently
