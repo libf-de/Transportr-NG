@@ -18,7 +18,7 @@ compose-plugin = "1.6.11"
 junit = "4.13.2"
 kotlin = "2.0.20"
 ksp = "2.0.20-1.0.25"
-publictransportenabler = "0.0.4"
+publictransportenabler = "0.0.5"
 room = "2.7.0-alpha07"
 sqlite = "2.5.0-alpha07"
 koin-bom = "4.0.0-RC2"
@@ -30,6 +30,7 @@ kotlinx-serialization = "1.7.2"
 kotlinx-datetime = "0.6.1"
 material = "1.12.0" # 1.5.0
 ktor = "3.0.0-rc-1"
+xmlutil = "0.90.1"
 
 [libraries]
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
@@ -70,6 +71,8 @@ ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
 ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
 ktor-client-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+
+xmlutil = { module = "io.github.pdvrieze.xmlutil:serialization", version.ref = "xmlutil" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

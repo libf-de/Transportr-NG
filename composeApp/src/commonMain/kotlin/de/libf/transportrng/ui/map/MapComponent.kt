@@ -1,8 +1,6 @@
 package de.libf.transportrng.ui.map
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -25,19 +23,19 @@ expect fun <T : MapViewStateInterface> MapViewComposable(
 )
 
 interface MapViewStateInterface {
-    fun animateTo(latLng: LatLng?, zoom: Int)
+    suspend fun animateTo(latLng: LatLng?, zoom: Int)
 
-    fun zoomToBounds(latLngBounds: LatLngBounds?, animate: Boolean)
+    suspend fun zoomToBounds(latLngBounds: LatLngBounds?, animate: Boolean)
 
-    fun zoomToBounds(latLngBounds: LatLngBounds?) {
+    suspend fun zoomToBounds(latLngBounds: LatLngBounds?) {
         zoomToBounds(latLngBounds, false)
     }
 
-    fun animateToBounds(latLngBounds: LatLngBounds?) {
+    suspend fun animateToBounds(latLngBounds: LatLngBounds?) {
         zoomToBounds(latLngBounds, true)
     }
 
-    fun setPadding(left: Int = 0, top: Int = 0, right: Int = 0, bottom: Int = 0)
+    suspend fun setPadding(left: Int = 0, top: Int = 0, right: Int = 0, bottom: Int = 0)
 
     suspend fun drawTrip(trip: Trip?, shouldZoom: Boolean)
 }

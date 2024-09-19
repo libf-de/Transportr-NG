@@ -71,13 +71,18 @@ class TransportNetworks(
                             description = Res.string.np_desc_db,
                             logo = Res.drawable.network_db_logo,
                             itemIdExtra = 1,
-                            factory = { DbProvider("{\"type\":\"AID\",\"aid\":\"n91dB8Z77MLdoR0K\"}", "bdI8UVj40K5fvxwf".toByteArray(Charsets.UTF_8)) }
+                            factory = { DbProvider(
+                                apiAuthorization = "{\"type\":\"AID\",\"aid\":\"n91dB8Z77MLdoR0K\"}",
+                                salt = "bdI8UVj40K5fvxwf".toByteArray(Charsets.UTF_8),
+                                httpClient = httpClient) }
                         ),
                         TransportNetwork(
                             id = NetworkId.VVO,
                             description = Res.string.np_desc_vvo,
                             logo = Res.drawable.network_vvo_logo,
-                            factory = { VvoProvider() }
+                            factory = { VvoProvider(
+                                httpClient = httpClient
+                            ) }
                         ),
                     )
                 ),

@@ -277,7 +277,7 @@ class MapViewState : MapViewStateInterface {
         this.onMapStyleLoaded = onMapStyleLoaded
     }
 
-    override fun animateTo(latLng: de.libf.transportrng.data.maplibrecompat.LatLng?, zoom: Int) {
+    override suspend fun animateTo(latLng: de.libf.transportrng.data.maplibrecompat.LatLng?, zoom: Int) {
         return animateTo(latLng?.toLatLng(), zoom)
     }
 
@@ -301,7 +301,7 @@ class MapViewState : MapViewStateInterface {
         }
     }
 
-    override fun zoomToBounds(latLngBounds: de.libf.transportrng.data.maplibrecompat.LatLngBounds?, animate: Boolean) {
+    override suspend fun zoomToBounds(latLngBounds: de.libf.transportrng.data.maplibrecompat.LatLngBounds?, animate: Boolean) {
         return _zoomToBounds(latLngBounds?.toLatLngBounds(), animate)
     }
 
@@ -320,7 +320,7 @@ class MapViewState : MapViewStateInterface {
     }
 
 
-    override fun setPadding(left: Int, top: Int, right: Int, bottom: Int) {
+    override suspend fun setPadding(left: Int, top: Int, right: Int, bottom: Int) {
         // store map padding to be retained even after CameraBoundsUpdates
         // and update directly for subsequent camera updates in MapDrawer
         mapInset = MapPadding(left, top, right, bottom)
@@ -521,9 +521,9 @@ class MapViewState : MapViewStateInterface {
                     i += 1
                 }
 
-                if (shouldZoom) {
+//                if (shouldZoom) {
                     _zoomToBounds(builder.build(), false)
-                }
+//                }
             }
         }
     }

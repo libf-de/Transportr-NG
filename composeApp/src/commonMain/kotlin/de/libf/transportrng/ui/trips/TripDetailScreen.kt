@@ -170,40 +170,6 @@ fun TripDetailScreen(
             Box(
                 modifier = Modifier.fillMaxSize()
             ) {
-
-                SmallFloatingActionButton(
-                    onClick = { navController.popBackStack() },
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    modifier = Modifier
-                        .windowInsetsPadding(WindowInsets.systemBars)
-                        .padding(start = 12.dp)
-                ) {
-                    Icon(
-                        Icons.AutoMirrored.Rounded.ArrowBack,
-                        null
-                    )
-                }
-
-                if(!scaffoldState.bottomSheetState.isVisible || fabScale != 0f) {
-                    FloatingActionButton(
-                        onClick = {
-                            scope.launch {
-                                scaffoldState.bottomSheetState.partialExpand()
-                            }
-                        },
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .scale(fabScale)
-                    ) {
-                        Icon(
-                            Icons.Rounded.KeyboardArrowUp,
-                            null
-                        )
-                    }
-                }
-
-
-
                 BottomSheetScaffold(
                     scaffoldState = scaffoldState,
                     sheetContent = {
@@ -289,8 +255,39 @@ fun TripDetailScreen(
                     MapViewComposable(
                         mapViewState = mapState,
                         compassMargins = CompassMargins(top = 24.dp),
-                        isHalfHeight = true
+                        isHalfHeight = scaffoldState.bottomSheetState.targetValue != SheetValue.Hidden
                     )
+                }
+
+                SmallFloatingActionButton(
+                    onClick = { navController.popBackStack() },
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    modifier = Modifier
+                        .windowInsetsPadding(WindowInsets.systemBars)
+                        .padding(start = 12.dp)
+                ) {
+                    Icon(
+                        Icons.AutoMirrored.Rounded.ArrowBack,
+                        null
+                    )
+                }
+
+                if(!scaffoldState.bottomSheetState.isVisible || fabScale != 0f) {
+                    FloatingActionButton(
+                        onClick = {
+                            scope.launch {
+                                scaffoldState.bottomSheetState.partialExpand()
+                            }
+                        },
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .scale(fabScale)
+                    ) {
+                        Icon(
+                            Icons.Rounded.KeyboardArrowUp,
+                            null
+                        )
+                    }
                 }
             }
         },

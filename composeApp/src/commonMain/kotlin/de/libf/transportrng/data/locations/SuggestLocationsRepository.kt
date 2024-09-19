@@ -70,15 +70,23 @@ class SuggestLocationsRepository(
         suggestLocationsJob = scope.launch {
             delay(autoCompletionDelay)
 
+            println("Suggesting locations for '$query'")
+            println("Transport network is $transportNetwork")
+
             transportNetwork?.let {
                 _suggestedLocations.value = (it.networkProvider
                     .suggestLocations(constraint = query, types = setOf(Location.Type.STATION), maxLocations = 99)
+                    .also { println(it) }
                     .suggestedLocations
                     ?.map { sl -> WrapLocation(sl.location) }
                     ?.toSet() ?: emptySet())
-                    .also { _isLoading.value = false }
+                    .also { _isLoading.value = false; println(it) }
             }
                 .also { if(it == null) _isLoading.value = false }
+                ?: run {
+                    println("No transport network available")
+                    _isLoading.value = false
+                }
         }
     }
 

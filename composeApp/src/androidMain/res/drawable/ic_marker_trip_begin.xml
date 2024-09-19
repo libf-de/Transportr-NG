@@ -2,11 +2,9 @@
 <layer-list
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item>
-        <bitmap
-            android:src="@drawable/ic_marker_background_big"
-            android:gravity="center"/>
-    </item>
+    <item
+        android:drawable="@drawable/circle"
+        android:gravity="center" />
 
     <item
         android:drawable="@drawable/ic_trip_begin"
