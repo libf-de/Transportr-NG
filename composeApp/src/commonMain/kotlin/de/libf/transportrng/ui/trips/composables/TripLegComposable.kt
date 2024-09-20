@@ -63,8 +63,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import de.libf.ptek.dto.IndividualLeg
 import de.libf.transportrng.ui.transport.composables.ProductComposable
 import de.libf.transportrng.ui.trips.search.getArrivalTimes
 import de.libf.transportrng.ui.trips.search.getDepartureTimes
@@ -166,8 +168,87 @@ fun LegListComposable(
                             duration = formatDuration(next.departureTime - prev.arrivalTime)
                         )
                     }
+                } else if(prev == null) {
+                    item {
+                        FirstIndividualLegComponent(
+                            leg = current,
+                            otherLegColor = prev?.getColor(),
+                            dispTime = current.getDepartureTimes(),
+                            location = current.departure,
+                        )
+                    }
+                } else if(next == null) {
+                    item {
+                        LastIndividualLegComponent(
+                            leg = current,
+                            otherLegColor = next?.getColor(),
+                            dispTime = current.getArrivalTimes(),
+                        )
+                    }
                 }
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FirstIndividualLegComponent(
+    leg: Leg,
+    dispTime: Pair<String, String>,
+    location: Location,
+    thisLegColor: Color = leg.getColor(),
+    otherLegColor: Color? = null,
+    modifier: Modifier = Modifier
+) {
+    val textPad = if(otherLegColor == null) 0.dp else 4.dp
+
+    Row(
+        modifier = modifier
+            .height(IntrinsicSize.Min)
+            .heightIn(min = 48.dp)
+            .background(MaterialTheme.colorScheme.surfaceContainerLowest),
+        verticalAlignment = if(otherLegColor == null) Alignment.Top else Alignment.CenterVertically
+    ) {
+        Column(
+            horizontalAlignment = Alignment.End,
+            verticalArrangement = if(otherLegColor == null) Arrangement.Top else Arrangement.Center,
+            modifier = Modifier.width(50.dp).padding(top = textPad).fillMaxHeight()
+        ) {
+            Column(
+                modifier = Modifier.height(22.dp),
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = dispTime.first,
+                    style = MaterialTheme.typography.bodyLarge,
+                    lineHeight = MaterialTheme.typography.bodyLarge.fontSize
+                )
+            }
+
+            Spacer(modifier.weight(1f))
+        }
+
+        Canvas(
+            modifier = Modifier
+                .padding(horizontal = 8.dp)
+                .width(20.dp)
+                .fillMaxHeight()
+        ) {
+            drawFirstLeg(thisLegColor, dotted = true, dotPhase = 1f)
+        }
+
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+            Text(
+                text = location.getName() ?: "Start",
+                style = MaterialTheme.typography.titleMedium,
+                fontSize = MaterialTheme.typography.titleMedium.fontSize.times(1.1),
+                lineHeight = MaterialTheme.typography.bodyMedium.lineHeight,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(top = textPad).height(22.dp).wrapContentHeight(align = Alignment.CenterVertically)
+            )
         }
     }
 }
@@ -205,12 +286,7 @@ fun FirstLegComponent(
                     style = MaterialTheme.typography.bodyLarge,
                     lineHeight = MaterialTheme.typography.bodyLarge.fontSize
                 )
-                if(dispTime.second.isNotBlank()) {
-                    Text(
-                        text = dispTime.second,
-                        style = MaterialTheme.typography.bodySmall,
-                    )
-                }
+                DelayTextComposable(dispTime.second)
             }
 
             Spacer(modifier.weight(1f))
@@ -355,14 +431,7 @@ fun MiddleStopComponent(
                 lineHeight = MaterialTheme.typography.bodySmall.fontSize,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            if(dispTime.second.isNotBlank()) {
-                Text(
-                    text = dispTime.second,
-                    lineHeight = MaterialTheme.typography.bodySmall.fontSize,
-                    style = MaterialTheme.typography.bodySmall,
-                    fontSize = MaterialTheme.typography.labelSmall.fontSize
-                )
-            }
+            DelayTextComposable(dispTime.second, true)
         }
 
         Canvas(
@@ -402,6 +471,99 @@ fun MiddleStopComponent(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+fun LastIndividualLegComponent(
+    leg: Leg,
+    dispTime: Pair<String, String>,
+    thisLegColor: Color = leg.getColor(),
+    otherLegColor: Color? = null,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .height(IntrinsicSize.Min)
+            .heightIn(min = 48.dp)
+            .background(if(leg is IndividualLeg) MaterialTheme.colorScheme.surfaceContainerLowest else Color.Transparent)
+        ,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(
+            horizontalAlignment = Alignment.End,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.padding(top = 32.dp).width(50.dp).fillMaxHeight()
+        ) {
+            Text(
+                text = dispTime.first,
+                modifier = Modifier.padding(bottom = 4.dp).height(22.dp).wrapContentHeight(align = Alignment.CenterVertically)
+            )
+        }
+
+        Canvas(
+            modifier = Modifier
+                .padding(horizontal = 8.dp)
+                .padding(bottom = 4.dp)
+                .width(20.dp)
+                .fillMaxHeight()
+        ) {
+            drawLastIndividualLeg(thisLegColor, true)
+        }
+
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+            Text(
+                text = "zu Fuß",
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.height(32.dp).wrapContentHeight(align = Alignment.Bottom)
+            )
+            Text(
+                text = leg.arrival.getName() ?: "Ziel",
+                style = MaterialTheme.typography.titleMedium,
+                fontSize = MaterialTheme.typography.titleMedium.fontSize.times(1.1),
+                lineHeight = MaterialTheme.typography.bodyMedium.lineHeight,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 4.dp).height(22.dp).wrapContentHeight(align = Alignment.CenterVertically)
+            )
+        }
+
+        if(leg is PublicLeg) {
+            CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
+                IconButton(
+                    onClick = { /* TODO */ },
+                ) {
+                    Icon(
+                        painter = painterResource(Res.drawable.ic_more_horiz),
+                        contentDescription = stringResource(Res.string.more)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DelayTextComposable(
+    delay: String?,
+    smaller: Boolean = false,
+    modifier: Modifier = Modifier
+) {
+    if(!delay.isNullOrBlank()) {
+        Text(
+            text = delay,
+            lineHeight = if(smaller) MaterialTheme.typography.bodySmall.fontSize else TextUnit.Unspecified,
+            style = MaterialTheme.typography.bodySmall,
+            fontSize = if(smaller) MaterialTheme.typography.labelSmall.fontSize else TextUnit.Unspecified,
+            color = when {
+                delay.startsWith("+") -> Color.Red
+                delay.startsWith("-") -> Color.Blue
+                else -> Color.Unspecified
+            },
+            modifier = modifier
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
 fun LastLegComponent(
     leg: Leg,
     dispTime: Pair<String, String>,
@@ -410,7 +572,11 @@ fun LastLegComponent(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier.height(IntrinsicSize.Min).heightIn(min = 48.dp),
+        modifier = modifier
+            .height(IntrinsicSize.Min)
+            .heightIn(min = 48.dp)
+            .background(if(leg is IndividualLeg) MaterialTheme.colorScheme.surfaceContainerLowest else Color.Transparent)
+        ,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(
@@ -421,12 +587,7 @@ fun LastLegComponent(
             Text(
                 text = dispTime.first
             )
-            if(dispTime.second.isNotBlank()) {
-                Text(
-                    text = dispTime.second,
-                    style = MaterialTheme.typography.bodySmall,
-                )
-            }
+            DelayTextComposable(dispTime.second)
         }
 
         Canvas(
@@ -446,7 +607,10 @@ fun LastLegComponent(
         ) {
             Text(
                 text = leg.arrival.getName() ?: "Start",
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.titleMedium,
+                fontSize = MaterialTheme.typography.titleMedium.fontSize.times(1.1),
+                lineHeight = MaterialTheme.typography.bodyMedium.lineHeight,
+                fontWeight = FontWeight.Bold,
             )
         }
 
@@ -516,196 +680,6 @@ private fun Leg.getColor(): Color {
     return if(this is PublicLeg) Color(this.line.getColorInt()) else Color.Yellow //colorResource(R.color.walking)
 }
 
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun LegComponent(
-    dispTime: Pair<String, String>,
-    location: Location,
-    line: Line?,
-    lineName: String? = null,
-    type: LegType,
-    thisLegColor: Color,
-    otherLegColor: Color? = null,
-    duration: String? = null,
-    collapsed: Boolean = true,
-
-    modifier: Modifier = Modifier
-) {
-    if(type == LegType.MIDDLE && collapsed) return
-
-    Row(
-        modifier = modifier.height(IntrinsicSize.Min).heightIn(min = 48.dp),
-        verticalAlignment = if(type.isFirstStop()) Alignment.Top else Alignment.CenterVertically
-    ) {
-        Column(
-            horizontalAlignment = Alignment.End,
-            verticalArrangement = if(type == LegType.FIRST) Arrangement.Top else Arrangement.Center,
-            modifier = Modifier.width(38.dp).fillMaxHeight()
-        ) {
-
-            if(type.isEndingStop()) {
-                Text(
-                    text = dispTime.first
-                )
-                Text(
-                    text = dispTime.second,
-                    style = MaterialTheme.typography.bodySmall,
-                )
-            } else if(type == LegType.MIDDLE) {
-                Text(
-                    text = dispTime.first,
-                    style = MaterialTheme.typography.bodySmall,
-                    lineHeight = MaterialTheme.typography.bodySmall.fontSize,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Text(
-                    text = dispTime.second,
-                    lineHeight = MaterialTheme.typography.bodySmall.fontSize,
-                    style = MaterialTheme.typography.bodySmall,
-                    fontSize = MaterialTheme.typography.labelSmall.fontSize
-                )
-            }
-
-            if(type.isFirstStop() && collapsed && duration != null) {
-                Spacer(modifier.weight(1f))
-                Text(
-                    text = "Dauer:",
-                    fontSize = 7.sp,
-                    lineHeight = 7.sp,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.outline
-                )
-                Text(
-                    text = duration,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.outline
-                )
-                Spacer(modifier.weight(1f))
-            }
-        }
-
-        Canvas(
-            modifier = Modifier
-                .padding(horizontal = 8.dp)
-                .width(20.dp)
-                .fillMaxHeight()
-                .padding(top = if(type == LegType.FIRST) 4.dp else 0.dp)
-        ) {
-            when(type) {
-                LegType.FIRST -> drawFirstLeg(thisLegColor)
-                LegType.MIDDLE -> drawMiddleLeg(thisLegColor)
-                LegType.INTERMEDIATE_LAST -> drawIntermediaryLastLeg(thisLegColor, false, otherLegColor ?: thisLegColor, true)
-                LegType.INTERMEDIATE -> drawIntermediaryLeg(thisLegColor)
-                LegType.INTERMEDIATE_FIRST -> drawIntermediaryFirstLeg(otherLegColor ?: thisLegColor, true, thisLegColor, false, dotPhase = 1f)
-                LegType.LAST -> drawLastLeg(thisLegColor, false)
-                LegType.LAST_WALK -> drawLastLeg(thisLegColor, true)
-            }
-        }
-
-        Column(
-            modifier = Modifier.weight(1f)
-        ) {
-            if(type.isFirstStop()) {
-                val textPad = (MaterialTheme.typography.bodyMedium.fontSize.value / 2.5f).dp
-                Text(
-                    text = location.getName() ?: "Start",
-                    style = MaterialTheme.typography.bodyLarge,
-                    lineHeight = MaterialTheme.typography.bodyMedium.lineHeight,
-                    modifier = Modifier.padding(top = textPad).weight(1f)
-                )
-
-                if(line != null) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.padding(top = 4.dp)
-                    ) {
-                        ProductComposable(
-                            drawableId = line.product.getDrawable(),
-                            label = line.label,
-                        )
-
-                        val displayedLine = lineName ?: (line.name.takeIf { !it.isNullOrEmpty() } ?: "")
-                        Text(
-                            text = displayedLine
-                        )
-                    }
-                }
-
-
-                Text(
-                    text = "This is an important message that can be several lines long and even include HTML.",
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.padding(top = 8.dp),
-                    style = MaterialTheme.typography.bodySmall
-                )
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier
-                        .height(48.dp)
-                        .fillMaxWidth()
-                        .clickable {
-                            /* TODO */
-                        }
-                ) {
-                    Text(
-                        text = "42 Stops"
-                    )
-
-                    Icon(
-                        painter = painterResource(Res.drawable.ic_action_navigation_unfold_more),
-                        contentDescription = stringResource(Res.string.more),
-                        modifier = Modifier.width(48.dp)
-                    )
-                }
-            }
-            else if(type.isEndingStop()) {
-                Text(
-                    text = "Michelau (Oberfr)",
-                    style = MaterialTheme.typography.bodyLarge,
-                )
-            } else if(type == LegType.INTERMEDIATE) {
-                val textPad = (MaterialTheme.typography.bodyMedium.fontSize.value / 2.5f).dp
-                Text(
-                    text = "Umsteigen (5min)",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Start,
-                    modifier = Modifier.padding(bottom = textPad).height(64.dp).wrapContentHeight(align = Alignment.CenterVertically)
-                )
-            } else {
-                Text(
-                    text = "Umsteigen (5min)",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-
-        }
-
-        if(type != LegType.LAST_WALK && type != LegType.INTERMEDIATE) {
-            CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
-                IconButton(
-                    onClick = { /* TODO */ },
-                    modifier = Modifier
-                        .padding(end = if(type == LegType.MIDDLE) 12.dp else 0.dp)
-                        .size(if(type == LegType.MIDDLE) 32.dp else 40.dp)
-
-                ) {
-                    Icon(
-                        painter = painterResource(Res.drawable.ic_more_horiz),
-                        contentDescription = stringResource(Res.string.more)
-                    )
-                }
-            }
-        }
-    }
-}
-
-
 enum class LegType {
     FIRST,
     MIDDLE,
@@ -728,8 +702,13 @@ fun LegType.isLastStop(): Boolean {
     return this == LegType.LAST || this == LegType.LAST_WALK || this == LegType.INTERMEDIATE_LAST
 }
 
-fun DrawScope.drawFirstLeg(color: Color) {
+fun DrawScope.drawFirstLeg(
+    color: Color,
+    dotted: Boolean = false,
+    dotPhase: Float = 0f
+) {
     val legBaseSizePx = 11.dp.toPx()
+    val dotEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), dotPhase)
 
     drawCircle(
         color = color,
@@ -741,7 +720,8 @@ fun DrawScope.drawFirstLeg(color: Color) {
         color = color,
         start = Offset(size.width / 2, legBaseSizePx),
         end = Offset(size.width / 2, size.height),
-        strokeWidth = 4.5.dp.toPx()
+        strokeWidth = 4.5.dp.toPx(),
+        pathEffect = if(dotted) dotEffect else null
     )
 }
 
@@ -936,6 +916,34 @@ fun DrawScope.drawLastLeg(
         center = Offset(size.width / 2, size.height / 2),
 
         )
+}
+
+fun DrawScope.drawLastIndividualLeg(
+    color: Color,
+    dot: Boolean = false,
+    dotPhase: Float = 10f,
+    legBaseSize: Dp = 11.dp,
+    strokeSize: Dp = 4.5.dp,
+) {
+    val legBaseSizePx = legBaseSize.toPx()
+    val strokeWidthPx = strokeSize.toPx()
+    val legHeight = (size.height - legBaseSizePx)
+    val dotEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), dotPhase)
+
+
+    drawCircle(
+        color = color,
+        radius = legBaseSizePx,
+        center = Offset(size.width / 2, legHeight)
+    )
+
+    drawLine(
+        color = color,
+        start = Offset(size.width / 2, 0f),
+        end = Offset(size.width / 2, legHeight * 1.1f),
+        strokeWidth = strokeWidthPx,
+        pathEffect = if(dot) dotEffect else null
+    )
 }
 
 

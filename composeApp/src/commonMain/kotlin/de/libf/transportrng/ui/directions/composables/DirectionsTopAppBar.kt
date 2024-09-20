@@ -30,6 +30,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import de.libf.transportrng.ui.composables.CustomLargeTopAppBar
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -65,6 +66,8 @@ fun DirectionsTopAppBar(
             expandedHeader()
         },
         scrollBehavior = scrollBehavior,
-        expandedHeight = expandedHeight
+        expandedHeight = expandedHeight,
+        expandedRadius = 28.dp,
+        collapsedRadius = 12.dp
     )
 }

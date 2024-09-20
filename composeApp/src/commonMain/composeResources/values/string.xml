@@ -111,7 +111,7 @@ and always knows where you are to not miss where to get off the bus.
 	<string name="more">More</string>
 
 	<!-- Shows a short(!) representation of how long you need to walk, e.g. "for 5 min" -->
-	<string name="for_x_min">for %d min</string>
+	<string name="for_x_min">for %1$d min</string>
 
 	<string name="change_time">Change Time</string>
 	<string name="now">Now</string>
@@ -119,9 +119,9 @@ and always knows where you are to not miss where to get off the bus.
 	<string name="yesterday">Yesterday</string>
 	<string name="today">Today</string>
 	<string name="tomorrow">Tomorrow</string>
-	<string name="in_x_minutes">in %dmin</string>
-	<string name="x_minutes_ago">%dmin ago</string>
-	<string name="total_time">Total time: %s</string>
+	<string name="in_x_minutes">in %1$dmin</string>
+	<string name="x_minutes_ago">%1$dmin ago</string>
+	<string name="total_time">Total time: %1$s</string>
 	<string name="time_picker_previous_day">Previous Day</string>
 	<string name="time_picker_next_day">Next Day</string>
 
@@ -173,20 +173,20 @@ and always knows where you are to not miss where to get off the bus.
 	<string name="try_again">Try Again</string>
 
 	<!-- This string shows the number of meters one has to walk. Please keep the translation short. -->
-	<string name="meter">%d m</string>
+	<string name="meter">%1$d m</string>
 
 	<plurals name="stops">
-		<item quantity="one">%d Stop</item>
-		<item quantity="other">%d Stops</item>
+		<item quantity="one">%1$d Stop</item>
+		<item quantity="other">%1$d Stops</item>
 	</plurals>
 
 	<!-- This is the platform or position where a train will depart or arrive. Please keep it short as it will be shown after the station name. -->
-	<string name="platform">(Platform %s)</string>
+	<string name="platform">(Platform %1$s)</string>
 
 	<string name="system_default">System Default</string>
-	<string name="trip_share_date">Date: %s</string>
+	<string name="trip_share_date">Date: %1$s</string>
 	<string name="times_include_delays">(Attention: Times may include reported delays)</string>
-	<string name="created_by">Created by %s</string>
+	<string name="created_by">Created by %1$s</string>
 
 	<string name="home">Home</string>
 	<string name="home_dialog_title">Set Home Location</string>

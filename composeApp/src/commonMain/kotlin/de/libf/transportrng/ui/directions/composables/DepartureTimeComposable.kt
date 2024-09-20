@@ -101,8 +101,8 @@ fun DepartureTimeComposable(
                     departureTimeStr = when {
                         difference !in -maxMins..maxMins -> formatTime(it, false)
                         difference == 0L -> dvNow
-                        difference > 0 -> dvInMinutes.replace("%d", difference.toString())
-                        else -> dvAgoMinutes.replace("%d", (difference * -1).toString())
+                        difference > 0 -> dvInMinutes.replace("%1\$d", difference.toString())
+                        else -> dvAgoMinutes.replace("%1\$d", (difference * -1).toString())
                     }
                 }
                 else -> {

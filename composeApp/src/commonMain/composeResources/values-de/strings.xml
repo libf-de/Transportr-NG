@@ -92,16 +92,16 @@ und weiß immer, wo man aussteigen muss.
   <string name="show_location_in">Standort anzeigen in…</string>
   <string name="more">Mehr</string>
   <!--Shows a short(!) representation of how long you need to walk, e.g. "for 5 min"-->
-  <string name="for_x_min">für %d min</string>
+  <string name="for_x_min">für %1$d min</string>
   <string name="change_time">Zeit ändern</string>
   <string name="now">Jetzt</string>
   <string name="now_small">jetzt</string>
   <string name="yesterday">Gestern</string>
   <string name="today">Heute</string>
   <string name="tomorrow">Morgen</string>
-  <string name="in_x_minutes">in %d min</string>
-  <string name="x_minutes_ago">vor %d min</string>
-  <string name="total_time">Gesamtzeit: %s</string>
+  <string name="in_x_minutes">in %1$d min</string>
+  <string name="x_minutes_ago">vor %1$d min</string>
+  <string name="total_time">Gesamtzeit: %1$s</string>
   <string name="time_picker_previous_day">Vorheriger Tag</string>
   <string name="time_picker_next_day">Nächster Tag</string>
   <string name="ok">OK</string>
@@ -148,17 +148,17 @@ und weiß immer, wo man aussteigen muss.
   <string name="trip_not_travelable">Unmöglich oder abgebrochen</string>
   <string name="try_again">Noch einmal versuchen</string>
   <!--This string shows the number of meters one has to walk. Please keep the translation short.-->
-  <string name="meter">%d m</string>
+  <string name="meter">%1$d m</string>
   <plurals name="stops">
-    <item quantity="one">%d Haltestelle</item>
-    <item quantity="other">%d Haltestellen</item>
+    <item quantity="one">%1$d Haltestelle</item>
+    <item quantity="other">%1$d Haltestellen</item>
   </plurals>
   <!--This is the platform or position where a train will depart or arrive. Please keep it short as it will be shown after the station name.-->
-  <string name="platform">(Gleis %s)</string>
+  <string name="platform">(Gleis %1$s)</string>
   <string name="system_default">Systemstandard</string>
-  <string name="trip_share_date">Datum: %s</string>
+  <string name="trip_share_date">Datum: %1$s</string>
   <string name="times_include_delays">(Achtung: Zeiten können gemeldete Verspätungen enthalten)</string>
-  <string name="created_by">Erstellt von %s</string>
+  <string name="created_by">Erstellt von %1$s</string>
   <string name="home">Zuhause</string>
   <string name="home_dialog_title">Heimatadresse festlegen</string>
   <string name="widget_name_quickhome">Nach Hause</string>

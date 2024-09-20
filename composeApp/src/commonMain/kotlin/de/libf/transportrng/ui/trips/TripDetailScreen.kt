@@ -316,6 +316,6 @@ fun TripDetailScreen(
 
 }
 
-private fun Float.invert(): Float = 1 - this
+fun Float.invert(): Float = 1 - this
 
-private fun Float.mapRange(min: Float, max: Float): Float = (this * (max - min)) + min
+fun Float.mapRange(min: Float, max: Float): Float = (this * (max - min)) + min

@@ -42,6 +42,7 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
@@ -73,7 +74,10 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.times
 import androidx.compose.ui.util.fastFirst
+import de.libf.transportrng.ui.trips.invert
+import de.libf.transportrng.ui.trips.mapRange
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.roundToInt
@@ -117,6 +121,8 @@ fun CustomLargeTopAppBar(
     colors: TopAppBarColors = TopAppBarDefaults.largeTopAppBarColors(),
     expandedHeight: Dp = TopAppBarLargeTokens.ContainerHeight,
     collapsedHeight: Dp = TopAppBarSmallTokens.ContainerHeight,
+    expandedRadius: Dp = 0.dp,
+    collapsedRadius: Dp = 0.dp,
     scrollBehavior: TopAppBarScrollBehavior? = null
 ) {
     TwoRowsTopAppBar(
@@ -132,7 +138,9 @@ fun CustomLargeTopAppBar(
         windowInsets = windowInsets,
         maxHeight = expandedHeight,
         pinnedHeight = collapsedHeight,
-        scrollBehavior = scrollBehavior
+        scrollBehavior = scrollBehavior,
+        expandedRadius = expandedRadius,
+        collapsedRadius = collapsedRadius
     )
 }
 
@@ -249,7 +257,9 @@ private fun TwoRowsTopAppBar(
     colors: TopAppBarColors,
     maxHeight: Dp,
     pinnedHeight: Dp,
-    scrollBehavior: TopAppBarScrollBehavior?
+    scrollBehavior: TopAppBarScrollBehavior?,
+    expandedRadius: Dp = 0.dp,
+    collapsedRadius: Dp = 0.dp
 ) {
     if (maxHeight <= pinnedHeight) {
         throw IllegalArgumentException(
@@ -316,7 +326,13 @@ private fun TwoRowsTopAppBar(
         Modifier
     }
 
-    Surface(modifier = modifier.then(appBarDragModifier), color = appBarContainerColor) {
+    Surface(
+        modifier = modifier.then(appBarDragModifier),
+        color = appBarContainerColor,
+        shape = RoundedCornerShape(
+            colorTransitionFraction.invert().mapRangeDp(collapsedRadius, expandedRadius)
+        )
+    ) {
         Column {
             TopAppBarLayout(
                 modifier = Modifier
@@ -736,3 +752,5 @@ internal fun Typography.fromToken(value: TypographyKeyTokens): TextStyle {
         TypographyKeyTokens.LabelSmall -> labelSmall
     }
 }
+
+fun Float.mapRangeDp(min: Dp, max: Dp): Dp = (this * (max - min)) + min
