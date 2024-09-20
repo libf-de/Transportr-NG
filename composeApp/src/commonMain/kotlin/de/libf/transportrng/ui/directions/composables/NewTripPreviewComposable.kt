@@ -50,6 +50,8 @@ import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.text.TextMeasurer
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
@@ -68,16 +70,244 @@ import de.libf.transportrng.data.utils.formatDuration
 import de.libf.transportrng.data.utils.getName
 import de.libf.transportrng.data.utils.getStandardFare
 import de.libf.transportrng.data.utils.hasProblem
+import de.libf.transportrng.ui.trips.composables.forEachWithNeighbors
 import org.jetbrains.compose.resources.painterResource
 import transportr_ng.composeapp.generated.resources.Res
 import transportr_ng.composeapp.generated.resources.ic_walk
+import kotlin.math.max
 
 private val Leg.line: Line?
     get() = if(this is PublicLeg) this.line else null
 
-@OptIn(ExperimentalLayoutApi::class)
+data class LegPosition(
+    val start: Float,
+    val width: Float,
+    val startImmediate: Boolean,
+    val endImmediate: Boolean,
+    val text: TextLayoutResult?
+)
+
+private fun computeLegPositions(textMeasurer: TextMeasurer, lblStyle: TextStyle, trip: Trip, totalWidth: Float): Map<Leg, LegPosition> {
+    val legWidths = mutableMapOf<Leg, Pair<TextLayoutResult?, Float>>()
+    var spacers = mutableListOf<Float>()
+
+    val tripDurationMin = trip.duration.toMins().toFloat()
+
+    trip.legs.forEachIndexed { i, leg ->
+        val proportionalWidth = (leg.min / tripDurationMin) * totalWidth
+        val measuredText = leg.getLineLabelOrNull()?.let {
+            textMeasurer.measure(
+                AnnotatedString(it),
+                style = lblStyle.copy(
+                    color = leg.line?.style?.foregroundColor?.let(::Color) ?: lblStyle.color
+                )
+            )
+        }
+
+        val legMinWidth = measuredText?.size?.width?.toFloat() ?: 0f
+        val width = max(proportionalWidth, legMinWidth)
+        legWidths[leg] = Pair(measuredText, width)
+
+        if(i < trip.legs.size - 1) {
+            val nextLeg = trip.legs[i+1]
+            val spacerDuration = (nextLeg.departureTime - leg.arrivalTime).toMins()
+            spacers.add((spacerDuration / tripDurationMin) * totalWidth)
+        }
+
+        val totalSpacerWidth = spacers.sum()
+        val totalLegWidth = legWidths.map { it.value.second }.sum()
+        var totalUsedWidth = totalLegWidth + totalSpacerWidth
+        var excessWidth = totalUsedWidth - totalWidth
+        if(excessWidth > 0) {
+
+            if(totalSpacerWidth >= excessWidth) {
+                val scaleFactor = (totalSpacerWidth - excessWidth) / totalSpacerWidth
+                spacers = spacers.map { it * scaleFactor }.toMutableList()
+            } else {
+                excessWidth -= totalSpacerWidth
+                spacers = spacers.map { 0f }.toMutableList()
+
+                val adjustableLegs = legWidths.filter {
+                    it.value.second > (it.value.first?.size?.width?.toFloat() ?: 0f)
+                }
+
+                val totalAdjustableWidth = adjustableLegs.map {
+                    it.value.second - (it.value.first?.size?.width?.toFloat() ?: 0f)
+                }.sum()
+
+                if(totalAdjustableWidth > excessWidth) {
+                    val scaleWidth = excessWidth / totalAdjustableWidth
+                    adjustableLegs.forEach {
+                        val cur = legWidths[it.key]!!
+                        legWidths[it.key] = cur.copy(second = cur.second * scaleWidth)
+                    }
+                }
+            }
+        }
+    }
+
+    var currentPos = 0f
+    var index = 0
+    return legWidths.mapValues {
+        val curWidth = it.value.second
+        LegPosition(
+            start = currentPos,
+            width = curWidth,
+            text = it.value.first,
+            startImmediate = index > 0 && spacers[index - 1] < 1f,
+            endImmediate = index < spacers.size && spacers[index] < 1f,
+        ).also {
+            currentPos += curWidth
+            if(index < spacers.size) currentPos += spacers[index]
+
+            index += 1
+        }
+    }
+//    return legWidths.entries.mapIndexed { index, mutableEntry ->
+//        val curWidth = mutableEntry.value.second
+//        LegPosition(currentPos, curWidth, mutableEntry.value.first, mutableEntry.key.hashCode()).also {
+//            currentPos += curWidth
+//            if(index < spacers.size) currentPos += spacers[index]
+//        }
+//    }
+}
+
 @Composable
 fun NewTripPreviewComposable(
+    trip: Trip,
+    onClick: () -> Unit,
+) {
+    var departureTime by remember { mutableStateOf("") }
+    var departureDelay by remember { mutableStateOf("") }
+    var departureName by remember { mutableStateOf("") }
+    var duration by remember { mutableStateOf("") }
+    var price by remember { mutableStateOf("") }
+    var warning by remember { mutableStateOf(false) }
+    var arrivalTime by remember { mutableStateOf("") }
+    var arrivalDelay by remember { mutableStateOf("") }
+    var arrivalName by remember { mutableStateOf("") }
+
+    LaunchedEffect(trip) {
+        val departureData = getDepartureTimes(trip)
+        departureTime = departureData.first
+        departureDelay = departureData.second
+        departureName = trip.from.getName() ?: "???"
+
+        duration = formatDuration(trip.duration) ?: ""
+        price = trip.getStandardFare() ?: ""
+        warning = trip.hasProblem()
+
+        val arrivalData = getArrivalTimes(trip)
+        arrivalTime = arrivalData.first
+        arrivalDelay = arrivalData.second
+        arrivalName = trip.to.getName() ?: "???"
+    }
+
+    //val busIcon = painterResource(R.drawable.product_bus)
+    val tripIcons = trip.legs.mapNotNull {
+        if(it is PublicLeg)
+            it.line.product to painterResource(it.line.product.getDrawableRes())
+        else null
+    }.plus(null to painterResource(Res.drawable.ic_walk)).toMap()
+
+    val textMeasurer = rememberTextMeasurer()
+    val lblStyle = MaterialTheme.typography.labelSmall.copy(
+        color = Color.Gray
+    )
+
+    OutlinedCard(
+        modifier = Modifier.clickable { onClick() },
+    ) {
+        Row(
+            modifier = Modifier.padding(8.dp)
+        ) {
+            Column(
+                horizontalAlignment = Alignment.End
+            ) {
+                Text(
+                    text = departureTime,
+                    fontWeight = FontWeight.Bold,
+                    lineHeight = MaterialTheme.typography.bodyMedium.fontSize,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+
+                Text(
+                    text = departureDelay,
+                    color = if(departureDelay.startsWith("+")) Color.Red else Color.Blue
+                )
+            }
+
+            Column(
+                modifier = Modifier
+                    .padding(horizontal = 8.dp)
+                    .weight(1f)
+            ) {
+                Canvas(
+                    modifier = Modifier
+                        .padding(horizontal = 8.dp)
+                        .fillMaxWidth()
+                ) {
+                    val lineCenter = 8.dp.toPx()
+                    val circleRad = 6.dp.toPx()
+                    val halfCircleStroke = 2.dp.toPx()
+                    val halfCircleSize = (circleRad * 2) - halfCircleStroke
+
+                    val testSegSize = size.width / 10
+                    var curPos = 0f
+
+                    computeLegPositions(textMeasurer, lblStyle, trip, size.width).entries.toList().forEachWithNeighbors { prev, it, next ->
+                        val leg = it.key
+                        val legColor = leg.colorOr(Color.Yellow)
+                        aSegment(
+                            start = it.value.start,
+                            width = it.value.width,
+                            color = legColor,
+                            icon = tripIcons[leg.line?.product],
+                            text = it.value.text,
+                            whichSegment = when {
+                                prev == null -> SegmentPos.FIRST
+                                next == null -> SegmentPos.LAST
+                                else -> SegmentPos.CENTER
+                            },
+                            startColor = prev?.key.colorOr(legColor),
+                            startImmediate = it.value.startImmediate,
+                            endImmediate = it.value.endImmediate,
+                            endColor = next?.key.colorOr(legColor),
+                            walk = leg is IndividualLeg,
+                            attrs = TripPreviewAttrs()
+                        )
+                    }
+                }
+
+            }
+
+            Column(
+                horizontalAlignment = Alignment.End
+            ) {
+                Text(
+                    text = arrivalTime,
+                    fontWeight = FontWeight.Bold,
+                    lineHeight = MaterialTheme.typography.bodyMedium.fontSize,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+
+                Text(
+                    text = arrivalDelay,
+                    color = if(arrivalDelay.startsWith("+")) Color.Red else Color.Blue
+                )
+            }
+        }
+    }
+}
+
+private fun Leg?.colorOr(alt: Color): Color {
+    if(this == null) return alt
+    return this.line?.style?.backgroundColor?.let(::Color) ?: alt
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun NewTripPreviewComposableLegacy(
     trip: Trip,
     onClick: () -> Unit,
 ) {
@@ -345,6 +575,8 @@ fun DrawScope.aSegment(
     walk: Boolean = false,
     startColor: Color = color,
     endColor: Color = color,
+    startImmediate: Boolean = true,
+    endImmediate: Boolean = true,
     useStartColor: Boolean = walk,
     useEndColor: Boolean = walk,
     icon: Painter?,
@@ -373,6 +605,8 @@ fun DrawScope.aSegment(
                 walk = walk,
                 startColor = startColor,
                 endColor = endColor,
+                startImmediate = startImmediate,
+                endImmediate = endImmediate,
                 useStartColor = useStartColor,
                 useEndColor = useEndColor,
                 attrs = attrs
@@ -393,6 +627,7 @@ fun DrawScope.aSegment(
                 width = width,
                 color = color,
                 start = start,
+                startImmediate = startImmediate,
                 walk = walk,
                 attrs = attrs
         )
@@ -507,6 +742,8 @@ fun DrawScope.centerSegment(
     walk: Boolean = false,
     startColor: Color = color,
     endColor: Color = color,
+    startImmediate: Boolean = true,
+    endImmediate: Boolean = true,
     useStartColor: Boolean = walk,
     useEndColor: Boolean = walk,
     attrs: TripPreviewAttrs = TripPreviewAttrs()
@@ -519,33 +756,55 @@ fun DrawScope.centerSegment(
 
     val end = start + width
 
+    val lineStart = if(startImmediate) start + halfCircleSize / 2 else start + halfCircleSize
+    val lineEnd = if(endImmediate) end - (halfCircleSize / 2) else end - halfCircleSize
+
     drawLine(
         color = color,
-        start = Offset(start + halfCircleSize / 2, lineCenter),
-        end = Offset(end - (halfCircleSize / 2), lineCenter),
+        start = Offset(lineStart, lineCenter),
+        end = Offset(lineEnd, lineCenter),
         pathEffect = if(walk) dotEffect else null,
         strokeWidth = 2.dp.toPx()
     )
 
-    drawArc(
-        color = if(useStartColor) startColor else color,
-        startAngle = -90f,
-        sweepAngle = 180f,
-        useCenter = false,
-        topLeft = Offset(start - halfCircleSize / 2, lineCenter - (circleRad / 2) - halfCircleStroke),
-        size = Size(halfCircleSize, halfCircleSize),
-        style = Stroke(width = halfCircleStroke),
-    )
+    if(startImmediate) {
+        drawArc(
+            color = if(useStartColor) startColor else color,
+            startAngle = -90f,
+            sweepAngle = 180f,
+            useCenter = false,
+            topLeft = Offset(start - halfCircleSize / 2, lineCenter - (circleRad / 2) - halfCircleStroke),
+            size = Size(halfCircleSize, halfCircleSize),
+            style = Stroke(width = halfCircleStroke),
+        )
+    } else {
+        drawCircle(
+            color = color,
+            radius = circleRad - halfCircleStroke / 2,
+            center = Offset(start + halfCircleSize / 2, lineCenter),
+            style = Stroke(width = halfCircleStroke),
+        )
+    }
 
-    drawArc(
-        color = if(useEndColor) endColor else color,
-        startAngle = 90f,
-        sweepAngle = 180f,
-        useCenter = false,
-        topLeft = Offset(end - halfCircleSize / 2, lineCenter - (circleRad / 2) - halfCircleStroke),
-        size = Size(halfCircleSize, halfCircleSize),
-        style = Stroke(width = halfCircleStroke),
-    )
+    if(endImmediate) {
+        drawArc(
+            color = if(useEndColor) endColor else color,
+            startAngle = 90f,
+            sweepAngle = 180f,
+            useCenter = false,
+            topLeft = Offset(end - halfCircleSize / 2, lineCenter - (circleRad / 2) - halfCircleStroke),
+            size = Size(halfCircleSize, halfCircleSize),
+            style = Stroke(width = halfCircleStroke),
+        )
+    } else {
+        drawCircle(
+            color = color,
+            radius = circleRad - halfCircleStroke / 2,
+            center = Offset(end - halfCircleSize / 2, lineCenter),
+            style = Stroke(width = halfCircleStroke),
+        )
+    }
+
 
     return start + width
 }
@@ -554,6 +813,7 @@ fun DrawScope.lastSegment(
     width: Float,
     color: Color,
     start: Float = 0f,
+    startImmediate: Boolean = true,
     walk: Boolean = false,
     attrs: TripPreviewAttrs = TripPreviewAttrs()
 ): Float {
@@ -566,20 +826,32 @@ fun DrawScope.lastSegment(
 
     val end = start + width
 
-    drawArc(
-        color = color,
-        startAngle = -90f,
-        sweepAngle = 180f,
-        useCenter = false,
-        topLeft = Offset(start - halfCircleSize / 2, lineCenter - (circleRad / 2) - halfCircleStroke),
-        size = Size(halfCircleSize, halfCircleSize),
-        style = Stroke(width = halfCircleStroke),
-    )
+    val lineStart = if(startImmediate) (start + halfCircleSize / 2) else (start + halfCircleSize)
+
+    if(startImmediate) {
+        drawArc(
+            color = color,
+            startAngle = -90f,
+            sweepAngle = 180f,
+            useCenter = false,
+            topLeft = Offset(start - halfCircleSize / 2, lineCenter - (circleRad / 2) - halfCircleStroke),
+            size = Size(halfCircleSize, halfCircleSize),
+            style = Stroke(width = halfCircleStroke),
+        )
+    } else {
+        drawCircle(
+            color = color,
+            radius = circleRad - halfCircleStroke / 2,
+            center = Offset(start + halfCircleSize / 2, lineCenter),
+            style = Stroke(width = halfCircleStroke),
+        )
+    }
+
 
 
     drawLine(
         color = color,
-        start = Offset(start + halfCircleSize / 2, lineCenter),
+        start = Offset(lineStart, lineCenter),
         end = Offset(end - halfCircleSize / 2, lineCenter),
         pathEffect = if(walk) dotEffect else null,
         strokeWidth = 2.dp.toPx()
