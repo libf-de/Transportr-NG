@@ -424,7 +424,7 @@ actual fun <T : MapViewStateInterface> MapViewComposable(
     rotateGestures: Boolean,
     showLogo: Boolean,
     showAttribution: Boolean,
-    mapStyle: String
+    isDark: Boolean
 ) {
     UIKitMapView(
         mapViewState as iOsMapViewState,
@@ -433,8 +433,7 @@ actual fun <T : MapViewStateInterface> MapViewComposable(
         mapPadding,
         rotateGestures,
         showLogo,
-        showAttribution,
-        mapStyle
+        showAttribution
     )
 }
 
@@ -448,8 +447,7 @@ fun UIKitMapView(
     mapPadding: MapPadding,
     rotateGestures: Boolean,
     showLogo: Boolean,
-    showAttribution: Boolean,
-    mapStyle: String
+    showAttribution: Boolean
 ) {
     LaunchedEffect(isHalfHeight) {
         mapViewState.setPadding(isHalfHeight)

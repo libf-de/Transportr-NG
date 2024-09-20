@@ -77,7 +77,7 @@ und weiß immer, wo man aussteigen muss.
   <string name="search_hint">Hier suchen</string>
   <string name="from_here">Von hier</string>
   <string name="to_here">Verbindung zum aktuellen Standort suchen</string>
-  <string name="connections_by_stop">Verbindungen von/zu Haltestelle</string>
+  <string name="connections_by_stop">Verbindungen von/nach hier</string>
   <string name="clear_location">Ort löschen</string>
   <string name="walk">Fußweg</string>
   <string name="alpha">alpha</string>
@@ -89,7 +89,7 @@ und weiß immer, wo man aussteigen muss.
   <string name="drawer_nearby_stations">Haltestellen in der Nähe</string>
   <string name="find_nearby_stations">Haltestellen in der Umgebung suchen</string>
   <string name="find_departures">Abfahrten suchen</string>
-  <string name="find_departures_from_stop">Abfahrten von dieser Haltestelle</string>
+  <string name="find_departures_from_stop">Abfahrten von hier</string>
   <string name="share_trip_via">Verbindungen teilen mit…</string>
   <string name="show_location_in">Standort anzeigen in…</string>
   <string name="more">Mehr</string>

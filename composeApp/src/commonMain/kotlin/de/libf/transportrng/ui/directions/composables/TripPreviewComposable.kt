@@ -92,7 +92,7 @@ fun FromRelativeTimeText(trip: Trip, max: Int = 99) {
 
     LaunchedEffect(value) {
         if(trip.isTravelable) {
-            val difference = Clock.System.now().minus(Instant.fromEpochMilliseconds(trip.firstDepartureTime)).inWholeMinutes ?: Long.MIN_VALUE
+            val difference = Instant.fromEpochMilliseconds(trip.firstDepartureTime).minus(Clock.System.now()).inWholeMinutes ?: Long.MIN_VALUE
             value = when {
                 difference !in -max..max -> ""
                 difference == 0L -> nowSmall

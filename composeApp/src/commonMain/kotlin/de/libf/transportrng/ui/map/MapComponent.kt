@@ -22,7 +22,7 @@ expect fun <T : MapViewStateInterface> MapViewComposable(
     rotateGestures: Boolean = false,
     showLogo: Boolean = true,
     showAttribution: Boolean = true,
-    mapStyle: String = "jawg-streets"
+    isDark: Boolean = true
 )
 
 interface MapViewStateInterface {

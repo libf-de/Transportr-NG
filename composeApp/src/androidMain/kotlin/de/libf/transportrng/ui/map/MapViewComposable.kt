@@ -31,6 +31,7 @@ import android.graphics.drawable.LayerDrawable
 import androidx.annotation.ColorInt
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
@@ -90,9 +91,18 @@ actual fun <T : MapViewStateInterface> MapViewComposable(
     rotateGestures: Boolean,
     showLogo: Boolean,
     showAttribution: Boolean,
-    mapStyle: String
+    isDark: Boolean
 ) {
-    AndroidMapViewComposable(mapViewState as MapViewState, compassMargins, isHalfHeight, mapPadding, rotateGestures, showLogo, showAttribution, mapStyle)
+    AndroidMapViewComposable(
+        mapViewState as MapViewState,
+        compassMargins,
+        isHalfHeight,
+        mapPadding,
+        rotateGestures,
+        showLogo,
+        showAttribution,
+        if(isDark) "jawg-dark" else "jawg-sunny"
+    )
 }
 
 @Composable

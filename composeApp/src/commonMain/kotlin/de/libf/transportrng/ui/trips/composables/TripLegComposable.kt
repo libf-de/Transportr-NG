@@ -67,6 +67,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -303,33 +304,14 @@ fun FirstLegComponent(
     onStopLongClick: (Stop) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val textPad = if(otherLegColor == null) 0.dp else 4.dp
-
-    var menuOpen by remember { mutableStateOf(false) }
+    val textPad = if(otherLegColor == null) 0.dp else 13.dp
 
     Row(
         modifier = modifier
             .height(IntrinsicSize.Min)
-            .heightIn(min = 48.dp)
-            .clickable {
-                onLegClick(leg)
-            },
+            .heightIn(min = 48.dp),
         verticalAlignment = if(otherLegColor == null) Alignment.Top else Alignment.CenterVertically
     ) {
-        DropdownMenu(
-            expanded = menuOpen,
-            properties = PopupProperties(),
-            onDismissRequest = { menuOpen = false },
-            modifier = Modifier.align(Alignment.CenterVertically)
-        ) {
-            PopupMenuItem(
-                text = Res.string.action_share,
-                icon = Res.drawable.ic_action_social_share
-            ) {
-
-            }
-        }
-
         Column(
             horizontalAlignment = Alignment.End,
             verticalArrangement = if(otherLegColor == null) Arrangement.Top else Arrangement.Center,
@@ -342,7 +324,8 @@ fun FirstLegComponent(
                 Text(
                     text = dispTime.first,
                     style = MaterialTheme.typography.bodyLarge,
-                    lineHeight = MaterialTheme.typography.bodyLarge.fontSize
+                    lineHeight = MaterialTheme.typography.bodyLarge.fontSize,
+                    maxLines = 1
                 )
                 DelayTextComposable(dispTime.second)
             }
@@ -360,7 +343,8 @@ fun FirstLegComponent(
                 Text(
                     text = formatDuration(leg.arrivalTime - leg.departureTime) ?: "",
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.outline
+                    color = MaterialTheme.colorScheme.outline,
+                    maxLines = 1
                 )
                 Spacer(modifier.weight(1f))
             }
@@ -376,7 +360,14 @@ fun FirstLegComponent(
             if(otherLegColor == null) {
                 drawFirstLeg(thisLegColor)
             } else {
-                drawIntermediaryFirstLeg(otherLegColor, true, thisLegColor, false, dotPhase = 1f)
+                drawIntermediaryFirstLeg(
+                    colorTop = otherLegColor,
+                    dotTop = true,
+                    colorBottom = thisLegColor,
+                    dotBottom = false,
+                    dotPhase = 1f,
+                    circleY = 24.dp
+                )
             }
         }
 
@@ -391,14 +382,28 @@ fun FirstLegComponent(
                 }
             )
         ) {
-            Text(
-                text = location.getName() ?: "Start",
-                style = MaterialTheme.typography.titleMedium,
-                fontSize = MaterialTheme.typography.titleMedium.fontSize.times(1.1),
-                lineHeight = MaterialTheme.typography.bodyMedium.lineHeight,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(top = textPad).height(22.dp).wrapContentHeight(align = Alignment.CenterVertically)
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(top = textPad, end = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text(
+                    text = location.getName() ?: "Start",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontSize = MaterialTheme.typography.titleMedium.fontSize.times(1.1),
+                    lineHeight = MaterialTheme.typography.bodyMedium.lineHeight,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    modifier = Modifier.height(22.dp).wrapContentHeight(align = Alignment.CenterVertically)
+                )
+
+                Spacer(modifier.weight(1f))
+
+                if(leg is PublicLeg && leg.departurePosition != null)
+                    StationDisplay(
+                        position = leg.departurePosition
+                    )
+            }
 
             if(leg is PublicLeg) {
                 Row(
@@ -415,7 +420,9 @@ fun FirstLegComponent(
 
                     val displayedLine = customLineName ?: (leg.line?.name.takeIf { !it.isNullOrEmpty() } ?: "")
                     Text(
-                        text = displayedLine
+                        text = displayedLine,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
 
@@ -458,29 +465,25 @@ fun FirstLegComponent(
             }
         }
 
-        Column {
-            if(leg is PublicLeg && leg.departurePosition != null)
-                StationDisplay(
-                    position = leg.departurePosition,
-                    modifier = Modifier.height(22.dp).wrapContentHeight(align = Alignment.CenterVertically)
-                )
-
-            Spacer(modifier.weight(1f))
-
-            CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
-                IconButton(
-                    onClick = { /* TODO */ },
-                    modifier = Modifier
-                ) {
-                    Icon(
-                        painter = painterResource(Res.drawable.ic_more_horiz),
-                        contentDescription = stringResource(Res.string.more)
-                    )
-                }
-            }
-
-            Spacer(modifier.weight(1f))
-        }
+//        Column {
+//
+//
+//            Spacer(modifier.weight(1f))
+//
+//            CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
+//                IconButton(
+//                    onClick = { /* TODO */ },
+//                    modifier = Modifier
+//                ) {
+//                    Icon(
+//                        painter = painterResource(Res.drawable.ic_more_horiz),
+//                        contentDescription = stringResource(Res.string.more)
+//                    )
+//                }
+//            }
+//
+//            Spacer(modifier.weight(1f))
+//        }
     }
 }
 
@@ -944,10 +947,11 @@ fun DrawScope.drawIntermediaryFirstLeg(
     dotPhase: Float = 10f,
     legBaseSize: Dp = 11.dp,
     strokeSize: Dp = 4.5.dp,
+    circleY: Dp = 16.dp
 ) {
     val legBaseSizePx = legBaseSize.toPx()
     val strokeSizePx = strokeSize.toPx()
-    val circleY = 16.dp.toPx()
+    val circleY = circleY.toPx()
     val legHeight = (circleY - legBaseSizePx)
     val dotEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), dotPhase)
 

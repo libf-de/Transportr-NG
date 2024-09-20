@@ -6,4 +6,18 @@
         <item name="maplibre_uiLogo">false</item>
         <item name="maplibre_uiTiltGestures">false</item>
     </style>
+
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <!-- Set the splash screen background, animated icon, and animation
+        duration. -->
+        <item name="windowSplashScreenBackground">?attr/colorSurfaceContainer</item>
+
+        <item name="windowSplashScreenIconBackgroundColor">?attr/colorOnSurface</item>
+
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground_vec</item>
+
+        <!-- Set the theme of the Activity that directly follows your splash
+        screen. This is required. -->
+        <item name="postSplashScreenTheme">@style/Theme.Material3.DayNight.NoActionBar</item>
+    </style>
 </resources>

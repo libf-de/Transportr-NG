@@ -13,6 +13,7 @@ androidx-material = "1.12.0"
 androidx-test-junit = "1.2.1"
 androidx-navigation = "2.8.0-alpha09"
 compose-plugin = "1.6.11"
+androidx-splashscreen = "1.1.0-rc01"
 #compose-plugin = "1.7.0-beta02"
 #compose-plugin = "1.7.0-dev1840"
 junit = "4.13.2"
@@ -47,6 +48,7 @@ androidx-activity-compose = { module = "androidx.activity:activity-compose", ver
 androidx-lifecycle-viewmodel = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-runtime-compose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
 androidx-navigation = { group = "org.jetbrains.androidx.navigation", name = "navigation-compose", version.ref = "androidx-navigation"}
+androidx-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "androidx-splashscreen" }
 publictransportenabler = { group = "de.libf.ptek", name = "public-transport-enabler-ktx", version.ref = "publictransportenabler"}
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room"}

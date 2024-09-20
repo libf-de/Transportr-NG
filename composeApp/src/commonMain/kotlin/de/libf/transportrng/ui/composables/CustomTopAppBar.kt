@@ -326,11 +326,14 @@ private fun TwoRowsTopAppBar(
         Modifier
     }
 
+
+    val btmRadius = colorTransitionFraction.invert().mapRangeDp(collapsedRadius, expandedRadius)
     Surface(
         modifier = modifier.then(appBarDragModifier),
         color = appBarContainerColor,
         shape = RoundedCornerShape(
-            colorTransitionFraction.invert().mapRangeDp(collapsedRadius, expandedRadius)
+            bottomEnd = btmRadius,
+            bottomStart = btmRadius
         )
     ) {
         Column {

@@ -23,6 +23,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -43,6 +44,7 @@ import androidx.compose.material.icons.rounded.Timer
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -57,6 +59,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberStandardBottomSheetState
@@ -75,6 +78,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -96,8 +100,10 @@ import transportr_ng.composeapp.generated.resources.action_refresh
 import transportr_ng.composeapp.generated.resources.action_share
 import transportr_ng.composeapp.generated.resources.action_show_on_external_map
 import transportr_ng.composeapp.generated.resources.action_trip_calendar
+import transportr_ng.composeapp.generated.resources.cancel
 import transportr_ng.composeapp.generated.resources.connections_by_stop
 import transportr_ng.composeapp.generated.resources.continue_journey_later
+import transportr_ng.composeapp.generated.resources.find_departures
 import transportr_ng.composeapp.generated.resources.find_departures_from_stop
 import transportr_ng.composeapp.generated.resources.ic_action_calendar
 import transportr_ng.composeapp.generated.resources.ic_action_departures
@@ -191,9 +197,12 @@ fun TripDetailScreen(
     var showStationActions by remember { mutableStateOf(false) }
     val stationAction = remember { mutableStateOf<Stop?>(null) }
 
-    AnimatedVisibility(showStationActions) {
+//    AnimatedVisibility(showStationActions) {
+    if(showStationActions) {
         AlertDialog(
-            onDismissRequest = {},
+            onDismissRequest = {
+                showStationActions = false
+            },
             icon = {
                 Icon(
                     painter = painterResource(Res.drawable.ic_stop),
@@ -209,7 +218,10 @@ fun TripDetailScreen(
                 )
             },
             confirmButton = {
-                Column(modifier = Modifier.fillMaxWidth()) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
                     FilledTonalButton(
                         onClick = {},
                         modifier = Modifier.fillMaxWidth()
@@ -219,7 +231,11 @@ fun TripDetailScreen(
                             contentDescription = null,
                             modifier = Modifier.padding(end = 8.dp)
                         )
-                        Text(stringResource(Res.string.action_show_on_external_map))
+                        Text(
+                            text = stringResource(Res.string.action_show_on_external_map),
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 1
+                        )
                     }
 
                     FilledTonalButton(
@@ -231,7 +247,11 @@ fun TripDetailScreen(
                             contentDescription = null,
                             modifier = Modifier.padding(end = 8.dp)
                         )
-                        Text(stringResource(Res.string.find_departures_from_stop))
+                        Text(
+                            text = stringResource(Res.string.find_departures),
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 1
+                        )
                     }
 
                     FilledTonalButton(
@@ -243,7 +263,11 @@ fun TripDetailScreen(
                             contentDescription = null,
                             modifier = Modifier.padding(end = 8.dp)
                         )
-                        Text(stringResource(Res.string.connections_by_stop))
+                        Text(
+                            text = stringResource(Res.string.connections_by_stop),
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 1
+                        )
                     }
 
                     FilledTonalButton(
@@ -255,7 +279,21 @@ fun TripDetailScreen(
                             contentDescription = null,
                             modifier = Modifier.padding(end = 8.dp)
                         )
-                        Text(stringResource(Res.string.continue_journey_later))
+                        Text(
+                            text = stringResource(Res.string.continue_journey_later),
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 1
+                        )
+                    }
+
+                    TextButton(
+                        onClick = { showStationActions = false },
+                        colors = ButtonDefaults.textButtonColors(
+                            contentColor = MaterialTheme.colorScheme.secondary
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(stringResource(Res.string.cancel))
                     }
                 }
             }

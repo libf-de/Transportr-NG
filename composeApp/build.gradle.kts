@@ -41,7 +41,9 @@ kotlin {
             implementation(libs.maplibre.android)
             implementation(libs.maplibre.android.annotation)
             implementation(libs.material)
+            implementation(libs.androidx.splashscreen)
         }
+
         commonMain.dependencies {
             implementation(project.dependencies.platform(libs.koin.bom))
             implementation(libs.koin.core)
