@@ -4,6 +4,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import de.libf.ptek.dto.Leg
+import de.libf.ptek.dto.Point
+import de.libf.ptek.dto.PublicLeg
 import de.libf.ptek.dto.Trip
 import de.libf.transportrng.data.maplibrecompat.LatLng
 import de.libf.transportrng.data.maplibrecompat.LatLngBounds
@@ -37,7 +40,7 @@ interface MapViewStateInterface {
 
     suspend fun setPadding(left: Int = 0, top: Int = 0, right: Int = 0, bottom: Int = 0)
 
-    suspend fun drawTrip(trip: Trip?, shouldZoom: Boolean)
+    suspend fun drawTrip(trip: Trip?, shouldZoom: Boolean): Boolean
 }
 
 data class CompassMargins(

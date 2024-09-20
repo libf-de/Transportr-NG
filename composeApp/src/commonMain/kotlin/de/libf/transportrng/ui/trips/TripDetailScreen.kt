@@ -19,6 +19,7 @@
 
 package de.libf.transportrng.ui.trips
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -35,15 +36,24 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.material.icons.rounded.KeyboardArrowUp
+import androidx.compose.material.icons.rounded.Timer
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalMinimumInteractiveComponentEnforcement
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
@@ -57,6 +67,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -65,10 +76,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import de.libf.ptek.dto.Stop
 import de.libf.transportrng.ui.composables.CustomSmallTopAppBar
 import de.libf.transportrng.data.utils.formatDuration
+import de.libf.transportrng.data.utils.getName
 import de.libf.transportrng.ui.map.CompassMargins
 import de.libf.transportrng.ui.map.MapViewComposable
 import de.libf.transportrng.ui.map.provideMapState
@@ -80,10 +94,19 @@ import org.jetbrains.compose.resources.stringResource
 import transportr_ng.composeapp.generated.resources.Res
 import transportr_ng.composeapp.generated.resources.action_refresh
 import transportr_ng.composeapp.generated.resources.action_share
+import transportr_ng.composeapp.generated.resources.action_show_on_external_map
 import transportr_ng.composeapp.generated.resources.action_trip_calendar
+import transportr_ng.composeapp.generated.resources.connections_by_stop
+import transportr_ng.composeapp.generated.resources.continue_journey_later
+import transportr_ng.composeapp.generated.resources.find_departures_from_stop
 import transportr_ng.composeapp.generated.resources.ic_action_calendar
+import transportr_ng.composeapp.generated.resources.ic_action_departures
+import transportr_ng.composeapp.generated.resources.ic_action_external_map
 import transportr_ng.composeapp.generated.resources.ic_action_navigation_refresh
 import transportr_ng.composeapp.generated.resources.ic_action_social_share
+import transportr_ng.composeapp.generated.resources.ic_menu_directions
+import transportr_ng.composeapp.generated.resources.ic_nearby_stations
+import transportr_ng.composeapp.generated.resources.ic_stop
 import transportr_ng.composeapp.generated.resources.total_time
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -147,8 +170,8 @@ fun TripDetailScreen(
     }
 
     LaunchedEffect(trip) {
-        mapState.drawTrip(trip, viewModel.isFreshStart.value ?: true)
-        viewModel.isFreshStart.value = false
+        if(mapState.drawTrip(trip, viewModel.isFreshStart.value))
+            viewModel.isFreshStart.value = false
     }
 
     LaunchedEffect(zoomLocation) {
@@ -165,6 +188,81 @@ fun TripDetailScreen(
 
     val screenHeight = remember { mutableStateOf(300.dp) }
 
+    var showStationActions by remember { mutableStateOf(false) }
+    val stationAction = remember { mutableStateOf<Stop?>(null) }
+
+    AnimatedVisibility(showStationActions) {
+        AlertDialog(
+            onDismissRequest = {},
+            icon = {
+                Icon(
+                    painter = painterResource(Res.drawable.ic_stop),
+                    contentDescription = null,
+                    modifier = Modifier.size(48.dp)
+                )
+            },
+            title = {
+                Text(
+                    text = stationAction.value?.location.getName() ?: "Haltestelle",
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            confirmButton = {
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    FilledTonalButton(
+                        onClick = {},
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(
+                            painter = painterResource(Res.drawable.ic_action_external_map),
+                            contentDescription = null,
+                            modifier = Modifier.padding(end = 8.dp)
+                        )
+                        Text(stringResource(Res.string.action_show_on_external_map))
+                    }
+
+                    FilledTonalButton(
+                        onClick = {},
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(
+                            painter = painterResource(Res.drawable.ic_action_departures),
+                            contentDescription = null,
+                            modifier = Modifier.padding(end = 8.dp)
+                        )
+                        Text(stringResource(Res.string.find_departures_from_stop))
+                    }
+
+                    FilledTonalButton(
+                        onClick = {},
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(
+                            painter = painterResource(Res.drawable.ic_menu_directions),
+                            contentDescription = null,
+                            modifier = Modifier.padding(end = 8.dp)
+                        )
+                        Text(stringResource(Res.string.connections_by_stop))
+                    }
+
+                    FilledTonalButton(
+                        onClick = {},
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.Timer,
+                            contentDescription = null,
+                            modifier = Modifier.padding(end = 8.dp)
+                        )
+                        Text(stringResource(Res.string.continue_journey_later))
+                    }
+                }
+            }
+        )
+    }
+
+
     Layout(
         content = {
             Box(
@@ -177,7 +275,22 @@ fun TripDetailScreen(
                             LegListComposable(
                                 legs = trip?.legs ?: emptyList(),
                                 showLineNames = showLineNames,
-                                modifier = Modifier.fillMaxSize()
+                                modifier = Modifier.fillMaxSize(),
+                                onLegClick = { leg ->
+
+                                    scope.launch {
+                                        viewModel.setZoomLeg(leg)
+                                        scaffoldState.bottomSheetState.partialExpand()
+                                    }
+
+                                },
+
+                                onStopLongClick = {
+                                    stationAction.value = it
+                                    showStationActions = true
+                                },
+
+                                onLegLongClick = {}
                             )
                             Spacer(Modifier.weight(1f))
                         }

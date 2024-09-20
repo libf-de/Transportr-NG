@@ -88,7 +88,7 @@ data class LatLngBounds(
                 maxLat = max(maxLat, latitude)
                 maxLon = max(maxLon, longitude)
             }
-            return LatLngBounds(maxLat, maxLon, minLat, minLon)
+            return LatLngBounds(maxLat, minLat,  maxLon, minLon)
         }
 
         /**

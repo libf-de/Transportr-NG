@@ -37,6 +37,7 @@ import de.libf.ptek.dto.PublicLeg
 import de.libf.ptek.dto.Stop
 import de.libf.ptek.dto.Trip
 import de.libf.ptek.dto.min
+import de.libf.ptek.util.PathUtil
 
 private fun Stop.toStopEntity(locationId: Long): StopEntity {
     return StopEntity(
@@ -156,15 +157,20 @@ interface TripsDao {
                 to = to!!.toLocation(),
                 legs = legs.map {
                     if(it.tripLeg.isPublicLeg) {
+                        val departure = it.departureStop!!.toStop()
+                        val intermediateStops = it.intermediateStops.map { iStop -> iStop.toStop() }
+                        val arrival = it.arrivalStop!!.toStop()
                         PublicLeg(
                             line = it.line!!.toLine(),
                             destination = it.destination!!.toLocation(),
-                            departureStop = it.departureStop!!.toStop(),
-                            arrivalStop = it.arrivalStop!!.toStop(),
-                            intermediateStops = it.intermediateStops.map { intStop ->
-                                intStop.toStop()
-                            },
-                            path = it.tripLeg.path,
+                            departureStop = departure,
+                            arrivalStop = arrival,
+                            intermediateStops = intermediateStops,
+                            path = it.tripLeg.path ?: PathUtil.interpolatePath(
+                                departure.location,
+                                intermediateStops,
+                                arrival.location
+                            ),
                             message = it.tripLeg.message,
                         )
                     } else {
@@ -174,7 +180,11 @@ interface TripsDao {
                             departureTime = it.tripLeg.departureTime ?: 0L,
                             arrival = it.arrivalStop!!.location!!.toLocation(),
                             arrivalTime = it.tripLeg.arrivalTime ?: 0L,
-                            path = it.tripLeg.path,
+                            path = it.tripLeg.path ?: PathUtil.interpolatePath(
+                                it.departureStop.location!!.toLocation(),
+                                null,
+                                it.arrivalStop.location!!.toLocation()
+                            ),
                             distance = it.tripLeg.distance!!
                         )
                     }

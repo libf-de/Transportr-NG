@@ -21,8 +21,10 @@ package de.libf.transportrng.ui.trips.composables
 
 import androidx.annotation.ColorInt
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -38,6 +40,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -52,6 +56,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -66,6 +71,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.PopupProperties
 import de.libf.ptek.dto.IndividualLeg
 import de.libf.transportrng.ui.transport.composables.ProductComposable
 import de.libf.transportrng.ui.trips.search.getArrivalTimes
@@ -74,11 +80,13 @@ import de.libf.ptek.dto.Leg
 import de.libf.ptek.dto.Line
 import de.libf.ptek.dto.Line.Companion.DEFAULT_LINE_COLOR
 import de.libf.ptek.dto.Location
+import de.libf.ptek.dto.Position
 import de.libf.ptek.dto.PublicLeg
 import de.libf.ptek.dto.Stop
 import de.libf.transportrng.data.utils.formatDuration
 import de.libf.transportrng.data.utils.getDrawable
 import de.libf.transportrng.data.utils.getName
+import de.libf.transportrng.ui.favorites.composables.PopupMenuItem
 import de.libf.transportrng.ui.trips.search.timeFmt
 import kotlinx.datetime.Instant
 import kotlinx.datetime.format
@@ -86,10 +94,14 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import transportr_ng.composeapp.generated.resources.Res
+import transportr_ng.composeapp.generated.resources.action_share
 import transportr_ng.composeapp.generated.resources.ic_action_navigation_unfold_less
 import transportr_ng.composeapp.generated.resources.ic_action_navigation_unfold_more
+import transportr_ng.composeapp.generated.resources.ic_action_social_share
 import transportr_ng.composeapp.generated.resources.ic_more_horiz
 import transportr_ng.composeapp.generated.resources.more
+import transportr_ng.composeapp.generated.resources.platform
+import transportr_ng.composeapp.generated.resources.platform_short
 import transportr_ng.composeapp.generated.resources.stops
 
 
@@ -111,11 +123,15 @@ private fun Line.getColorInt(): Int {
 }
 
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun LegListComposable(
     legs: List<Leg>,
     showLineNames: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onLegClick: (Leg) -> Unit,
+    onStopLongClick: (Stop) -> Unit,
+    onLegLongClick: (Leg) -> Unit
 ) {
     var expandedLegs: List<Leg> by remember { mutableStateOf(emptyList()) }
 
@@ -139,7 +155,10 @@ fun LegListComposable(
                                 expandedLegs + current
                             else
                                 expandedLegs - current
-                        }
+                        },
+                        onLegClick = onLegClick,
+                        onStopLongClick = onStopLongClick,
+                        modifier = Modifier
                     )
                 }
 
@@ -148,7 +167,11 @@ fun LegListComposable(
                         MiddleStopComponent(
                             stop = stop,
                             thisLegColor = current.getColor(),
-                            type = LegType.MIDDLE
+                            type = LegType.MIDDLE,
+                            modifier = Modifier.combinedClickable(
+                                onClick = { onLegClick(current) },
+                                onLongClick = { onLegLongClick(current) }
+                            )
                         )
                     }
                 }
@@ -158,6 +181,10 @@ fun LegListComposable(
                         leg = current,
                         otherLegColor = next?.getColor(),
                         dispTime = current.getArrivalTimes(),
+                        modifier = Modifier.combinedClickable(
+                            onClick = { onLegClick(current) },
+                            onLongClick = { onLegLongClick(current) }
+                        )
                     )
                 }
             } else {
@@ -175,6 +202,10 @@ fun LegListComposable(
                             otherLegColor = prev?.getColor(),
                             dispTime = current.getDepartureTimes(),
                             location = current.departure,
+                            modifier = Modifier.combinedClickable(
+                                onClick = { onLegClick(current) },
+                                onLongClick = { onLegLongClick(current) }
+                            )
                         )
                     }
                 } else if(next == null) {
@@ -183,6 +214,10 @@ fun LegListComposable(
                             leg = current,
                             otherLegColor = next?.getColor(),
                             dispTime = current.getArrivalTimes(),
+                            modifier = Modifier.combinedClickable(
+                                onClick = { onLegClick(current) },
+                                onLongClick = { onLegLongClick(current) }
+                            )
                         )
                     }
                 }
@@ -253,7 +288,7 @@ fun FirstIndividualLegComponent(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun FirstLegComponent(
     leg: Leg,
@@ -264,14 +299,37 @@ fun FirstLegComponent(
     thisLegColor: Color = leg.getColor(),
     otherLegColor: Color? = null,
     collapsed: Boolean = true,
+    onLegClick: (Leg) -> Unit,
+    onStopLongClick: (Stop) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val textPad = if(otherLegColor == null) 0.dp else 4.dp
 
+    var menuOpen by remember { mutableStateOf(false) }
+
     Row(
-        modifier = modifier.height(IntrinsicSize.Min).heightIn(min = 48.dp),
+        modifier = modifier
+            .height(IntrinsicSize.Min)
+            .heightIn(min = 48.dp)
+            .clickable {
+                onLegClick(leg)
+            },
         verticalAlignment = if(otherLegColor == null) Alignment.Top else Alignment.CenterVertically
     ) {
+        DropdownMenu(
+            expanded = menuOpen,
+            properties = PopupProperties(),
+            onDismissRequest = { menuOpen = false },
+            modifier = Modifier.align(Alignment.CenterVertically)
+        ) {
+            PopupMenuItem(
+                text = Res.string.action_share,
+                icon = Res.drawable.ic_action_social_share
+            ) {
+
+            }
+        }
+
         Column(
             horizontalAlignment = Alignment.End,
             verticalArrangement = if(otherLegColor == null) Arrangement.Top else Arrangement.Center,
@@ -323,7 +381,15 @@ fun FirstLegComponent(
         }
 
         Column(
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f).combinedClickable(
+                onLongClick = {
+                    if(leg is PublicLeg)
+                        onStopLongClick(leg.departureStop)
+                },
+                onClick = {
+                    onLegClick(leg)
+                }
+            )
         ) {
             Text(
                 text = location.getName() ?: "Start",
@@ -376,7 +442,9 @@ fun FirstLegComponent(
                             }
                     ) {
                         Text(
-                            text = pluralStringResource(Res.plurals.stops, stops.size, stops.size)
+                            text = pluralStringResource(Res.plurals.stops, stops.size, stops.size),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
 
                         Icon(
@@ -390,18 +458,49 @@ fun FirstLegComponent(
             }
         }
 
-        CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
-            IconButton(
-                onClick = { /* TODO */ },
-                modifier = Modifier
-            ) {
-                Icon(
-                    painter = painterResource(Res.drawable.ic_more_horiz),
-                    contentDescription = stringResource(Res.string.more)
+        Column {
+            if(leg is PublicLeg && leg.departurePosition != null)
+                StationDisplay(
+                    position = leg.departurePosition,
+                    modifier = Modifier.height(22.dp).wrapContentHeight(align = Alignment.CenterVertically)
                 )
+
+            Spacer(modifier.weight(1f))
+
+            CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
+                IconButton(
+                    onClick = { /* TODO */ },
+                    modifier = Modifier
+                ) {
+                    Icon(
+                        painter = painterResource(Res.drawable.ic_more_horiz),
+                        contentDescription = stringResource(Res.string.more)
+                    )
+                }
             }
+
+            Spacer(modifier.weight(1f))
         }
     }
+}
+
+@Composable
+fun StationDisplay(
+    position: Position?,
+    modifier: Modifier = Modifier
+) {
+    if(position == null) return
+
+    Text(
+        text = stringResource(Res.string.platform_short, listOfNotNull(position.name, position.section).joinToString(" ")),
+        style = MaterialTheme.typography.bodyMedium,
+        lineHeight = MaterialTheme.typography.bodyMedium.fontSize,
+        color = MaterialTheme.colorScheme.onSecondaryContainer,
+        modifier = modifier
+            .clip(RoundedCornerShape(4.dp))
+            .background(MaterialTheme.colorScheme.secondaryContainer)
+            .padding(horizontal = 4.dp, vertical = 1.dp)
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

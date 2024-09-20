@@ -374,7 +374,7 @@ fun TripPreviewComposablePreview() {
                         predictedDepartureTime = null
                     ),
                     intermediateStops = emptyList(),
-                    null,
+                    emptyList(),
                     "hi"
                 )
             ),

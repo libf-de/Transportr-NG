@@ -26,6 +26,7 @@ import de.grobox.transportr.networks.TransportNetworkViewModel
 import de.grobox.transportr.settings.SettingsManager
 import de.grobox.transportr.ui.trips.TripQuery
 import de.grobox.transportr.ui.trips.detail.reload
+import de.libf.ptek.dto.Leg
 import de.libf.ptek.dto.Trip
 import de.libf.transportrng.data.gps.GpsRepository
 import de.libf.transportrng.data.maplibrecompat.LatLng
@@ -71,6 +72,18 @@ class TripDetailViewModel internal constructor(
     var from: WrapLocation? = null
     var via: WrapLocation? = null
     var to: WrapLocation? = null
+
+    fun setZoomLeg(leg: Leg) {
+        if(leg.path.size < 2) return
+
+        viewModelScope.launch {
+            val latLngs = leg.path.map { LatLng(it.lat, it.lon) }
+            _zoomLeg.emit(
+                LatLngBounds.Builder().includes(latLngs).build()
+            )
+        }
+
+    }
 
 //    override fun onLocationClick(location: Location) {
 //        if (!location.hasLocation()) return

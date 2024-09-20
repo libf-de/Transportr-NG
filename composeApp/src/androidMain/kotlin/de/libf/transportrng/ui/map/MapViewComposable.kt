@@ -36,9 +36,6 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
@@ -70,7 +67,6 @@ import org.maplibre.android.plugins.annotation.LineOptions
 import org.maplibre.android.plugins.annotation.Symbol
 import org.maplibre.android.plugins.annotation.SymbolManager
 import org.maplibre.android.plugins.annotation.SymbolOptions
-import java.util.Date
 import kotlin.math.abs
 
 
@@ -356,8 +352,8 @@ class MapViewState : MapViewStateInterface {
     }
 
     @OptIn(ExperimentalStdlibApi::class)
-    override suspend fun drawTrip(trip: Trip?, shouldZoom: Boolean) {
-        if (trip == null) return
+    override suspend fun drawTrip(trip: Trip?, shouldZoom: Boolean): Boolean {
+        if (trip == null) return false
 
         withTimeout(5000L) {
             while (symbolManager == null) {
@@ -370,8 +366,8 @@ class MapViewState : MapViewStateInterface {
         //symbolManager?.deleteAll()
         lineManager?.deleteAll()
 
-
         val builder = LatLngBounds.Builder()
+        var pointCount = 0
 
         context?.let { ctx ->
             mapView?.getMapAsync { map ->
@@ -429,17 +425,19 @@ class MapViewState : MapViewStateInterface {
 
                 var i = 1
                 trip.legs.forEachIndexed { j, leg ->
+                    val path = leg.path
+
                     // get colors
                     val backgroundColor = leg.getBackgroundColor(ctx).let(::Color).takeIf { leg is PublicLeg } ?: Color(0xFFFED21B)
                     //val foregroundColor = leg.getForegroundColor(ctx).let(::Color)
                     val foregroundColor = Color.White
 
                     lineManager?.let { lineMgr ->
-                        val points = ArrayList<LatLng>(leg.path?.size ?: 0)
+                        val points = ArrayList<LatLng>(path.size)
 
                         val colorHex = backgroundColor.toHexString()
 
-                        leg.path?.mapTo(points) { LatLng(it.lat, it.lon) }
+                        path.mapTo(points) { LatLng(it.lat, it.lon) }
                         val lineOptions = LineOptions()
                             .withLineJoin("round")
                             .withLatLngs(points)
@@ -451,6 +449,7 @@ class MapViewState : MapViewStateInterface {
                         )
 
                         builder.includes(points)
+                        pointCount += points.size
                     }
 
                     symbolManager?.let { symMgr ->
@@ -521,11 +520,14 @@ class MapViewState : MapViewStateInterface {
                     i += 1
                 }
 
-//                if (shouldZoom) {
+                if (shouldZoom && pointCount > 1) {
                     _zoomToBounds(builder.build(), false)
-//                }
+                }
             }
         }
+
+
+        return true
     }
 
     private fun getMarkerIcon(context: Context, type: MarkerType, backgroundColor: Color, foregroundColor: Color): Drawable {

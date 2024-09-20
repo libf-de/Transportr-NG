@@ -61,7 +61,10 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
@@ -88,14 +91,27 @@ import transportr_ng.composeapp.generated.resources.stations_searching_position
 //    }
 //}
 
-@Deprecated("")
-private fun getHighlightedText(l: WrapLocation, search: String?): String {
-    return if (search != null && search.length >= 3) {
-        val regex = "(?i)(" + search.toString() + ")"
-        val str = l.fullName.replace(regex.toRegex(), "<b>$1</b>")
-        str
-    } else {
-        l.fullName
+private fun getHighlightedText(l: WrapLocation, search: String?): AnnotatedString {
+
+    val regex = Regex("(?i)(" + search.toString() + ")")
+    val matchResult = regex.find(l.fullName)
+
+    return buildAnnotatedString {
+        if (matchResult != null) {
+            // Append text before the match
+            append(l.fullName.substring(0, matchResult.range.first))
+
+            // Append the match with bold style
+            pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
+            append(matchResult.value)
+            pop()
+
+            // Append text after the match
+            append(l.fullName.substring(matchResult.range.last + 1))
+        } else {
+            // If no match, append the entire input
+            append(l.fullName)
+        }
     }
 }
 

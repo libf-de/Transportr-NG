@@ -7,7 +7,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 //import androidx.compose.ui.viewinterop.UIKitInteropInteractionMode
 //import androidx.compose.ui.viewinterop.UIKitInteropProperties
 import androidx.compose.ui.interop.UIKitView
@@ -20,17 +19,11 @@ import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.allocArray
 import kotlinx.cinterop.memScoped
-import kotlinx.cinterop.objcPtr
 import kotlinx.cinterop.useContents
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeout
 import platform.CoreLocation.CLLocationCoordinate2D
 import platform.CoreLocation.CLLocationCoordinate2DMake
-import platform.MapKit.MKAnnotationProtocol
-import platform.MapKit.MKCoordinateRegion
-import platform.MapKit.MKCoordinateRegionMake
-import platform.MapKit.MKCoordinateSpanMake
-import platform.MapKit.MKMapRect
 import platform.MapKit.MKMapRectMake
 import platform.MapKit.MKMapView
 import platform.MapKit.MKMapViewDelegateProtocol
@@ -38,7 +31,6 @@ import platform.MapKit.MKOverlayProtocol
 import platform.MapKit.MKOverlayRenderer
 import platform.MapKit.MKPointAnnotation
 import platform.MapKit.MKPolyline
-import platform.MapKit.MKPolylineMeta
 import platform.MapKit.MKPolylineRenderer
 import platform.MapKit.addOverlay
 import platform.MapKit.overlays
@@ -138,10 +130,10 @@ class iOsMapViewState : MapViewStateInterface {
     }
 
     @OptIn(ExperimentalForeignApi::class)
-    override suspend fun drawTrip(trip: Trip?, shouldZoom: Boolean) {
+    override suspend fun drawTrip(trip: Trip?, shouldZoom: Boolean): Boolean {
         println("drawTrip")
 
-        if (trip == null) return
+        if (trip == null) return false
 
         withTimeout(5000L) {
             while (mapView == null) {
@@ -395,6 +387,7 @@ class iOsMapViewState : MapViewStateInterface {
 //                }
 //            }
 //        }
+        return true
     }
 
 }
