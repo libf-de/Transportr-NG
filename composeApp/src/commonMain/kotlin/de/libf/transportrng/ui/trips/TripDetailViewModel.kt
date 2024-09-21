@@ -28,6 +28,7 @@ import de.grobox.transportr.ui.trips.TripQuery
 import de.grobox.transportr.ui.trips.detail.reload
 import de.libf.ptek.dto.Leg
 import de.libf.ptek.dto.Trip
+import de.libf.transportrng.data.PlatformTool
 import de.libf.transportrng.data.gps.GpsRepository
 import de.libf.transportrng.data.maplibrecompat.LatLng
 import de.libf.transportrng.data.maplibrecompat.LatLngBounds
@@ -48,7 +49,8 @@ class TripDetailViewModel internal constructor(
     transportNetworkManager: TransportNetworkManager,
     override val gpsRepository: GpsRepository,
     private val settingsManager: SettingsManager,
-    private val tripsRepository: TripsRepository
+    private val tripsRepository: TripsRepository,
+    private val platformTool: PlatformTool
 ) : TransportNetworkViewModel(transportNetworkManager), GpsMapViewModel by GpsMapViewModelImpl(gpsRepository)  {
 
     enum class SheetState {
@@ -128,6 +130,10 @@ class TripDetailViewModel internal constructor(
 
             _tripReloadError.emit(reloadError)
         }
+    }
+
+    fun showOnExternalMap(loc: WrapLocation) {
+        platformTool.showLocationOnMap(loc)
     }
 }
 

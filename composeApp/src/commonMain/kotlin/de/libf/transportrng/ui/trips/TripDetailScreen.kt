@@ -84,6 +84,8 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import de.libf.ptek.dto.Stop
+import de.libf.transportrng.Routes
+import de.libf.transportrng.data.locations.WrapLocation
 import de.libf.transportrng.ui.composables.CustomSmallTopAppBar
 import de.libf.transportrng.data.utils.formatDuration
 import de.libf.transportrng.data.utils.getName
@@ -91,6 +93,8 @@ import de.libf.transportrng.ui.map.CompassMargins
 import de.libf.transportrng.ui.map.MapViewComposable
 import de.libf.transportrng.ui.map.provideMapState
 import de.libf.transportrng.ui.trips.composables.LegListComposable
+import de.libf.transportrng.ui.trips.composables.StopActions
+import de.libf.transportrng.ui.trips.composables.StopActionsDialog
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
@@ -198,107 +202,29 @@ fun TripDetailScreen(
     val stationAction = remember { mutableStateOf<Stop?>(null) }
 
 //    AnimatedVisibility(showStationActions) {
-    if(showStationActions) {
-        AlertDialog(
-            onDismissRequest = {
-                showStationActions = false
-            },
-            icon = {
-                Icon(
-                    painter = painterResource(Res.drawable.ic_stop),
-                    contentDescription = null,
-                    modifier = Modifier.size(48.dp)
+    StopActionsDialog(
+        selectedStop = stationAction,
+        actions = StopActions(
+            showStationOnExternalMap = { stop ->
+                viewModel.showOnExternalMap(
+                    WrapLocation(stop.location)
                 )
             },
-            title = {
-                Text(
-                    text = stationAction.value?.location.getName() ?: "Haltestelle",
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            },
-            confirmButton = {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    FilledTonalButton(
-                        onClick = {},
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Icon(
-                            painter = painterResource(Res.drawable.ic_action_external_map),
-                            contentDescription = null,
-                            modifier = Modifier.padding(end = 8.dp)
-                        )
-                        Text(
-                            text = stringResource(Res.string.action_show_on_external_map),
-                            overflow = TextOverflow.Ellipsis,
-                            maxLines = 1
-                        )
-                    }
+            findDepartures = { stop -> navController.navigate(Routes.Departures(
+                WrapLocation(stop.location)
+            ))},
+            findConnections = { stop -> navController.navigate(Routes.Directions(
+                from = WrapLocation(stop.location),
+            ))},
+            continueJourneyLater = { stop -> navController.navigate(Routes.Directions(
+                from = WrapLocation(stop.location),
+                to = trip?.to?.let(::WrapLocation),
+                time = (stop.predictedArrivalTime ?: stop.plannedArrivalTime)?.plus(300000) ?: -1L
+            ))}
 
-                    FilledTonalButton(
-                        onClick = {},
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Icon(
-                            painter = painterResource(Res.drawable.ic_action_departures),
-                            contentDescription = null,
-                            modifier = Modifier.padding(end = 8.dp)
-                        )
-                        Text(
-                            text = stringResource(Res.string.find_departures),
-                            overflow = TextOverflow.Ellipsis,
-                            maxLines = 1
-                        )
-                    }
-
-                    FilledTonalButton(
-                        onClick = {},
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Icon(
-                            painter = painterResource(Res.drawable.ic_menu_directions),
-                            contentDescription = null,
-                            modifier = Modifier.padding(end = 8.dp)
-                        )
-                        Text(
-                            text = stringResource(Res.string.connections_by_stop),
-                            overflow = TextOverflow.Ellipsis,
-                            maxLines = 1
-                        )
-                    }
-
-                    FilledTonalButton(
-                        onClick = {},
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Icon(
-                            imageVector = Icons.Rounded.Timer,
-                            contentDescription = null,
-                            modifier = Modifier.padding(end = 8.dp)
-                        )
-                        Text(
-                            text = stringResource(Res.string.continue_journey_later),
-                            overflow = TextOverflow.Ellipsis,
-                            maxLines = 1
-                        )
-                    }
-
-                    TextButton(
-                        onClick = { showStationActions = false },
-                        colors = ButtonDefaults.textButtonColors(
-                            contentColor = MaterialTheme.colorScheme.secondary
-                        ),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(stringResource(Res.string.cancel))
-                    }
-                }
-            }
         )
-    }
+    )
+
 
 
     Layout(

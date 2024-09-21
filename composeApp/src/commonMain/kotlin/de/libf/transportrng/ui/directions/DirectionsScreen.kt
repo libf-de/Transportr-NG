@@ -27,11 +27,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -68,9 +73,13 @@ import de.libf.transportrng.data.locations.WrapLocation
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.datetime.Instant
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import transportr_ng.composeapp.generated.resources.Res
+import transportr_ng.composeapp.generated.resources.error
 import transportr_ng.composeapp.generated.resources.product_bus
+import transportr_ng.composeapp.generated.resources.try_again
 
 @Composable
 fun Int.pxToDp() = with(LocalDensity.current) { this@pxToDp.toDp() }
@@ -87,12 +96,16 @@ fun DirectionsScreen(
     to: WrapLocation?,
     specialLocation: FavoriteTripType?,
     search: Boolean,
+    time: Long?,
     onSelectDepartureClicked: () -> Unit = {},
     onSelectDepartureLongClicked: () -> Unit = {},
     tripClicked: (Trip) -> Unit = {},
     changeHome: () -> Unit = {},
     changeWork: () -> Unit = {}
 ) {
+    val viewState by viewModel.viewState.collectAsStateWithLifecycle()
+
+
     LaunchedEffect(Unit) {
         if(specialLocation == FavoriteTripType.WORK || specialLocation == FavoriteTripType.HOME) {
             //TODO: Home/Work location
@@ -101,8 +114,6 @@ fun DirectionsScreen(
             viewModel.setViaLocation(via)
             viewModel.setToLocation(to)
         }
-
-        if(search) viewModel.search()
     }
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
@@ -124,7 +135,9 @@ fun DirectionsScreen(
     val suggestions by viewModel.locationSuggestions.collectAsStateWithLifecycle(null)
     val suggestionsLoading by viewModel.suggestionsLoading.collectAsStateWithLifecycle(false)
 
-    val departureCalendar by viewModel.lastQueryCalendar.collectAsStateWithLifecycle()
+    val departureCalendar by viewModel.lastQueryCalendar.collectAsStateWithLifecycle(
+        time?.let(Instant::fromEpochMilliseconds)
+    )
     val isDeparture by viewModel.isDeparture.collectAsStateWithLifecycle(true)
 
     val products by viewModel.products.collectAsStateWithLifecycle()
@@ -218,6 +231,88 @@ fun DirectionsScreen(
             )
         },
     ) { pv ->
+        when(val viewState = viewState) {
+            is DirectionsState.Loading -> {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    CircularProgressIndicator(Modifier.align(Alignment.Center))
+                }
+            }
+
+            is DirectionsState.ShowFavorites -> {
+                SavedSearchesComponent(
+                    modifier = Modifier.padding(pv),
+                    contentPadding = PaddingValues(8.dp),
+                    items = viewState.favorites,
+                    specialLocations = specialTrips,
+                    actions = SavedSearchesActions(
+                        requestDirectionsFromViaTo = { from, via, to, search ->
+                            navController.navigate(
+                                route = Routes.Directions(
+                                    from = from,
+                                    via = via,
+                                    to = to,
+                                    search = search
+                                )
+                            )
+                        },
+                        requestDeparturesFrom = {
+                            navController.navigate(
+                                route = Routes.Departures(
+                                    location = it
+                                )
+                            )
+                        },
+                        requestSetTripFavorite = viewModel::setFavoriteTrip,
+                        onChangeSpecialLocationRequested = {},
+                        onCreateShortcutRequested = {},
+                        requestDelete = viewModel::removeFavoriteTrip
+                    )
+                )
+            }
+
+            is DirectionsState.ShowTrips -> {
+                SearchResultComponent(
+                    modifier = Modifier.padding(pv),
+                    trips = trips?.toSet(),
+                    tripClicked = tripClicked,
+                    onLoadMoreRequested = viewModel::searchMore
+                )
+            }
+
+            is DirectionsState.ShowDepartures -> {
+                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                    items(viewState.departures) {
+                        Text(it.toString())
+                    }
+                }
+            }
+
+            is DirectionsState.Error -> {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    Column(
+                        modifier = Modifier.align(Alignment.Center),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = stringResource(Res.string.error),
+                            style = MaterialTheme.typography.headlineSmall,
+                        )
+
+                        Text(text = viewState.message)
+
+                        FilledTonalButton(
+                            onClick = {
+                                viewModel.reload()
+                            }
+                        ) {
+                            Text(text = stringResource(Res.string.try_again))
+                        }
+                    }
+                }
+            }
+        }
+
+
         if(showTrips) {
             // TODO: Show error states:
             //    val topSwipeEnabled by viewModel.topSwipeEnabled.observeAsState(false)
@@ -238,42 +333,9 @@ fun DirectionsScreen(
                 }
             }
 
-            SearchResultComponent(
-                modifier = Modifier.padding(pv),
-                trips = trips?.toSet(),
-                tripClicked = tripClicked,
-                onLoadMoreRequested = viewModel::searchMore
-            )
+
         } else {
-            SavedSearchesComponent(
-                modifier = Modifier.padding(pv),
-                contentPadding = PaddingValues(8.dp),
-                items = favoriteTrips,
-                specialLocations = specialTrips,
-                actions = SavedSearchesActions(
-                    requestDirectionsFromViaTo = { from, via, to, search ->
-                        navController.navigate(
-                            route = Routes.Directions(
-                                from = from,
-                                via = via,
-                                to = to,
-                                search = search
-                            )
-                        )
-                    },
-                    requestDeparturesFrom = {
-                        navController.navigate(
-                            route = Routes.Departures(
-                                location = it
-                            )
-                        )
-                    },
-                    requestSetTripFavorite = viewModel::setFavoriteTrip,
-                    onChangeSpecialLocationRequested = {},
-                    onCreateShortcutRequested = {},
-                    requestDelete = viewModel::removeFavoriteTrip
-                )
-            )
+
         }
     }
 }

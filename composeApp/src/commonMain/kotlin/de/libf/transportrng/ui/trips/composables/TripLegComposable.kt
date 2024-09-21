@@ -123,7 +123,6 @@ private fun Line.getColorInt(): Int {
     return if (this.style!!.borderColor != 0) this.style!!.borderColor else DEFAULT_LINE_COLOR
 }
 
-
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun LegListComposable(

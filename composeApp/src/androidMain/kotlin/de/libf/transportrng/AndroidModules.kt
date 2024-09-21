@@ -5,7 +5,9 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.russhwolf.settings.ObservableSettings
 import com.russhwolf.settings.SharedPreferencesSettings
+import de.libf.transportrng.data.AndroidPlatformTool
 import de.libf.transportrng.data.Db
+import de.libf.transportrng.data.PlatformTool
 import de.libf.transportrng.data.gps.AndroidGeocoder
 import de.libf.transportrng.data.gps.AndroidGpsRepository
 import de.libf.transportrng.data.gps.GpsRepository
@@ -18,6 +20,12 @@ import org.koin.dsl.module
 
 
 actual val PlatformModule = module {
+    single<PlatformTool> {
+        AndroidPlatformTool(
+            androidContext()
+        )
+    }
+
     single<ObservableSettings> {
         SharedPreferencesSettings(
             androidContext().getSharedPreferences(

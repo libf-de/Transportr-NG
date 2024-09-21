@@ -39,52 +39,46 @@ import de.libf.transportrng.ui.settings.SettingsViewModel
 import de.libf.transportrng.ui.transportnetworkselector.TransportNetworkSelectorScreen
 import de.libf.transportrng.ui.trips.TripDetailScreen
 import de.libf.transportrng.data.locations.WrapLocation
+import de.libf.transportrng.ui.departures.DeparturesScreen
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromHexString
+import kotlinx.serialization.encodeToByteArray
+import kotlinx.serialization.encodeToHexString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.protobuf.ProtoBuf
 import kotlinx.serialization.serializer
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.reflect.typeOf
 
-val WrapLocationNavType = object : NavType<WrapLocation?>(
-    isNullableAllowed = true
-) {
-    override fun get(bundle: Bundle, key: String): WrapLocation? {
-        return Json.decodeFromString(bundle.getString(key) ?: "")
-    }
-
-    override fun parseValue(value: String): WrapLocation? {
-        return Json.decodeFromString(value)
-    }
-
-    override fun serializeAsValue(value: WrapLocation?): String {
-        return Json.encodeToString(value)
-    }
-
-    override fun put(bundle: Bundle, key: String, value: WrapLocation?) {
-        bundle.putString(key, Json.encodeToString(value))
-    }
-}
-
-class SerializableNavType<T>(
+@OptIn(ExperimentalSerializationApi::class)
+class ProtobufNavType<T>(
     private val serializer: KSerializer<T>
-) : NavType<T>(isNullableAllowed = false) {
+) : NavType<T>(isNullableAllowed = true) {
     override fun get(bundle: Bundle, key: String): T? {
-        return bundle.getString(key)?.let { Json.decodeFromString(serializer, it) }
+        return bundle.getByteArray(key)?.let {
+            ProtoBuf.decodeFromByteArray(serializer, it)
+        }
+    }
+
+    override fun serializeAsValue(value: T): String {
+        if(value == null) return ""
+        return ProtoBuf.encodeToHexString(serializer, value)
     }
 
     override fun parseValue(value: String): T {
-        return Json.decodeFromString(serializer, value)
+        return ProtoBuf.decodeFromHexString(serializer, value)
     }
 
     override fun put(bundle: Bundle, key: String, value: T) {
-        bundle.putString(key, Json.encodeToString(serializer, value))
+        bundle.putByteArray(key, ProtoBuf.encodeToByteArray(serializer, value))
     }
 }
 
-inline fun <reified T> serializableNavType(): NavType<T> {
-    return SerializableNavType(serializer())
+inline fun <reified T> protobufNavType(): NavType<T> {
+    return ProtobufNavType(serializer())
 }
 
 @Serializable
@@ -101,6 +95,7 @@ sealed class Routes {
         val from: WrapLocation? = null,
         val via: WrapLocation? = null,
         val to: WrapLocation? = null,
+        val time: Long = -1,
         val search: Boolean = true
     )
 
@@ -130,7 +125,7 @@ fun TransportrNavigationController() {
         modifier = Modifier.fillMaxSize()
     ) {
         composable<Routes.Map>(
-            typeMap = mapOf(typeOf<WrapLocation?>() to WrapLocationNavType)
+            typeMap = mapOf(typeOf<WrapLocation?>() to protobufNavType<WrapLocation?>())
         ) {
             val params: Routes.Map = it.toRoute()
 
@@ -144,8 +139,8 @@ fun TransportrNavigationController() {
 
         composable<Routes.Directions>(
             typeMap = mapOf(
-                typeOf<WrapLocation?>() to WrapLocationNavType,
-                typeOf<FavoriteTripType>() to serializableNavType<FavoriteTripType>())
+                typeOf<WrapLocation?>() to protobufNavType<WrapLocation?>(),
+                typeOf<FavoriteTripType>() to protobufNavType<FavoriteTripType>())
         ) {
             val params: Routes.Directions = it.toRoute()
 
@@ -157,6 +152,7 @@ fun TransportrNavigationController() {
                 to = params.to,
                 specialLocation = params.specialLocation,
                 search = params.search,
+                time = params.time.takeIf { it != -1L },
                 tripClicked = { trip ->
                     navController.navigate(
                         Routes.TripDetail(
@@ -170,15 +166,13 @@ fun TransportrNavigationController() {
         composable<Routes.Settings> {
             SettingsScreen(
                 onSelectNetworkClicked = {
-//                    val intent = Intent(context, PickTransportNetworkActivity::class.java)
-//                    ActivityCompat.startActivity(context, intent, null)
                     navController.navigate(route = Routes.TransportNetworkSelector)
                 }
             )
         }
 
         composable<Routes.TripDetail>(
-            typeMap = mapOf(typeOf<Trip>() to serializableNavType<Trip>())
+            typeMap = mapOf(typeOf<Trip>() to protobufNavType<Trip>())
         ) {
             val params = it.toRoute<Routes.TripDetail>()
             TripDetailScreen(
@@ -193,6 +187,20 @@ fun TransportrNavigationController() {
             TransportNetworkSelectorScreen(
                 viewModel = koinViewModel(),
                 navController = navController
+            )
+        }
+
+        composable<Routes.Departures>(
+            typeMap = mapOf(
+                typeOf<WrapLocation>() to protobufNavType<WrapLocation>()
+            )
+        ) {
+            val params = it.toRoute<Routes.Departures>()
+
+            DeparturesScreen(
+                navController = navController,
+                location = params.location,
+                viewModel = koinViewModel()
             )
         }
     }

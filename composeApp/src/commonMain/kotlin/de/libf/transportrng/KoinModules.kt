@@ -33,6 +33,7 @@ import de.libf.transportrng.data.searches.SearchesDao
 import de.libf.transportrng.data.searches.SearchesRepository
 import de.libf.transportrng.data.trips.TripsDao
 import de.libf.transportrng.data.trips.TripsRepository
+import de.libf.transportrng.ui.departures.DeparturesViewModel
 import de.libf.transportrng.ui.directions.DirectionsViewModel
 import de.libf.transportrng.ui.map.MapViewModel
 import de.libf.transportrng.ui.settings.SettingsViewModel
@@ -171,7 +172,8 @@ val ViewModelModule = module {
             transportNetworkManager = get(),
             gpsRepository = get(),
             settingsManager = get(),
-            tripsRepository = get()
+            tripsRepository = get(),
+            platformTool = get()
         )
     }
 
@@ -180,6 +182,12 @@ val ViewModelModule = module {
             settings = get(),
             netManager = get(),
             networks = get()
+        )
+    }
+
+    viewModel {
+        DeparturesViewModel(
+            transportManager = get()
         )
     }
 }

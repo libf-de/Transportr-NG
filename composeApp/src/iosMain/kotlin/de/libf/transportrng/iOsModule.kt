@@ -5,10 +5,12 @@ import androidx.room.RoomDatabase
 import com.russhwolf.settings.NSUserDefaultsSettings
 import com.russhwolf.settings.ObservableSettings
 import de.libf.transportrng.data.Db
+import de.libf.transportrng.data.PlatformTool
 import de.libf.transportrng.data.gps.GpsRepository
 import de.libf.transportrng.data.gps.OsmGeocoder
 import de.libf.transportrng.data.gps.ReverseGeocoderV2
 import de.libf.transportrng.data.gps.iOsGpsRepository
+import de.libf.transportrng.data.iOsPlatformTool
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.engine.darwin.Darwin
@@ -20,6 +22,10 @@ import platform.Foundation.NSUserDefaults
 import platform.Foundation.NSUserDomainMask
 
 actual val PlatformModule = module {
+    single<PlatformTool> {
+        iOsPlatformTool()
+    }
+
     single<ObservableSettings> {
         NSUserDefaultsSettings(
             NSUserDefaults.standardUserDefaults()

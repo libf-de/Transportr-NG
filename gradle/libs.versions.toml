@@ -19,7 +19,7 @@ androidx-splashscreen = "1.1.0-rc01"
 junit = "4.13.2"
 kotlin = "2.0.20"
 ksp = "2.0.20-1.0.25"
-publictransportenabler = "0.0.7"
+publictransportenabler = "0.0.10"
 room = "2.7.0-alpha07"
 sqlite = "2.5.0-alpha07"
 koin-bom = "4.0.0-RC2"
@@ -61,6 +61,7 @@ koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel" }
 maplibre-android = { module = "org.maplibre.gl:android-sdk", version.ref = "maplibre-android" }
 maplibre-android-annotation = { module = "org.maplibre.gl:android-plugin-annotation-v9", version.ref = "maplibre-android-annotation"}
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+kotlinx-serialization-protobuf = { module = "org.jetbrains.kotlinx:kotlinx-serialization-protobuf", version.ref = "kotlinx-serialization"}
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime"}
 
 composeSettings-ui = { group = "com.github.alorma.compose-settings", name = "ui-tiles", version.ref = "compose-settings" }

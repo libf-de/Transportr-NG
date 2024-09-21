@@ -33,19 +33,42 @@ import de.libf.transportrng.data.searches.SearchesRepository
 import de.libf.transportrng.data.trips.TripsRepository
 
 import de.libf.ptek.NetworkProvider
+import de.libf.ptek.dto.Departure
+import de.libf.ptek.dto.QueryDeparturesResult
+import de.libf.ptek.dto.StationDepartures
 import de.libf.transportrngocations.CombinedSuggestionRepository
 import de.libf.transportrng.data.locations.WrapLocation
+import de.libf.transportrng.ui.departures.DeparturesState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import org.jetbrains.compose.resources.getString
+import transportr_ng.composeapp.generated.resources.Res
+import transportr_ng.composeapp.generated.resources.trip_error_service_down
+import transportr_ng.composeapp.generated.resources.trip_error_unresolvable_address
+
+private data class DirectionsUserInput(
+    val from: WrapLocation?,
+    val via: WrapLocation?,
+    val to: WrapLocation?,
+    val time: Long,
+    val timeIsDeparture: Boolean,
+    val products: Set<Product>
+)
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DirectionsViewModel internal constructor(
@@ -58,11 +81,15 @@ class DirectionsViewModel internal constructor(
     private val gpsRepository: GpsRepository,
     private val geocoder: ReverseGeocoderV2
 ) : SavedSearchesViewModel(transportNetworkManager, locationRepository, searchesRepository) {
+    private val _viewState: MutableStateFlow<DirectionsState> = MutableStateFlow(DirectionsState.Loading)
+    val viewState = _viewState.asStateFlow()
 
-//    private val _fromLocation = MutableLiveData<WrapLocation?>()
-//    private val _viaLocation = MutableLiveData<WrapLocation?>()
-//    val viaSupported: LiveData<Boolean>
-//    private val _toLocation = MutableLiveData<WrapLocation?>()
+    val queryMoreState = tripsRepository.queryMoreState
+    val trips: Flow<Set<Trip>> = tripsRepository.trips
+    val queryError = tripsRepository.queryError
+    val queryPTEError = tripsRepository.queryPTEError
+    val queryMoreError = tripsRepository.queryMoreError
+
     private val _fromLocation = MutableStateFlow<WrapLocation?>(null)
     private val _viaLocation = MutableStateFlow<WrapLocation?>(null)
     val viaSupported: Flow<Boolean> = transportNetwork.mapLatest {
@@ -94,9 +121,9 @@ class DirectionsViewModel internal constructor(
 
     val topSwipeEnabled = MutableStateFlow(false)
 
-    val fromLocation: Flow<WrapLocation?> = _fromLocation
-    val viaLocation: Flow<WrapLocation?> = _viaLocation
-    val toLocation: Flow<WrapLocation?> = _toLocation
+    val fromLocation = _fromLocation.asStateFlow()
+    val viaLocation = _viaLocation.asStateFlow()
+    val toLocation = _toLocation.asStateFlow()
 
     val locationSuggestions: Flow<Set<WrapLocation>> = combinedSuggestionRepository.suggestions
     val suggestionsLoading: Flow<Boolean> = combinedSuggestionRepository.isLoading
@@ -105,6 +132,84 @@ class DirectionsViewModel internal constructor(
     private val currentLocation = gpsRepository.getLocationFlow()
     private val _gpsLoading = MutableStateFlow(false)
     val gpsLoading = _gpsLoading.asStateFlow()
+
+    private val _departures = MutableStateFlow<Result<List<StationDepartures>>?>(null)
+
+    init {
+        val savedLocs = combine(favoriteTrips, specialLocations) { f, s -> listOf(f, s).flatten() }
+
+        combine(
+            savedLocs,
+            _departures,
+            trips,
+            fromLocation,
+            toLocation
+        ) { saved, deps, trips, from, to ->
+            if (from == null && to == null)
+                DirectionsState.ShowFavorites(saved)
+            else if(from != null && to != null)
+                DirectionsState.ShowTrips(trips)
+            else if (((from != null && from.hasId()) || (to != null && to.hasId())) && deps != null)
+                deps.getOrNull()?.let { dep ->
+                    DirectionsState.ShowDepartures(
+                        dep.flatMap { it.departures },
+                        dep.flatMap { it.lines }
+                    )
+                } ?: DirectionsState.Error(
+                    message = deps.exceptionOrNull()?.message ?: "unknown error"
+                )
+            else null
+        }
+            .distinctUntilChanged()
+            .onEach { it?.let { _viewState.value = it } }
+            .launchIn(viewModelScope)
+
+        val locations = combine(fromLocation, viaLocation, toLocation) { from, via, to -> Triple(from, via, to) }
+
+        combine(locations, _calendar.asStateFlow(), isDeparture, products) {
+                locs, time, timeIsDep, prods ->
+            DirectionsUserInput(
+                locs.first, locs.second, locs.third, time.toEpochMilliseconds(), timeIsDep, prods
+            )
+        }
+            .debounce(300)
+            .distinctUntilChanged()
+            .onEach {
+                _viewState.value = DirectionsState.Loading
+
+                if(it.to != null && it.from != null) {
+                    val tripQuery = TripQuery(it.from, it.via, it.to, it.time, it.timeIsDeparture, it.products)
+                    tripsRepository.search(tripQuery, viewModelScope)
+                } else {
+                    val candidates = listOfNotNull(it.from, it.to, it.via).filter { it.id != null }
+
+                    if(candidates.isEmpty()) return@onEach
+
+                    val station = candidates.first()
+                    transportNetwork.value?.networkProvider?.queryDepartures(
+                        stationId = station.id!!,
+                        time = Clock.System.now().toEpochMilliseconds(),
+                        maxDepartures = 12,
+                        equivs = false
+                    )?.let {
+                        when(it.status) {
+                            QueryDeparturesResult.Status.OK ->
+                                _departures.value = Result.success(it.stationDepartures)
+
+                            QueryDeparturesResult.Status.SERVICE_DOWN ->
+                                _departures.value = Result.failure(Exception(
+                                    getString(Res.string.trip_error_service_down)
+                                ))
+
+                            QueryDeparturesResult.Status.INVALID_STATION ->
+                                _departures.value = Result.failure(Exception(
+                                    getString(Res.string.trip_error_unresolvable_address)
+                                ))
+                        }
+                    }
+                }
+            }.launchIn(viewModelScope)
+    }
 
     suspend fun fetchLocationFromGps() {
         _gpsLoading.value = true
@@ -164,24 +269,22 @@ class DirectionsViewModel internal constructor(
             gpsLocationFor.value = null
         }
 
-        maybeSearch()
+//        maybeSearch()
     }
 
     fun setViaLocation(location: WrapLocation?) {
         _viaLocation.value = location
-        maybeSearch()
     }
 
     fun setToLocation(location: WrapLocation?) {
         _toLocation.value = location
-        maybeSearch()
     }
-
-    fun maybeSearch() {
-        if (_fromLocation.value != null && _toLocation.value != null) {
-            search()
-        }
-    }
+//
+//    fun maybeSearch() {
+//        if (_fromLocation.value != null && _toLocation.value != null) {
+//            search()
+//        }
+//    }
 
     fun swapFromAndToLocations() {
         val tmp = _toLocation.value
@@ -209,7 +312,8 @@ class DirectionsViewModel internal constructor(
 
     fun resetCalender() {
         _now.value = true
-        search()
+        _calendar.value = Clock.System.now()
+//        search()
     }
 
 //    private fun setCalendar(calendar: Calendar) {
@@ -221,7 +325,6 @@ class DirectionsViewModel internal constructor(
 
     fun setProducts(newProducts: Set<Product>) {
         _products.value = newProducts
-        search()
         settingsManager.setPreferredProducts(newProducts)
     }
 
@@ -229,7 +332,6 @@ class DirectionsViewModel internal constructor(
 
     fun setIsDeparture(departure: Boolean) {
         _isDeparture.value = departure
-        search()
     }
 
 
@@ -275,7 +377,7 @@ class DirectionsViewModel internal constructor(
 //    }
 
     /* Trip Queries */
-    fun search() {
+    fun searchTrips() {
         viewModelScope.launch {
             val from = _fromLocation.value; val to = _toLocation.value
             val via = if (_isExpanded.value != null && _isExpanded.value!!)
@@ -285,8 +387,7 @@ class DirectionsViewModel internal constructor(
             if (from == null || to == null || calendar == null) return@launch
             _calendar.value = calendar
 
-            val tripQuery = TripQuery(from, via, to, calendar.toEpochMilliseconds(), _isDeparture.value, _products.value)
-            tripsRepository.search(tripQuery, viewModelScope)
+
 
             _displayTrips.emit(true)
         }
@@ -303,9 +404,7 @@ class DirectionsViewModel internal constructor(
         _gpsLoading.value = false
     }
 
-    val queryMoreState = tripsRepository.queryMoreState
-    val trips: Flow<Set<Trip>> = tripsRepository.trips
-    val queryError = tripsRepository.queryError
-    val queryPTEError = tripsRepository.queryPTEError
-    val queryMoreError = tripsRepository.queryMoreError
+    fun reload() {
+        TODO("Not yet implemented")
+    }
 }
