@@ -19,7 +19,11 @@
 
 package de.libf.transportrng.ui.map
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -46,10 +50,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.SheetValue
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -57,7 +63,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.DrawModifier
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
+import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.drawscope.ContentDrawScope
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.IntOffset
@@ -65,10 +78,13 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import de.libf.transportrng.Routes
+import de.libf.transportrng.data.gps.GpsState
+import de.libf.transportrng.data.gps.enabled
 import de.libf.transportrng.data.locations.WrapLocation
 import de.libf.transportrng.ui.composables.BaseLocationGpsInput
 import de.libf.transportrng.ui.favorites.SavedSearchesActions
 import de.libf.transportrng.ui.favorites.SavedSearchesComponent
+import de.libf.transportrng.ui.map.composables.GpsFabComposable
 import de.libf.transportrng.ui.map.composables.LocationComponent
 import de.libf.transportrng.ui.map.composables.MapNavDrawerContent
 import kotlinx.coroutines.launch
@@ -76,6 +92,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import transportr_ng.composeapp.generated.resources.Res
 import transportr_ng.composeapp.generated.resources.directions
+import transportr_ng.composeapp.generated.resources.ic_gps
 import transportr_ng.composeapp.generated.resources.ic_menu_black
 import transportr_ng.composeapp.generated.resources.ic_menu_directions
 import transportr_ng.composeapp.generated.resources.material_drawer_open
@@ -112,6 +129,15 @@ fun MapScreen(
     val specialTrips by viewModel.specialLocations.collectAsStateWithLifecycle(emptyList())
 
     val transportNetworks by viewModel.transportNetworks.collectAsStateWithLifecycle(emptyList())
+
+    val locationState by viewModel.gpsRepository.getGpsStateFlow().collectAsStateWithLifecycle(
+        GpsState.Disabled
+    )
+
+    LaunchedEffect(locationState) {
+        mapState.showUserLocation(locationState.enabled)
+    }
+
 
     val screenHeight = remember { mutableStateOf(300.dp) }
 
@@ -265,14 +291,9 @@ fun MapScreen(
                         }
                     }
 
-                    FloatingActionButton(
-                        onClick = {
-                            navController.navigate(
-                                route = Routes.Directions(
-                                    from = WrapLocation(WrapLocation.WrapType.GPS)
-                                )
-                            )
-                        },
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
                         modifier = Modifier
                             .align(Alignment.TopEnd)
                             .offset {
@@ -287,11 +308,38 @@ fun MapScreen(
                                 )
                             }
                     ) {
-                        Icon(
-                            painter = painterResource(Res.drawable.ic_menu_directions),
-                            contentDescription = stringResource(Res.string.directions),
+                        GpsFabComposable(
+                            gpsState = locationState,
+                            onLongClick = {
+                                viewModel.gpsRepository.setEnabled(!viewModel.gpsRepository.isEnabled)
+                                          },
+                            onClick = {
+                                println(locationState)
+
+                                scope.launch {
+                                mapState.animateTo(it, 14)
+                            } },
                         )
+
+                        FloatingActionButton(
+                            onClick = {
+                                navController.navigate(
+                                    route = Routes.Directions(
+                                        from = WrapLocation(WrapLocation.WrapType.GPS)
+                                    )
+                                )
+                            },
+                            modifier = Modifier
+
+                        ) {
+                            Icon(
+                                painter = painterResource(Res.drawable.ic_menu_directions),
+                                contentDescription = stringResource(Res.string.directions),
+                            )
+                        }
                     }
+
+
                 }
             }
         },
@@ -316,10 +364,4 @@ fun MapScreen(
             }
         }
     )
-
-
 }
-
-
-
-

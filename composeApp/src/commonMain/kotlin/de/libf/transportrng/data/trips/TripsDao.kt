@@ -198,7 +198,7 @@ interface TripsDao {
 
     @Transaction
     @Query("SELECT * FROM trips WHERE id = :tripId LIMIT 1")
-    suspend fun getTripByIdWithLegs(tripId: String): TripWithLegs
+    suspend fun getTripByIdWithLegs(tripId: String): TripWithLegs?
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun _addLocation(location: GenericLocation): Long

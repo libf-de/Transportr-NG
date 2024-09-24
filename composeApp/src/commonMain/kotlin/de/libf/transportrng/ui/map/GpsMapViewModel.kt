@@ -46,14 +46,14 @@ class GpsMapViewModelImpl(override val gpsRepository: GpsRepository) : GpsMapVie
     override val isCameraTracking = MutableStateFlow(false)
     override val isPositionStale = MutableStateFlow(false)
     override val gpsFabState: Flow<GpsFabState?> = combine(
-        gpsRepository.getGpsState(),
+        gpsRepository.getGpsStateFlow(),
         isCameraTracking,
         isPositionStale
     ) { positionState, isTracking, isStale ->
         when {
-            positionState == GpsState.DENIED || positionState == GpsState.DISABLED || isStale -> GpsFabState.DISABLED
-            positionState == GpsState.ENABLED && !isTracking -> GpsFabState.ENABLED
-            positionState == GpsState.ENABLED && isTracking -> GpsFabState.TRACKING
+            positionState is GpsState.Denied || positionState is GpsState.Disabled || isStale -> GpsFabState.DISABLED
+            positionState is GpsState.Enabled && !isTracking -> GpsFabState.ENABLED
+            positionState is GpsState.Enabled && isTracking -> GpsFabState.TRACKING
             else -> null
         }
     }

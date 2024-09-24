@@ -390,6 +390,10 @@ class iOsMapViewState : MapViewStateInterface {
         return true
     }
 
+    override suspend fun showUserLocation(enabled: Boolean) {
+        mapView?.showsUserLocation = enabled
+    }
+
 }
 
 private fun MapPadding.negative(): MapPadding {

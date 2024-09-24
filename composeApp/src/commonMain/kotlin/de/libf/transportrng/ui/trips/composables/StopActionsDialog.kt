@@ -33,6 +33,7 @@ import transportr_ng.composeapp.generated.resources.continue_journey_later
 import transportr_ng.composeapp.generated.resources.find_departures
 import transportr_ng.composeapp.generated.resources.ic_action_departures
 import transportr_ng.composeapp.generated.resources.ic_action_external_map
+import transportr_ng.composeapp.generated.resources.ic_location
 import transportr_ng.composeapp.generated.resources.ic_menu_directions
 import transportr_ng.composeapp.generated.resources.ic_stop
 
@@ -48,6 +49,7 @@ fun StopActionsDialog(
     selectedStop: MutableState<Stop?>,
     actions: StopActions
 ) {
+    val isStop = selectedStop.value?.plannedArrivalTime != null
     if(selectedStop.value != null) {
         AlertDialog(
             onDismissRequest = {
@@ -55,7 +57,12 @@ fun StopActionsDialog(
             },
             icon = {
                 Icon(
-                    painter = painterResource(Res.drawable.ic_stop),
+                    painter = painterResource(
+                        if(isStop)
+                            Res.drawable.ic_stop
+                        else
+                            Res.drawable.ic_location
+                    ),
                     contentDescription = null,
                     modifier = Modifier.size(48.dp)
                 )
@@ -90,22 +97,24 @@ fun StopActionsDialog(
                         )
                     }
 
-                    FilledTonalButton(
-                        onClick = {
-                            actions.findDepartures(selectedStop.value!!)
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Icon(
-                            painter = painterResource(Res.drawable.ic_action_departures),
-                            contentDescription = null,
-                            modifier = Modifier.padding(end = 8.dp)
-                        )
-                        Text(
-                            text = stringResource(Res.string.find_departures),
-                            overflow = TextOverflow.Ellipsis,
-                            maxLines = 1
-                        )
+                    if(isStop) {
+                        FilledTonalButton(
+                            onClick = {
+                                actions.findDepartures(selectedStop.value!!)
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(
+                                painter = painterResource(Res.drawable.ic_action_departures),
+                                contentDescription = null,
+                                modifier = Modifier.padding(end = 8.dp)
+                            )
+                            Text(
+                                text = stringResource(Res.string.find_departures),
+                                overflow = TextOverflow.Ellipsis,
+                                maxLines = 1
+                            )
+                        }
                     }
 
                     FilledTonalButton(

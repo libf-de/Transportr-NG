@@ -41,6 +41,8 @@ interface MapViewStateInterface {
     suspend fun setPadding(left: Int = 0, top: Int = 0, right: Int = 0, bottom: Int = 0)
 
     suspend fun drawTrip(trip: Trip?, shouldZoom: Boolean): Boolean
+
+    suspend fun showUserLocation(enabled: Boolean)
 }
 
 data class CompassMargins(

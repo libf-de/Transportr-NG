@@ -28,6 +28,7 @@ import de.libf.ptek.dto.Location
 import de.libf.ptek.dto.NearbyLocationsResult
 import de.libf.ptek.dto.QueryDeparturesResult
 import de.libf.transportrng.data.gps.GpsRepository
+import de.libf.transportrng.data.gps.GpsState
 import de.libf.transportrng.data.locations.LocationRepository
 import de.libf.transportrng.data.maplibrecompat.LatLng
 import de.libf.transportrng.data.maplibrecompat.LatLngBounds
@@ -85,9 +86,9 @@ class MapViewModel internal constructor(
         home.lastOrNull()?.let { if (it.hasLocation()) points.add(it.latLng) }
         work.lastOrNull()?.let { if (it.hasLocation()) points.add(it.latLng) }
 
-        gpsRepository.getLocationFlow()
-            .filter { it.isSuccess }
-            .map { it.getOrNull()!! }
+        gpsRepository.getGpsStateFlow()
+            .filter { it is GpsState.Enabled }
+            .map { (it as GpsState.Enabled).location }
             .lastOrNull()
             ?.let { points.add(LatLng(it.lat, it.lon)) }
 

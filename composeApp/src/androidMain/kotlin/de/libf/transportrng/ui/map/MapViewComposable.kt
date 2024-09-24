@@ -19,7 +19,10 @@
 
 package de.libf.transportrng.ui.map
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
+import android.content.pm.PackageManager
 import android.graphics.Canvas
 import android.graphics.ColorFilter
 import android.graphics.Paint
@@ -38,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import com.google.android.material.color.MaterialColors
@@ -47,17 +51,26 @@ import de.libf.transportrng.R
 import de.libf.transportrng.ui.map.drawable.createSpeechBubbleDrawable
 import de.libf.ptek.dto.Leg
 import de.libf.ptek.dto.Location
+import de.libf.ptek.dto.Point
 import de.libf.ptek.dto.PublicLeg
 import de.libf.ptek.dto.Stop
 import de.libf.ptek.dto.Trip
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeout
 import kotlinx.datetime.Instant
 import kotlinx.datetime.format
 import kotlinx.datetime.format.DateTimeComponents
+import org.maplibre.android.MapLibre
 import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.geometry.LatLngBounds
+import org.maplibre.android.location.LocationComponent
+import org.maplibre.android.location.LocationComponentActivationOptions
+import org.maplibre.android.location.LocationComponentOptions
+import org.maplibre.android.location.OnCameraTrackingChangedListener
+import org.maplibre.android.location.engine.LocationEngineRequest
+import org.maplibre.android.location.modes.CameraMode
 import org.maplibre.android.maps.MapLibreMap
 import org.maplibre.android.maps.MapLibreMapOptions
 import org.maplibre.android.maps.MapView
@@ -68,6 +81,8 @@ import org.maplibre.android.plugins.annotation.LineOptions
 import org.maplibre.android.plugins.annotation.Symbol
 import org.maplibre.android.plugins.annotation.SymbolManager
 import org.maplibre.android.plugins.annotation.SymbolOptions
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 import kotlin.math.abs
 
 
@@ -105,6 +120,7 @@ actual fun <T : MapViewStateInterface> MapViewComposable(
     )
 }
 
+@SuppressLint("MissingPermission")
 @Composable
 fun AndroidMapViewComposable(
     mapViewState: MapViewState,
@@ -153,7 +169,25 @@ fun AndroidMapViewComposable(
                             it.iconIgnorePlacement = true
                         }
 
-                        mvs.onMapStyleLoaded(style)
+                        map.locationComponent.activateLocationComponent(
+                            LocationComponentActivationOptions
+                                .builder(context, style)
+                                .useDefaultLocationEngine(true)
+                                .locationEngineRequest(
+                                    LocationEngineRequest.Builder(750)
+                                        .setFastestInterval(750)
+                                        .setPriority(LocationEngineRequest.PRIORITY_HIGH_ACCURACY)
+                                        .build()
+                                )
+                                .locationComponentOptions(
+                                    LocationComponentOptions.builder(context)
+                                        .pulseEnabled(false)
+                                        .build()
+                                )
+                                .build()
+                        )
+
+                        mvs.onMapStyleLoaded(style, map)
                     }
 
                     map.addOnMapClickListener(mvs::maybeClearPopup)
@@ -179,7 +213,6 @@ fun AndroidMapViewComposable(
                                 this.height / 2.0
                             )
                         )
-
                     }
 
                 }
@@ -235,7 +268,8 @@ class MapViewState : MapViewStateInterface {
     protected var mapView: MapView? = null
     var mapPadding: Int = 0
     internal var mapInset: MapPadding = MapPadding()
-    internal var onMapStyleLoaded: (style: Style) -> Unit = {}
+    internal var _onMapStyleLoaded: (style: Style, map: MapLibreMap) -> Unit = { _, _ -> }
+    private var mapStyle: Style? = null
 
     internal var symbolManager: SymbolManager? = null
     internal var lineManager: LineManager? = null
@@ -246,6 +280,8 @@ class MapViewState : MapViewStateInterface {
     private var onSymbolClickListener: ((Symbol) -> Boolean)? = null
     private var speechBubbleSymbol: Symbol? = null
     private var speechBubbleId: String? = null
+
+    internal var locationComponent: LocationComponent? = null
 
     internal var nearbyStationsDrawer: NearbyStationsDrawer? = null
         private set
@@ -268,19 +304,19 @@ class MapViewState : MapViewStateInterface {
         return false
     }
 
-    internal fun styleLoadedTrig(style: Style) {
-        this.onMapStyleLoaded(style)
-
-    }
-
     internal fun registerMapView(mapView: MapView, context: Context): MapViewState {
         this.mapView = mapView
         this.context = context
         return this
     }
 
-    fun setOnMapStyleLoaded(onMapStyleLoaded: (style: Style) -> Unit) {
-        this.onMapStyleLoaded = onMapStyleLoaded
+    fun onMapStyleLoaded(style: Style, map: MapLibreMap) {
+        this.mapStyle = style
+        this._onMapStyleLoaded(style, map)
+    }
+
+    fun setOnMapStyleLoaded(onMapStyleLoaded: (style: Style, map: MapLibreMap) -> Unit) {
+        this._onMapStyleLoaded = onMapStyleLoaded
     }
 
     override suspend fun animateTo(latLng: de.libf.transportrng.data.maplibrecompat.LatLng?, zoom: Int) {
@@ -540,6 +576,40 @@ class MapViewState : MapViewStateInterface {
         return true
     }
 
+    private fun locationPermissionGranted(context: Context): Boolean {
+        return ActivityCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    @SuppressLint("MissingPermission")
+    override suspend fun showUserLocation(enabled: Boolean) {
+        context?.let { context ->
+            withTimeout(10000L) {
+                mapView?.getMap()?.let { map ->
+                    if (enabled && locationPermissionGranted(context)) {
+                        while (!map.locationComponent.isLocationComponentActivated) {
+                            delay(500L)
+                        }
+
+                        map.locationComponent.isLocationComponentEnabled = true
+                        map.locationComponent.cameraMode = CameraMode.TRACKING
+                        map.locationComponent.forceLocationUpdate(null)
+                    } else {
+                        if (map.locationComponent.isLocationComponentActivated) {
+                            map.locationComponent.isLocationComponentEnabled = false
+                            map.locationComponent.cameraMode = CameraMode.NONE
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private fun getMarkerIcon(context: Context, type: MarkerType, backgroundColor: Color, foregroundColor: Color): Drawable {
         // Get Drawable
         val drawable: Drawable
@@ -618,6 +688,10 @@ private fun de.libf.transportrng.data.maplibrecompat.LatLng.toLatLng(): LatLng {
         LatLng(this.latitude, this.longitude, this.altitude)
     else
         LatLng(this.latitude, this.longitude)
+}
+
+suspend fun MapView.getMap(): MapLibreMap = suspendCoroutine { continuation ->
+    this.getMapAsync { continuation.resume(it) }
 }
 
 @ColorInt

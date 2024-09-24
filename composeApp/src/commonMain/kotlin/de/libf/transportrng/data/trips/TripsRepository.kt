@@ -142,8 +142,8 @@ class TripsRepository(
         uid = 0L
     }
 
-    suspend fun findTripById(id: String): Trip {
-        return _trips.value.firstOrNull { it.id == id } ?: tripsDao.getTripByIdWithLegs(id).toTrip()
+    suspend fun findTripById(id: String): Trip? {
+        return _trips.value.firstOrNull { it.id == id } ?: tripsDao.getTripByIdWithLegs(id)?.toTrip()
     }
 
     fun search(query: TripQuery, scope: CoroutineScope) {

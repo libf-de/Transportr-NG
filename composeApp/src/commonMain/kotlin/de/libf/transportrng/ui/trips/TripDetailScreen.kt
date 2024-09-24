@@ -86,6 +86,7 @@ import androidx.navigation.NavController
 import de.libf.ptek.dto.Stop
 import de.libf.transportrng.Routes
 import de.libf.transportrng.data.locations.WrapLocation
+import de.libf.transportrng.data.maplibrecompat.LatLng
 import de.libf.transportrng.ui.composables.CustomSmallTopAppBar
 import de.libf.transportrng.data.utils.formatDuration
 import de.libf.transportrng.data.utils.getName
@@ -240,21 +241,19 @@ fun TripDetailScreen(
                                 legs = trip?.legs ?: emptyList(),
                                 showLineNames = showLineNames,
                                 modifier = Modifier.fillMaxSize(),
-                                onLegClick = { leg ->
-
+                                onLegClick = { leg, location ->
                                     scope.launch {
-                                        viewModel.setZoomLeg(leg)
-                                        scaffoldState.bottomSheetState.partialExpand()
+                                        mapState.animateTo(
+                                            location.coord?.let { LatLng(it.lat, it.lon) },
+                                            14
+                                        )
                                     }
-
                                 },
 
                                 onStopLongClick = {
                                     stationAction.value = it
                                     showStationActions = true
                                 },
-
-                                onLegLongClick = {}
                             )
                             Spacer(Modifier.weight(1f))
                         }

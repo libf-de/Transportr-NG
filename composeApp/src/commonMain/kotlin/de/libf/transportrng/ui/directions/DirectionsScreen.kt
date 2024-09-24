@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -70,6 +71,7 @@ import de.libf.ptek.dto.Product
 import de.libf.ptek.dto.Trip
 import de.libf.transportrng.data.favorites.FavoriteTripType
 import de.libf.transportrng.data.locations.WrapLocation
+import de.libf.transportrng.ui.departures.composables.DepartureComposable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
@@ -280,9 +282,12 @@ fun DirectionsScreen(
             }
 
             is DirectionsState.ShowDepartures -> {
-                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                LazyColumn(modifier = Modifier.padding(pv)) {
                     items(viewState.departures) {
-                        Text(it.toString())
+                        DepartureComposable(
+                            departure = it,
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
                 }
             }

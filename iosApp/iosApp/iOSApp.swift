@@ -1,5 +1,6 @@
 import SwiftUI
 import ComposeApp
+import CoreLocation
 
 @main
 struct iOSApp: App {
@@ -13,5 +14,7 @@ struct iOSApp: App {
         WindowGroup {
             ContentView()
         }
+        
+        CLAuthorizationStatus.authorizedAlways
     }
 }

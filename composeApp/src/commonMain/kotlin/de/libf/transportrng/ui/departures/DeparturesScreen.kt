@@ -73,6 +73,7 @@ import androidx.navigation.NavController
 import de.libf.transportrng.data.locations.WrapLocation
 import de.libf.transportrng.data.utils.formatDuration
 import de.libf.transportrng.ui.composables.CustomSmallTopAppBar
+import de.libf.transportrng.ui.departures.composables.DepartureComposable
 import de.libf.transportrng.ui.map.CompassMargins
 import de.libf.transportrng.ui.map.MapViewComposable
 import de.libf.transportrng.ui.map.provideMapState
@@ -323,7 +324,10 @@ private fun DeparturesComposable(
         is DeparturesState.Success -> {
             LazyColumn(modifier = modifier) {
                 items(viewState.departures) {
-                    Text(it.toString())
+                    DepartureComposable(
+                        departure = it,
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
             }
         }

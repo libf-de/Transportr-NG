@@ -20,11 +20,15 @@
 package de.libf.transportrng.data.gps
 
 import android.Manifest
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.LocationListener
 import android.location.LocationManager
+import android.location.LocationProvider
 import android.os.Bundle
+import android.provider.Settings
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat.getSystemService
 import de.libf.ptek.dto.Point
@@ -33,32 +37,51 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
 
-class AndroidGpsRepository(private val context: Context) : GpsRepository {
-    var locationManager: LocationManager? = null
+class AndroidGpsRepository(
+    private val context: Context,
+    private val provider: String = LocationManager.FUSED_PROVIDER,
+    private val minDeltaMeters: Float = 50f
+) : GpsRepository {
 
-    override fun getGpsState(): Flow<GpsState> = flow {
-        if(ActivityCompat.checkSelfPermission(context,
-                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
-            emit(GpsState.DENIED)
-        else {
-            if(locationManager == null) emit(GpsState.DISABLED)
-            else emit(GpsState.ENABLED)
+    var lastLocation: Point? = null
+    private var locationManager: LocationManager? = null
+    private var locationListener: LocationListener? = null
+    var listenerRegistered = false
+    override var isEnabled = true
+        private set
+
+    override fun getGpsStateFlow(): Flow<GpsState> = callbackFlow {
+        locationManager = getSystemService(context, LocationManager::class.java) ?: run {
+            trySend(GpsState.Disabled)
+            return@callbackFlow
         }
-    }
 
-    override fun getLocationFlow(): Flow<Result<Point>> = callbackFlow {
-        val locationManager = getSystemService(context, LocationManager::class.java)
-
-        val locationListener = object : LocationListener {
+        locationListener = object : LocationListener {
             override fun onLocationChanged(location: android.location.Location) {
-                val Point = Point.fromDouble(location.latitude, location.longitude)
-                trySend(Result.success(Point))
+                lastLocation = Point.fromDouble(location.latitude, location.longitude).also {
+                    if(isEnabled)
+                        trySend(
+                            GpsState.Enabled(it, location.accuracy < 100)
+                        )
+                }
             }
 
             @Deprecated("Deprecated in Java")
             override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
-            override fun onProviderEnabled(provider: String) {}
-            override fun onProviderDisabled(provider: String) {}
+            override fun onProviderEnabled(provider: String) {
+                if(provider == this@AndroidGpsRepository.provider && isEnabled) {
+                    lastLocation?.let {
+                        trySend(GpsState.Enabled(it, true))
+                    } ?: trySend(GpsState.EnabledSearching)
+                } else {
+                    trySend(GpsState.Disabled)
+                }
+            }
+            override fun onProviderDisabled(provider: String) {
+                if(provider == this@AndroidGpsRepository.provider) {
+                    trySend(GpsState.Disabled)
+                }
+            }
         }
 
         if (ActivityCompat.checkSelfPermission(
@@ -66,21 +89,77 @@ class AndroidGpsRepository(private val context: Context) : GpsRepository {
                 Manifest.permission.ACCESS_FINE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
         ) {
-            locationManager?.requestLocationUpdates(
-                LocationManager.GPS_PROVIDER,
-                5000, // 5 seconds
-                10f,  // 10 meters
-                locationListener
-            ) ?: trySend(Result.failure(Exception("Could not get location manager")))
+            if(locationManager?.getLocationEnabled() == true && isEnabled)
+                if(lastLocation == null)
+                    trySend(GpsState.EnabledSearching)
+                else
+                    trySend(GpsState.Enabled(lastLocation!!, true))
+            else
+                trySend(GpsState.Disabled)
+
+            startLocationUpdates()
         } else {
             // Handle permission not granted
-            trySend(Result.failure(Exception("Permission not granted")))
+            trySend(GpsState.Denied)
             close()
         }
 
         awaitClose {
-            locationManager?.removeUpdates(locationListener)
+            locationListener?.let {
+                locationManager?.removeUpdates(it)
+            }
+
+            locationListener = null
         }
     }
 
+    override fun setEnabled(enabled: Boolean) {
+        isEnabled = enabled
+        if (enabled) {
+            startLocationUpdates()
+        } else {
+            stopLocationUpdates()
+        }
+    }
+
+    private fun stopLocationUpdates() {
+        locationListener?.let { listener ->
+            locationManager?.removeUpdates(listener)
+            listenerRegistered = false
+        }
+    }
+
+    private fun startLocationUpdates() {
+        if (isEnabled && !listenerRegistered && ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            locationListener?.let { locationListener ->
+                locationManager?.also {
+                    listenerRegistered = true
+                }?.requestLocationUpdates(
+                    provider,
+                    10000, // 10 seconds
+                    minDeltaMeters,
+                    locationListener
+                )
+
+            }
+        }
+    }
+
+    private fun LocationManager.getLocationEnabled(): Boolean {
+        return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+            this.isLocationEnabled
+        } else {
+            @Suppress("DEPRECATION")
+            val mode = Settings.Secure.getInt(
+                context.contentResolver,
+                Settings.Secure.LOCATION_MODE,
+                Settings.Secure.LOCATION_MODE_OFF
+            )
+            mode != Settings.Secure.LOCATION_MODE_OFF
+        }
+    }
 }

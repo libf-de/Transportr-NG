@@ -31,6 +31,7 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -129,9 +130,8 @@ fun LegListComposable(
     legs: List<Leg>,
     showLineNames: Boolean,
     modifier: Modifier = Modifier,
-    onLegClick: (Leg) -> Unit,
-    onStopLongClick: (Stop) -> Unit,
-    onLegLongClick: (Leg) -> Unit
+    onLegClick: (Leg?, Location) -> Unit,
+    onStopLongClick: (Stop) -> Unit
 ) {
     var expandedLegs: List<Leg> by remember { mutableStateOf(emptyList()) }
 
@@ -168,10 +168,8 @@ fun LegListComposable(
                             stop = stop,
                             thisLegColor = current.getColor(),
                             type = LegType.MIDDLE,
-                            modifier = Modifier.combinedClickable(
-                                onClick = { onLegClick(current) },
-                                onLongClick = { onLegLongClick(current) }
-                            )
+                            onStopClick = { onLegClick(null, it.location) },
+                            onStopLongClick = onStopLongClick,
                         )
                     }
                 }
@@ -181,10 +179,12 @@ fun LegListComposable(
                         leg = current,
                         otherLegColor = next?.getColor(),
                         dispTime = current.getArrivalTimes(),
-                        modifier = Modifier.combinedClickable(
-                            onClick = { onLegClick(current) },
-                            onLongClick = { onLegLongClick(current) }
-                        )
+                        onLegClick = onLegClick,
+                        onStopLongClick = onStopLongClick,
+//                        modifier = Modifier.combinedClickable(
+//                            onClick = { onLegClick(current) },
+//                            onLongClick = { onLegLongClick(current) }
+//                        )
                     )
                 }
             } else {
@@ -202,10 +202,11 @@ fun LegListComposable(
                             otherLegColor = prev?.getColor(),
                             dispTime = current.getDepartureTimes(),
                             location = current.departure,
-                            modifier = Modifier.combinedClickable(
-                                onClick = { onLegClick(current) },
-                                onLongClick = { onLegLongClick(current) }
-                            )
+                            modifier = Modifier,
+                            onLegClick = onLegClick,
+                            onLongClick = {
+                                onStopLongClick(Stop(it))
+                            }
                         )
                     }
                 } else if(next == null) {
@@ -214,10 +215,11 @@ fun LegListComposable(
                             leg = current,
                             otherLegColor = next?.getColor(),
                             dispTime = current.getArrivalTimes(),
-                            modifier = Modifier.combinedClickable(
-                                onClick = { onLegClick(current) },
-                                onLongClick = { onLegLongClick(current) }
-                            )
+                            modifier = Modifier,
+                            onLegClick = onLegClick,
+                            onLongClick = {
+                                onStopLongClick(Stop(it))
+                            }
                         )
                     }
                 }
@@ -226,7 +228,7 @@ fun LegListComposable(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun FirstIndividualLegComponent(
     leg: Leg,
@@ -234,9 +236,11 @@ fun FirstIndividualLegComponent(
     location: Location,
     thisLegColor: Color = leg.getColor(),
     otherLegColor: Color? = null,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onLegClick: (Leg?, Location) -> Unit,
+    onLongClick: (Location) -> Unit,
 ) {
-    val textPad = if(otherLegColor == null) 0.dp else 4.dp
+    val textPad = if(otherLegColor == null) 12.dp else 4.dp
 
     Row(
         modifier = modifier
@@ -248,7 +252,10 @@ fun FirstIndividualLegComponent(
         Column(
             horizontalAlignment = Alignment.End,
             verticalArrangement = if(otherLegColor == null) Arrangement.Top else Arrangement.Center,
-            modifier = Modifier.width(50.dp).padding(top = textPad).fillMaxHeight()
+            modifier = Modifier
+                .width(50.dp)
+                .padding(top = textPad)
+                .fillMaxHeight()
         ) {
             Column(
                 modifier = Modifier.height(22.dp),
@@ -267,6 +274,7 @@ fun FirstIndividualLegComponent(
         Canvas(
             modifier = Modifier
                 .padding(horizontal = 8.dp)
+                .padding(top = 12.dp)
                 .width(20.dp)
                 .fillMaxHeight()
         ) {
@@ -274,7 +282,16 @@ fun FirstIndividualLegComponent(
         }
 
         Column(
-            modifier = Modifier.weight(1f)
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxSize()
+                .background(Color.Transparent)
+                .combinedClickable(
+                    onClick = { onLegClick(null, leg.departure) },
+                    onLongClick = {
+                        onLongClick(leg.departure)
+                    }
+                )
         ) {
             Text(
                 text = location.getName() ?: "Start",
@@ -283,6 +300,11 @@ fun FirstIndividualLegComponent(
                 lineHeight = MaterialTheme.typography.bodyMedium.lineHeight,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(top = textPad).height(22.dp).wrapContentHeight(align = Alignment.CenterVertically)
+            )
+            Text(
+                text = "zu Fuß",
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.height(32.dp).wrapContentHeight(align = Alignment.Top)
             )
         }
     }
@@ -299,7 +321,7 @@ fun FirstLegComponent(
     thisLegColor: Color = leg.getColor(),
     otherLegColor: Color? = null,
     collapsed: Boolean = true,
-    onLegClick: (Leg) -> Unit,
+    onLegClick: (Leg, Location) -> Unit,
     onStopLongClick: (Stop) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -377,7 +399,7 @@ fun FirstLegComponent(
                         onStopLongClick(leg.departureStop)
                 },
                 onClick = {
-                    onLegClick(leg)
+                    onLegClick(leg, leg.departure)
                 }
             )
         ) {
@@ -393,10 +415,13 @@ fun FirstLegComponent(
                     lineHeight = MaterialTheme.typography.bodyMedium.lineHeight,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
-                    modifier = Modifier.height(22.dp).wrapContentHeight(align = Alignment.CenterVertically)
+                    softWrap = false,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier
+                        .height(22.dp)
+                        .wrapContentHeight(align = Alignment.CenterVertically)
+                        .weight(1f)
                 )
-
-                Spacer(modifier.weight(1f))
 
                 if(leg is PublicLeg && leg.departurePosition != null)
                     StationDisplay(
@@ -505,12 +530,14 @@ fun StationDisplay(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun MiddleStopComponent(
     stop: Stop,
     type: LegType,
     thisLegColor: Color,
+    onStopClick: (Stop) -> Unit,
+    onStopLongClick: (Stop) -> Unit,
     modifier: Modifier = Modifier
 ) {
     if(type != LegType.MIDDLE) throw IllegalArgumentException("MiddleStopComponent can only be used for middle leg stop")
@@ -544,39 +571,35 @@ fun MiddleStopComponent(
             drawMiddleLeg(thisLegColor)
         }
 
-        Column(
-            modifier = Modifier.weight(1f)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight()
+                .combinedClickable(
+                    onClick = { onStopClick(stop) },
+                    onLongClick = { onStopLongClick(stop) }
+                )
         ) {
             Text(
                 text = stop.location.name ?: stop.location.place ?: "",
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.weight(1f)
             )
-        }
-
-        CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
-            IconButton(
-                onClick = { /* TODO */ },
-                modifier = Modifier
-                    .padding(end = 12.dp)
-                    .size(32.dp)
-            ) {
-                Icon(
-                    painter = painterResource(Res.drawable.ic_more_horiz),
-                    contentDescription = stringResource(Res.string.more)
-                )
-            }
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun LastIndividualLegComponent(
     leg: Leg,
     dispTime: Pair<String, String>,
     thisLegColor: Color = leg.getColor(),
     otherLegColor: Color? = null,
+    onLegClick: (Leg?, Location) -> Unit,
+    onLongClick: (Location) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -594,14 +617,14 @@ fun LastIndividualLegComponent(
         ) {
             Text(
                 text = dispTime.first,
-                modifier = Modifier.padding(bottom = 4.dp).height(22.dp).wrapContentHeight(align = Alignment.CenterVertically)
+                modifier = Modifier.padding(bottom = 12.dp).height(22.dp).wrapContentHeight(align = Alignment.CenterVertically)
             )
         }
 
         Canvas(
             modifier = Modifier
                 .padding(horizontal = 8.dp)
-                .padding(bottom = 4.dp)
+                .padding(bottom = 12.dp)
                 .width(20.dp)
                 .fillMaxHeight()
         ) {
@@ -609,7 +632,10 @@ fun LastIndividualLegComponent(
         }
 
         Column(
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f).fillMaxSize().combinedClickable(
+                onClick = { onLegClick(null, leg.departure) },
+                onLongClick = { onLongClick(leg.departure) }
+            )
         ) {
             Text(
                 text = "zu Fuß",
@@ -622,21 +648,8 @@ fun LastIndividualLegComponent(
                 fontSize = MaterialTheme.typography.titleMedium.fontSize.times(1.1),
                 lineHeight = MaterialTheme.typography.bodyMedium.lineHeight,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 4.dp).height(22.dp).wrapContentHeight(align = Alignment.CenterVertically)
+                modifier = Modifier.padding(bottom = 12.dp).height(22.dp).wrapContentHeight(align = Alignment.CenterVertically)
             )
-        }
-
-        if(leg is PublicLeg) {
-            CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
-                IconButton(
-                    onClick = { /* TODO */ },
-                ) {
-                    Icon(
-                        painter = painterResource(Res.drawable.ic_more_horiz),
-                        contentDescription = stringResource(Res.string.more)
-                    )
-                }
-            }
         }
     }
 }
@@ -663,13 +676,15 @@ fun DelayTextComposable(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun LastLegComponent(
     leg: Leg,
     dispTime: Pair<String, String>,
     thisLegColor: Color = leg.getColor(),
     otherLegColor: Color? = null,
+    onLegClick: (Leg, Location) -> Unit,
+    onStopLongClick: (Stop) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -703,8 +718,15 @@ fun LastLegComponent(
                 drawIntermediaryLastLeg(thisLegColor, false, otherLegColor ?: thisLegColor, true)
         }
 
-        Column(
-            modifier = Modifier.weight(1f)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight()
+                .combinedClickable(
+                    onClick = { onLegClick(leg, leg.arrival) },
+                    onLongClick = { if(leg is PublicLeg) onStopLongClick(leg.arrivalStop) }
+                )
         ) {
             Text(
                 text = leg.arrival.getName() ?: "Start",
@@ -712,21 +734,30 @@ fun LastLegComponent(
                 fontSize = MaterialTheme.typography.titleMedium.fontSize.times(1.1),
                 lineHeight = MaterialTheme.typography.bodyMedium.lineHeight,
                 fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(1f)
             )
+
+            if(leg is PublicLeg && leg.departurePosition != null)
+                StationDisplay(
+                    position = leg.arrivalPosition,
+                    modifier = Modifier.padding(end = 8.dp)
+                )
         }
 
-        if(leg is PublicLeg) {
-            CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
-                IconButton(
-                    onClick = { /* TODO */ },
-                ) {
-                    Icon(
-                        painter = painterResource(Res.drawable.ic_more_horiz),
-                        contentDescription = stringResource(Res.string.more)
-                    )
-                }
-            }
-        }
+
+
+//        if(leg is PublicLeg) {
+//            CompositionLocalProvider(LocalMinimumInteractiveComponentEnforcement provides false) {
+//                IconButton(
+//                    onClick = { /* TODO */ },
+//                ) {
+//                    Icon(
+//                        painter = painterResource(Res.drawable.ic_more_horiz),
+//                        contentDescription = stringResource(Res.string.more)
+//                    )
+//                }
+//            }
+//        }
     }
 }
 

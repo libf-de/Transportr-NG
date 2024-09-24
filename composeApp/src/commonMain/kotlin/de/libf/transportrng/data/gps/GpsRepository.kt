@@ -20,16 +20,60 @@
 package de.libf.transportrng.data.gps
 
 import de.libf.ptek.dto.Point
+import de.libf.ptek.util.LocationUtils
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
 
 interface GpsRepository {
-    fun getGpsState(): Flow<GpsState>
-
-    fun getLocationFlow(): Flow<Result<Point>>
+    val isEnabled: Boolean
+    fun getGpsStateFlow(): Flow<GpsState>
+    fun setEnabled(enabled: Boolean)
 }
 
-enum class GpsState {
-    DISABLED,
-    ENABLED,
-    DENIED
+sealed class GpsState {
+    data object Denied : GpsState()
+    data object Disabled : GpsState()
+    data object EnabledSearching : GpsState()
+    data class Enabled(val location: Point, val isAccurate: Boolean) : GpsState()
+    data class Error(val message: String) : GpsState()
 }
+
+val GpsState.enabled: Boolean
+    get() = this is GpsState.Enabled || this is GpsState.EnabledSearching
+
+fun Flow<GpsState>.filterByDistance(minDistanceMeters: Float = 50f): Flow<GpsState> {
+    var lastPoint: Point? = null
+    var lastAccurate: Boolean = false
+
+    return filter { newState ->
+        if(newState is GpsState.Enabled) {
+            val shouldInclude = lastPoint?.let { last ->
+                LocationUtils.computeDistance(last, newState.location) >= minDistanceMeters
+                        || (!lastAccurate && newState.isAccurate)
+            } ?: true
+            shouldInclude.also { if(it) {
+                lastPoint = newState.location
+                lastAccurate = newState.isAccurate
+            } }
+        } else true
+    }
+}
+
+fun Flow<Point>.filterByDistance(minDistanceMeters: Double = 50.0): Flow<Point> {
+    var lastPoint: Point? = null
+    return filter { newPoint ->
+        val shouldInclude = lastPoint?.let { last ->
+            LocationUtils.computeDistance(last, newPoint) >= minDistanceMeters
+        } ?: true
+        shouldInclude.also {
+            if(it) lastPoint = newPoint
+        }
+    }
+}
+
+//
+//enum class GpsState {
+//    DISABLED,
+//    ENABLED,
+//    DENIED
+//}

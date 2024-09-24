@@ -36,23 +36,29 @@ import de.libf.ptek.NetworkProvider
 import de.libf.ptek.dto.Departure
 import de.libf.ptek.dto.QueryDeparturesResult
 import de.libf.ptek.dto.StationDepartures
+import de.libf.transportrng.data.gps.GpsState
 import de.libf.transportrngocations.CombinedSuggestionRepository
 import de.libf.transportrng.data.locations.WrapLocation
 import de.libf.transportrng.ui.departures.DeparturesState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.timeout
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -60,6 +66,7 @@ import org.jetbrains.compose.resources.getString
 import transportr_ng.composeapp.generated.resources.Res
 import transportr_ng.composeapp.generated.resources.trip_error_service_down
 import transportr_ng.composeapp.generated.resources.trip_error_unresolvable_address
+import kotlin.time.Duration.Companion.seconds
 
 private data class DirectionsUserInput(
     val from: WrapLocation?,
@@ -129,7 +136,7 @@ class DirectionsViewModel internal constructor(
     val suggestionsLoading: Flow<Boolean> = combinedSuggestionRepository.isLoading
 
     private var gpsJob: Job? = null
-    private val currentLocation = gpsRepository.getLocationFlow()
+    private val currentLocation = gpsRepository.getGpsStateFlow()
     private val _gpsLoading = MutableStateFlow(false)
     val gpsLoading = _gpsLoading.asStateFlow()
 
@@ -211,12 +218,20 @@ class DirectionsViewModel internal constructor(
             }.launchIn(viewModelScope)
     }
 
+    @OptIn(FlowPreview::class)
     suspend fun fetchLocationFromGps() {
         _gpsLoading.value = true
 
-        currentLocation.first().let { loc ->
-            loc.onSuccess {
-                geocoder.findLocation(it)
+        currentLocation
+            .filter { it is GpsState.Enabled }
+            .timeout(10.seconds)
+            .catch {
+                _gpsLoading.value = false
+                println("Failed to get location")
+            }
+            .first()
+            .let {
+                geocoder.findLocation((it as GpsState.Enabled).location)
                     .onSuccess { location ->
                         when(gpsLocationFor.value) {
                             FavLocationType.FROM -> _fromLocation.value = location
@@ -231,13 +246,6 @@ class DirectionsViewModel internal constructor(
                         println("Failed to find location: ${fail.message}")
                     }
             }
-
-            loc.onFailure {
-                _gpsLoading.value = false
-                println("Failed to get location: ${it.message}")
-            }
-
-        }
     }
 
     override fun onCleared() {
