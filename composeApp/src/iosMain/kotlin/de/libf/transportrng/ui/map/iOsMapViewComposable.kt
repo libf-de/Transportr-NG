@@ -34,6 +34,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withTimeout
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.getDrawableResourceBytes
@@ -74,13 +75,11 @@ class iOsMapViewState : MapViewStateInterface {
 
     internal var mapInset: MapPadding = MapPadding()
 
-    private val _currentMapCenter: MutableStateFlow<CLLocationCoordinate2D?> = MutableStateFlow(null)
+    private val _currentMapCenter: MutableStateFlow<LatLng?> = MutableStateFlow(null)
     override val currentMapCenter: Flow<LatLng?>
         get() = _currentMapCenter.asStateFlow()
             .debounce(2000)
-            .map {
-                it?.let { LatLng(latitude = it.latitude, longitude = it.longitude) }
-            }
+            .onEach { println("flow: ${it?.latitude}, ${it?.longitude}") }
             .filterByDistance(2000.0)
             .distinctUntilChanged()
 
@@ -103,8 +102,12 @@ class iOsMapViewState : MapViewStateInterface {
         override fun mapViewDidChangeVisibleRegion(mapView: MKMapView) {
 //            super.mapViewDidChangeVisibleRegion(mapView)
             this@iOsMapViewState._currentMapCenter.value = mapView.centerCoordinate.useContents {
-                this
+                LatLng(
+                    this.latitude,
+                    this.longitude
+                )
             }
+            println(mapView.centerCoordinate.useContents { "${this.latitude}, ${this.longitude}" })
         }
     }
 
