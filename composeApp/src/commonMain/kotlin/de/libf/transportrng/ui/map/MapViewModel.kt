@@ -177,17 +177,28 @@ class MapViewModel internal constructor(
             _nearbyStationsState.value = NearbyLocationsState.Loading
 
             try {
-                val result = withContext(Dispatchers.IO) {
-                    transportNetwork.lastOrNull()?.networkProvider?.queryNearbyLocations(
-                        setOf(Location.Type.STATION),
-                        location.location,
-                        1000,
-                        0
-                    )
+                val np = transportNetwork.value?.networkProvider
+
+                val result = np?.queryNearbyLocations(
+                    setOf(Location.Type.STATION),
+                    location.location,
+                    2000,
+                    0
+                ).also {
+                    println(it)
                 }
 
-                _nearbyStationsState.value = NearbyLocationsState.Success(result!!)
+                println(result)
+
+                result?.let {
+                    _nearbyStationsState.value = when(it.status) {
+                        NearbyLocationsResult.Status.OK -> NearbyLocationsState.Success(it.locations)
+                        NearbyLocationsResult.Status.INVALID_ID -> NearbyLocationsState.InvalidId
+                        NearbyLocationsResult.Status.SERVICE_DOWN -> NearbyLocationsState.ServiceDown
+                    }
+                }
             } catch(e: Exception) {
+                e.printStackTrace()
                 _nearbyStationsState.value = NearbyLocationsState.Error(e.message ?: "Unknown error")
             }
 
@@ -210,7 +221,9 @@ class MapViewModel internal constructor(
 sealed class NearbyLocationsState {
     object Initial : NearbyLocationsState()
     object Loading : NearbyLocationsState()
-    data class Success(val result: NearbyLocationsResult) : NearbyLocationsState()
+    object InvalidId : NearbyLocationsState()
+    object ServiceDown : NearbyLocationsState()
+    data class Success(val locations: List<Location>) : NearbyLocationsState()
     data class Error(val message: String) : NearbyLocationsState()
 }
 

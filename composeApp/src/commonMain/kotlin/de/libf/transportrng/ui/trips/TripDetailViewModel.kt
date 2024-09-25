@@ -23,7 +23,7 @@ package de.libf.transportrng.ui.trips
 import androidx.lifecycle.viewModelScope
 import de.grobox.transportr.networks.TransportNetworkManager
 import de.grobox.transportr.networks.TransportNetworkViewModel
-import de.grobox.transportr.settings.SettingsManager
+import de.libf.transportrng.data.settings.SettingsManager
 import de.grobox.transportr.ui.trips.TripQuery
 import de.grobox.transportr.ui.trips.detail.reload
 import de.libf.ptek.dto.Leg

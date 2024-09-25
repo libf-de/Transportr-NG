@@ -7,23 +7,43 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 //import androidx.compose.ui.viewinterop.UIKitInteropInteractionMode
 //import androidx.compose.ui.viewinterop.UIKitInteropProperties
 import androidx.compose.ui.interop.UIKitView
+import de.libf.ptek.dto.Location
+import de.libf.ptek.dto.Point
 //import androidx.compose.ui.viewinterop.UIKitView
 import de.libf.ptek.dto.PublicLeg
 import de.libf.ptek.dto.Trip
+import de.libf.transportrng.data.gps.filterByDistance
+import de.libf.transportrng.data.locations.WrapLocation
 import de.libf.transportrng.data.maplibrecompat.LatLng
 import de.libf.transportrng.data.maplibrecompat.LatLngBounds
 import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.allocArray
 import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.useContents
+import kotlinx.cinterop.usePinned
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withTimeout
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.getDrawableResourceBytes
+import org.jetbrains.compose.resources.getSystemResourceEnvironment
 import platform.CoreLocation.CLLocationCoordinate2D
 import platform.CoreLocation.CLLocationCoordinate2DMake
+import platform.Foundation.NSData
+import platform.Foundation.dataWithBytes
+import platform.MapKit.MKCoordinateRegionMake
+import platform.MapKit.MKCoordinateSpanMake
 import platform.MapKit.MKMapRectMake
 import platform.MapKit.MKMapView
 import platform.MapKit.MKMapViewDelegateProtocol
@@ -38,13 +58,31 @@ import platform.MapKit.removeOverlays
 import platform.UIKit.UIColor
 import platform.UIKit.UIEdgeInsets
 import platform.UIKit.UIEdgeInsetsMake
+import platform.UIKit.UIImage
 import platform.darwin.NSObject
+import transportr_ng.composeapp.generated.resources.Res
+import transportr_ng.composeapp.generated.resources.ic_marker_trip_begin
+import transportr_ng.composeapp.generated.resources.ic_marker_trip_change
+import transportr_ng.composeapp.generated.resources.ic_marker_trip_end
+import transportr_ng.composeapp.generated.resources.ic_marker_trip_stop
+import transportr_ng.composeapp.generated.resources.ic_marker_trip_walk
+import kotlin.math.pow
 
 @OptIn(ExperimentalForeignApi::class)
 class iOsMapViewState : MapViewStateInterface {
     private var mapView: MKMapView? = null
 
     internal var mapInset: MapPadding = MapPadding()
+
+    private val _currentMapCenter: MutableStateFlow<CLLocationCoordinate2D?> = MutableStateFlow(null)
+    override val currentMapCenter: Flow<LatLng?>
+        get() = _currentMapCenter.asStateFlow()
+            .debounce(2000)
+            .map {
+                it?.let { LatLng(latitude = it.latitude, longitude = it.longitude) }
+            }
+            .filterByDistance(2000.0)
+            .distinctUntilChanged()
 
     private val mapViewDelegate = object : NSObject(), MKMapViewDelegateProtocol {
         @Suppress("RETURN_TYPE_MISMATCH_ON_OVERRIDE")
@@ -61,6 +99,13 @@ class iOsMapViewState : MapViewStateInterface {
 //            return super.mapView(mapView, rendererForOverlay = rendererForOverlay)
             return MKOverlayRenderer(rendererForOverlay)
         }
+
+        override fun mapViewDidChangeVisibleRegion(mapView: MKMapView) {
+            super.mapViewDidChangeVisibleRegion(mapView)
+            this@iOsMapViewState._currentMapCenter.value = mapView.centerCoordinate.useContents {
+                this
+            }
+        }
     }
 
     fun setMapView(mapView: MKMapView) {
@@ -69,7 +114,27 @@ class iOsMapViewState : MapViewStateInterface {
         mapView.delegate = mapViewDelegate
     }
 
+    override var onLocationClicked: (WrapLocation) -> Unit
+        get() = TODO("Not yet implemented")
+        set(value) {}
+
+
+
     override suspend fun animateTo(latLng: LatLng?, zoom: Int) {
+        if(latLng == null || mapView == null) return
+        val coordinate = CLLocationCoordinate2DMake(latLng.latitude, latLng.longitude)
+
+        // Ensure zoom level is within 0-20 range
+        val clampedZoom = zoom.coerceIn(0, 20)
+
+        // Convert OSM zoom level to MKCoordinateSpan
+        // At zoom level 0, we want to show the whole world (360 degrees)
+        // Each zoom level divides this by 2
+        val latitudeDelta = 360.0 / 2.0.pow(clampedZoom.toDouble())
+        val span =  MKCoordinateSpanMake(latitudeDelta, latitudeDelta) // Assuming an equirectangular projection
+
+        val region = MKCoordinateRegionMake(coordinate, span)
+        mapView?.setRegion(region, animated = true)
     }
 
     override suspend fun zoomToBounds(latLngBounds: LatLngBounds?, animate: Boolean) {
@@ -230,168 +295,46 @@ class iOsMapViewState : MapViewStateInterface {
 //                    animated = true
 //                )
             }
-//        }
-//
-//        val builder = LatLngBounds.Builder()
-//
-//        context?.let { ctx ->
-//            mapView?.getMapAsync { map ->
-////                TripDrawer(ctx).draw(map, trip, shouldZoom)
-//
-//                if (this.onSymbolClickListener == null)
-//                    this.onSymbolClickListener = { symbol ->
-//                        if (symbol.iconImage == speechBubbleId) {
-//                            speechBubbleSymbol?.let {
-//                                symbolManager?.delete(it)
-//                                map.style?.removeImage(speechBubbleId ?: "")
-//
-//                                speechBubbleId = null
-//                                speechBubbleSymbol = null
-//                            }
-//                        } else {
-//                            speechBubbleSymbol?.let { symbolManager?.delete(it) }
-//                            speechBubbleId?.let { map.style?.removeImage(it) }
-//
-//                            symbol.data?.let {
-//                                val title = it.asJsonObject["title"].asString
-//                                val text = it.asJsonObject["text"].asString
-//
-//                                val drawable = createSpeechBubbleDrawable(
-//                                    context = ctx,
-//                                    title = title,
-//                                    content = text,
-//                                    backgroundColor = Color.White.toArgb(),
-//                                    outlineColor = Color.Blue.toArgb(),
-//                                    textColor = Color.Black.toArgb()
-//                                ).toBitmapDrawable().toBitmap()
-//                                //.toBitmap(width = 400, height = 200)
-//
-//                                val code = drawable.hashCode().toString()
-//
-//                                speechBubbleId = code
-//
-//                                map.style?.addImage(code, drawable)
-//
-//                                val symbolOptions = SymbolOptions()
-//                                    .withLatLng(symbol.latLng)
-//                                    .withIconImage(speechBubbleId ?: "")
-//                                    .withIconSize(1.0f)
-//                                    .withSymbolSortKey(1000f)
-//
-//                                speechBubbleSymbol = symbolManager!!.create(symbolOptions)
-//                            }
-//                        }
-//
-//                        true
-//                    }
-//
-//                symbolManager?.addClickListener(this.onSymbolClickListener!!)
-//
-//
-//                var i = 1
-//                trip.legs.forEachIndexed { j, leg ->
-//                    // get colors
-//                    val backgroundColor = leg.getBackgroundColor(ctx).let(::Color).takeIf { leg is PublicLeg } ?: Color(0xFFFED21B)
-//                    //val foregroundColor = leg.getForegroundColor(ctx).let(::Color)
-//                    val foregroundColor = Color.White
-//
-//                    lineManager?.let { lineMgr ->
-//                        val points = ArrayList<LatLng>(leg.path?.size ?: 0)
-//
-//                        val colorHex = backgroundColor.toHexString()
-//
-//                        leg.path?.mapTo(points) { LatLng(it.lat, it.lon) }
-//                        val lineOptions = LineOptions()
-//                            .withLineJoin("round")
-//                            .withLatLngs(points)
-//                            .withLineColor(colorHex)
-//                            .withLineWidth(5.0f)
-//
-//                        lines.add(
-//                            lineMgr.create(lineOptions)
-//                        )
-//
-//                        builder.includes(points)
-//                    }
-//
-//                    symbolManager?.let { symMgr ->
-//                        if (leg is PublicLeg) {
-//                            leg.intermediateStops?.forEach { stop ->
-//                                val stopIconId = stop.hashCode().toString()
-//                                val stopIcon = getMarkerIcon(ctx, MarkerType.STOP, backgroundColor, foregroundColor)
-//
-//                                addMarker(
-//                                    map = map,
-//                                    pos = stop.location.toLatLng(),
-//                                    title = stop.location.uniqueShortName ?: "",
-//                                    text = stop.getText(ctx),
-//                                    icon = stopIcon
-//                                )
-//                            }
-//
-//                            // Draw first station or change station
-//                            val startId = leg.departure.hashCode().toString()
-//                            val icon: Drawable
-//                            var text: String = ""
-//                            if (i == 1 || i == 2 && trip.legs[0] !is PublicLeg) {
-//                                icon = getMarkerIcon(ctx, MarkerType.BEGIN, backgroundColor, foregroundColor)
-//                                text = getStationText(ctx, leg, MarkerType.BEGIN)
-//                            } else {
-//                                icon = getMarkerIcon(ctx, MarkerType.CHANGE, backgroundColor, foregroundColor)
-//                                text = getStationText(ctx, trip.legs[i - 2], leg)
-//                            }
-//
-//                            addMarker(
-//                                map = map,
-//                                pos = leg.departure.toLatLng(),
-//                                icon = icon,
-//                                text = text,
-//                                title = leg.departure.uniqueShortName ?: ""
-//                            )
-//
-//                            // Draw final station only at the end or if end is walking
-//                            if (i == trip.legs.size || i == trip.legs.size - 1 && trip.legs[i] !is PublicLeg) {
-//                                val endId = leg.arrival.hashCode().toString()
-//                                val endIcon = getMarkerIcon(ctx, MarkerType.END, backgroundColor, foregroundColor)
-//
-//                                addMarker(
-//                                    map = map,
-//                                    pos = leg.arrival.toLatLng(),
-//                                    icon = endIcon,
-//                                    text = getStationText(ctx, leg, MarkerType.END),
-//                                    title = leg.arrival.uniqueShortName ?: ""
-//                                )
-//                            }
-//
-//
-//                        } else if (i > 1 && i < trip.legs.size) {
-//                            // only draw an icon if walk is required in the middle of a trip
-//                            val id = leg.departure.hashCode().toString()
-//                            val icon = getMarkerIcon(ctx, MarkerType.WALK, backgroundColor, foregroundColor)
-//
-//                            addMarker(
-//                                map = map,
-//                                pos = leg.departure.toLatLng(),
-//                                icon = icon,
-//                                text = getStationText(ctx, leg, MarkerType.END),
-//                                title = leg.departure.uniqueShortName ?: ""
-//                            )
-//                        }
-//                    }
-//
-//                    i += 1
-//                }
-//
-//                if (shouldZoom) {
-//                    _zoomToBounds(builder.build(), false)
-//                }
-//            }
-//        }
         return true
     }
 
-    override suspend fun showUserLocation(enabled: Boolean) {
+    override suspend fun showUserLocation(enabled: Boolean, userLocation: Point?) {
         mapView?.showsUserLocation = enabled
+    }
+
+    override suspend fun drawNearbyStations(nearbyStations: List<Location>) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun clearNearbyStations() {
+        TODO("Not yet implemented")
+    }
+
+    @OptIn(ExperimentalResourceApi::class)
+    private suspend fun getMarkerIcon(
+        type: MarkerType,
+        backgroundColor: Color = Color.Unspecified,
+        foregroundColor: Color = Color.Unspecified
+    ): UIImage {
+        return when(type) {
+            MarkerType.STOP -> Res.drawable.ic_marker_trip_stop
+            MarkerType.GENERIC_STOP -> Res.drawable.ic_marker_trip_stop // TODO
+            MarkerType.BEGIN -> Res.drawable.ic_marker_trip_begin
+            MarkerType.CHANGE -> Res.drawable.ic_marker_trip_change
+            MarkerType.END -> Res.drawable.ic_marker_trip_end
+            MarkerType.WALK -> Res.drawable.ic_marker_trip_walk
+        }.let {
+            val bytes: ByteArray = getDrawableResourceBytes(
+                getSystemResourceEnvironment(),
+                it
+            )
+
+            val nsData = bytes.usePinned { pinnedBytes ->
+                NSData.dataWithBytes(pinnedBytes.addressOf(0), bytes.size.toULong())
+            }
+
+            UIImage.imageWithData(nsData)
+        } ?: throw RuntimeException()
     }
 
 }

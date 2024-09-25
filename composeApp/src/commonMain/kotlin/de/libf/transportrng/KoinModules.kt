@@ -24,7 +24,7 @@ import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import com.russhwolf.settings.ObservableSettings
 import de.grobox.transportr.networks.TransportNetworkManager
 import de.grobox.transportr.networks.TransportNetworks
-import de.grobox.transportr.settings.SettingsManager
+import de.libf.transportrng.data.settings.SettingsManager
 import de.libf.transportrng.data.Db
 import de.libf.transportrng.data.gps.OsmGeocoder
 import de.libf.transportrng.data.locations.LocationDao
@@ -40,8 +40,6 @@ import de.libf.transportrng.ui.settings.SettingsViewModel
 import de.libf.transportrng.ui.trips.TripDetailViewModel
 import de.libf.transportrngocations.CombinedSuggestionRepository
 import de.libf.transportrngocations.SuggestLocationsRepository
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import org.koin.core.module.Module

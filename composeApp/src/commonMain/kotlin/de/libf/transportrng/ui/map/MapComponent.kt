@@ -4,12 +4,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import de.libf.ptek.dto.Leg
+import de.libf.ptek.dto.Location
 import de.libf.ptek.dto.Point
-import de.libf.ptek.dto.PublicLeg
 import de.libf.ptek.dto.Trip
+import de.libf.transportrng.data.locations.WrapLocation
 import de.libf.transportrng.data.maplibrecompat.LatLng
 import de.libf.transportrng.data.maplibrecompat.LatLngBounds
+import kotlinx.coroutines.flow.Flow
 
 expect fun provideMapState(): MapViewStateInterface
 
@@ -25,7 +26,15 @@ expect fun <T : MapViewStateInterface> MapViewComposable(
     isDark: Boolean = true
 )
 
+enum class MarkerType {
+    BEGIN, CHANGE, STOP, END, WALK, GENERIC_STOP
+}
+
 interface MapViewStateInterface {
+    var onLocationClicked: (WrapLocation) -> Unit
+
+    val currentMapCenter: Flow<LatLng?>
+
     suspend fun animateTo(latLng: LatLng?, zoom: Int)
 
     suspend fun zoomToBounds(latLngBounds: LatLngBounds?, animate: Boolean)
@@ -42,7 +51,11 @@ interface MapViewStateInterface {
 
     suspend fun drawTrip(trip: Trip?, shouldZoom: Boolean): Boolean
 
-    suspend fun showUserLocation(enabled: Boolean)
+    suspend fun showUserLocation(enabled: Boolean, userLocation: Point?)
+
+    suspend fun drawNearbyStations(nearbyStations: List<Location>)
+
+    suspend fun clearNearbyStations()
 }
 
 data class CompassMargins(

@@ -34,7 +34,6 @@ import android.graphics.drawable.LayerDrawable
 import androidx.annotation.ColorInt
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
@@ -46,32 +45,46 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import com.google.android.material.color.MaterialColors
 import com.google.gson.JsonParser
+import com.google.gson.JsonPrimitive
+import com.mapbox.android.gestures.StandardScaleGestureDetector
 import de.grobox.transportr.map.NearbyStationsDrawer
-import de.libf.transportrng.R
-import de.libf.transportrng.ui.map.drawable.createSpeechBubbleDrawable
 import de.libf.ptek.dto.Leg
 import de.libf.ptek.dto.Location
 import de.libf.ptek.dto.Point
 import de.libf.ptek.dto.PublicLeg
 import de.libf.ptek.dto.Stop
 import de.libf.ptek.dto.Trip
+import de.libf.ptek.util.LocationUtils
+import de.libf.transportrng.R
+import de.libf.transportrng.data.gps.filterByDistance
+import de.libf.transportrng.data.locations.WrapLocation
+import de.libf.transportrng.ui.map.drawable.createSpeechBubbleDrawable
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withTimeout
 import kotlinx.datetime.Instant
 import kotlinx.datetime.format
 import kotlinx.datetime.format.DateTimeComponents
-import org.maplibre.android.MapLibre
+import org.maplibre.android.camera.CameraPosition
 import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.geometry.LatLngBounds
 import org.maplibre.android.location.LocationComponent
 import org.maplibre.android.location.LocationComponentActivationOptions
 import org.maplibre.android.location.LocationComponentOptions
-import org.maplibre.android.location.OnCameraTrackingChangedListener
 import org.maplibre.android.location.engine.LocationEngineRequest
 import org.maplibre.android.location.modes.CameraMode
 import org.maplibre.android.maps.MapLibreMap
+import org.maplibre.android.maps.MapLibreMap.OnCameraMoveListener
+import org.maplibre.android.maps.MapLibreMap.OnScaleListener
 import org.maplibre.android.maps.MapLibreMapOptions
 import org.maplibre.android.maps.MapView
 import org.maplibre.android.maps.Style
@@ -81,19 +94,17 @@ import org.maplibre.android.plugins.annotation.LineOptions
 import org.maplibre.android.plugins.annotation.Symbol
 import org.maplibre.android.plugins.annotation.SymbolManager
 import org.maplibre.android.plugins.annotation.SymbolOptions
+import org.maplibre.android.style.expressions.Expression
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlin.math.abs
+import kotlin.math.min
 
 
 // Returns the Jawg url depending on the style given (jawg-streets by default)
 // taken from https://www.jawg.io/docs/integration/maplibre-gl-android/simple-map/
 private fun makeStyleUrl(style: String = "jawg-streets", context: Context) =
     "${context.getString(R.string.jawg_styles_url) + style}.json?access-token=${context.getString(R.string.jawg_access_token)}"
-
-enum class MarkerType {
-    BEGIN, CHANGE, STOP, END, WALK
-}
 
 actual fun provideMapState(): MapViewStateInterface = MapViewState()
 
@@ -133,7 +144,6 @@ fun AndroidMapViewComposable(
     mapStyle: String
 ) {
     val compassMarginsInt = compassMargins.toIntArray()
-
     var viewOnDestroy: () -> Unit = {}
 
     DisposableEffect(Unit) {
@@ -161,12 +171,24 @@ fun AndroidMapViewComposable(
                     val styleUrl = makeStyleUrl(mapStyle, context)
                     if (map.style?.uri != styleUrl) map.setStyle(styleUrl) { style ->
                         mvs.lineManager = LineManager(this, map, style)
-                        mvs.symbolManager = SymbolManager(this, map, style)
+                        mvs.symbolManager = SymbolManager(this, map, style).also {
+                            it.addClickListener(mvs.onSymbolClickListener)
+                        }
 
                         mvs.symbolManager?.let {
                             it.iconAllowOverlap = true
-                            it.textAllowOverlap = true
+                            it.textAllowOverlap = false
                             it.iconIgnorePlacement = true
+                        }
+
+                        map.addOnCameraMoveListener(mvs.onCameraMove)
+
+                        map.addOnCameraMoveListener {
+                            if(map.cameraPosition.zoom > 12) {
+                                mvs.symbolManager?.setFilter(Expression.neq(Expression.literal(""), ""))
+                            } else {
+                                mvs.symbolManager?.setFilter(Expression.eq(Expression.literal(""), ""))
+                            }
                         }
 
                         map.locationComponent.activateLocationComponent(
@@ -217,6 +239,10 @@ fun AndroidMapViewComposable(
 
                 }
             }
+        },
+        onRelease = {
+            it.getMapAsync { it.locationComponent.isLocationComponentEnabled = false }
+            it.onDestroy()
         }
     )
 }
@@ -263,21 +289,112 @@ private fun Symbol.near(other: LatLng): Boolean {
     return latOk && lonOk
 }
 
+@OptIn(FlowPreview::class)
 class MapViewState : MapViewStateInterface {
     protected var context: Context? = null
     protected var mapView: MapView? = null
     var mapPadding: Int = 0
     internal var mapInset: MapPadding = MapPadding()
-    internal var _onMapStyleLoaded: (style: Style, map: MapLibreMap) -> Unit = { _, _ -> }
-    private var mapStyle: Style? = null
+    internal var onMapStyleLoaded: (style: Style, map: MapLibreMap) -> Unit = { _, _ -> }
+
+    override var onLocationClicked: (WrapLocation) -> Unit = { _ -> }
 
     internal var symbolManager: SymbolManager? = null
     internal var lineManager: LineManager? = null
 
     private val lines: MutableList<Line> = mutableListOf()
     private val markers: MutableList<Symbol> = mutableListOf()
+    private val stations: MutableList<Symbol> = mutableListOf()
+    internal val genericStopIconName = "GenericStop"
+    private val stops: MutableMap<Int, Location> = mutableMapOf()
 
-    private var onSymbolClickListener: ((Symbol) -> Boolean)? = null
+    private val _currentMapCenter: MutableStateFlow<LatLng?> = MutableStateFlow(null)
+    override val currentMapCenter = _currentMapCenter.asStateFlow()
+        .debounce(2000)
+        .map {
+            it?.let {
+                de.libf.transportrng.data.maplibrecompat.LatLng(
+                    it.latitude, it.longitude, it.altitude
+                )
+            }
+        }
+        .filterByDistance(2000.0)
+        .distinctUntilChanged()
+
+    internal val onCameraMove = OnCameraMoveListener {
+        mapView?.getMapAsync { map ->
+            if(map.cameraPosition.zoom > 12) {
+                symbolManager?.setFilter(Expression.neq(Expression.literal(""), ""))
+
+                _currentMapCenter.value = map.cameraPosition.target
+            } else {
+                symbolManager?.setFilter(Expression.eq(Expression.literal(""), ""))
+            }
+        }
+    }
+
+    internal var onSymbolClickListener: ((Symbol) -> Boolean) = { symbol ->
+        mapView?.getMapAsync { map ->
+            when (symbol.iconImage) {
+                genericStopIconName -> {
+                    onLocationClicked(
+                        stops[symbol.data?.asInt]?.let(::WrapLocation) ?: WrapLocation(
+                            de.libf.transportrng.data.maplibrecompat.LatLng(
+                                latitude = symbol.latLng.latitude,
+                                longitude = symbol.latLng.longitude
+                            )
+                        )
+                    )
+                }
+                speechBubbleId -> {
+                    speechBubbleSymbol?.let {
+                        symbolManager?.delete(it)
+                        map.style?.removeImage(speechBubbleId ?: "")
+
+
+                        speechBubbleId = null
+                        speechBubbleSymbol = null
+                    }
+                }
+                else -> {
+                    speechBubbleSymbol?.let { symbolManager?.delete(it) }
+                    speechBubbleId?.let { map.style?.removeImage(it) }
+
+                    symbol.data?.let {
+                        val title = it.asJsonObject["title"].asString
+                        val text = it.asJsonObject["text"].asString
+
+                        val drawable = createSpeechBubbleDrawable(
+                            context = context!!,
+                            title = title,
+                            content = text,
+                            backgroundColor = Color.White.toArgb(),
+                            outlineColor = Color.Blue.toArgb(),
+                            textColor = Color.Black.toArgb()
+                        ).toBitmapDrawable().toBitmap()
+                        //.toBitmap(width = 400, height = 200)
+
+                        val code = drawable.hashCode().toString()
+
+                        speechBubbleId = code
+
+                        map.style?.addImage(code, drawable)
+
+                        val symbolOptions = SymbolOptions()
+                            .withLatLng(symbol.latLng)
+                            .withIconImage(speechBubbleId ?: "")
+                            .withIconSize(1.0f)
+                            .withSymbolSortKey(1000f)
+
+                        speechBubbleSymbol = symbolManager!!.create(symbolOptions)
+                    }
+                }
+            }
+        }
+
+        true
+    }
+
     private var speechBubbleSymbol: Symbol? = null
     private var speechBubbleId: String? = null
 
@@ -310,13 +427,8 @@ class MapViewState : MapViewStateInterface {
         return this
     }
 
-    fun onMapStyleLoaded(style: Style, map: MapLibreMap) {
-        this.mapStyle = style
-        this._onMapStyleLoaded(style, map)
-    }
-
     fun setOnMapStyleLoaded(onMapStyleLoaded: (style: Style, map: MapLibreMap) -> Unit) {
-        this._onMapStyleLoaded = onMapStyleLoaded
+        this.onMapStyleLoaded = onMapStyleLoaded
     }
 
     override suspend fun animateTo(latLng: de.libf.transportrng.data.maplibrecompat.LatLng?, zoom: Int) {
@@ -417,58 +529,6 @@ class MapViewState : MapViewStateInterface {
 
         context?.let { ctx ->
             mapView?.getMapAsync { map ->
-//                TripDrawer(ctx).draw(map, trip, shouldZoom)
-
-                if (this.onSymbolClickListener == null)
-                    this.onSymbolClickListener = { symbol ->
-                        if (symbol.iconImage == speechBubbleId) {
-                            speechBubbleSymbol?.let {
-                                symbolManager?.delete(it)
-                                map.style?.removeImage(speechBubbleId ?: "")
-
-                                speechBubbleId = null
-                                speechBubbleSymbol = null
-                            }
-                        } else {
-                            speechBubbleSymbol?.let { symbolManager?.delete(it) }
-                            speechBubbleId?.let { map.style?.removeImage(it) }
-
-                            symbol.data?.let {
-                                val title = it.asJsonObject["title"].asString
-                                val text = it.asJsonObject["text"].asString
-
-                                val drawable = createSpeechBubbleDrawable(
-                                    context = ctx,
-                                    title = title,
-                                    content = text,
-                                    backgroundColor = Color.White.toArgb(),
-                                    outlineColor = Color.Blue.toArgb(),
-                                    textColor = Color.Black.toArgb()
-                                ).toBitmapDrawable().toBitmap()
-                                //.toBitmap(width = 400, height = 200)
-
-                                val code = drawable.hashCode().toString()
-
-                                speechBubbleId = code
-
-                                map.style?.addImage(code, drawable)
-
-                                val symbolOptions = SymbolOptions()
-                                    .withLatLng(symbol.latLng)
-                                    .withIconImage(speechBubbleId ?: "")
-                                    .withIconSize(1.0f)
-                                    .withSymbolSortKey(1000f)
-
-                                speechBubbleSymbol = symbolManager!!.create(symbolOptions)
-                            }
-                        }
-
-                        true
-                    }
-
-                symbolManager?.addClickListener(this.onSymbolClickListener!!)
-
-
                 var i = 1
                 trip.legs.forEachIndexed { j, leg ->
                     val path = leg.path
@@ -587,7 +647,7 @@ class MapViewState : MapViewStateInterface {
     }
 
     @SuppressLint("MissingPermission")
-    override suspend fun showUserLocation(enabled: Boolean) {
+    override suspend fun showUserLocation(enabled: Boolean, userLocation: Point?) {
         context?.let { context ->
             withTimeout(10000L) {
                 mapView?.getMap()?.let { map ->
@@ -597,43 +657,104 @@ class MapViewState : MapViewStateInterface {
                         }
 
                         map.locationComponent.isLocationComponentEnabled = true
-                        map.locationComponent.cameraMode = CameraMode.TRACKING
+                        map.locationComponent.cameraMode = CameraMode.TRACKING_GPS_NORTH
                         map.locationComponent.forceLocationUpdate(null)
+
+                        userLocation?.let {
+                            CameraPosition.Builder()
+                                .target(LatLng(it.lat, it.lon))
+                                .zoom(13.0) // Adjust this value to set the desired zoom level
+                                .build()
+                                .let { userCam ->
+                                    map.animateCamera(CameraUpdateFactory.newCameraPosition(userCam), 1000)
+                                }
+                        }
                     } else {
                         if (map.locationComponent.isLocationComponentActivated) {
                             map.locationComponent.isLocationComponentEnabled = false
                             map.locationComponent.cameraMode = CameraMode.NONE
                         }
+                        null
                     }
                 }
             }
         }
     }
 
-    private fun getMarkerIcon(context: Context, type: MarkerType, backgroundColor: Color, foregroundColor: Color): Drawable {
-        // Get Drawable
-        val drawable: Drawable
-        if (type == MarkerType.STOP) {
-            drawable = ContextCompat.getDrawable(context, R.drawable.ic_marker_trip_stop) ?: throw RuntimeException()
-            drawable.setTint(backgroundColor.toArgb())
-            //return DrawableCompat.wrap(drawable)
-            //drawable.mutate().setColorFilter(backgroundColor.toArgb(), SRC_IN)
-        } else {
-            val res: Int = when (type) {
-                MarkerType.BEGIN -> R.drawable.ic_marker_trip_begin
-                MarkerType.CHANGE -> R.drawable.ic_marker_trip_change
-                MarkerType.END -> R.drawable.ic_marker_trip_end
-                MarkerType.WALK -> R.drawable.ic_marker_trip_walk
-                else -> throw IllegalArgumentException()
-            }
-            drawable = ContextCompat.getDrawable(context, res) as LayerDrawable
-            drawable.getDrawable(0).setTint(backgroundColor.toArgb())
-            drawable.getDrawable(1).setTint(foregroundColor.toArgb())
+    override suspend fun drawNearbyStations(nearbyStations: List<Location>) {
+        context?.let { context ->
+            mapView?.getMap()?.let { map ->
+                if (map.style?.getImage(genericStopIconName) == null) {
+                    map.style?.addImage(
+                        genericStopIconName,
+                        getMarkerIcon(context, MarkerType.GENERIC_STOP)
+                    )
+                }
 
-            //drawable.getDrawable(0).mutate().setColorFilter(backgroundColor.toArgb(), MULTIPLY)
-            //drawable.getDrawable(1).mutate().setColorFilter(foregroundColor.toArgb(), SRC_IN)
+                symbolManager?.let { symMgr ->
+                    nearbyStations.forEach {
+                        stops[it.hashCode()] = it
+
+                        val symbolOptions = SymbolOptions()
+                            .withData(JsonPrimitive(it.hashCode()))
+                            .withLatLng(it.toLatLng())
+                            .withIconImage(genericStopIconName)
+                            .withIconSize(1.0f)
+                            .withTextField(it.uniqueShortName?.shorten())
+                            .withTextAnchor("top")
+                            .withTextSize(10f)
+                            .withTextMaxWidth(5f)
+                            .withTextColor(
+                                if(map.style?.uri?.contains("dark") == true)
+                                    "#ffffff"
+                                else
+                                    "#000000"
+                            )
+                            .withTextOffset(arrayOf(0f, 1.1f))  // Adjust the second value to move text down
+
+
+                        symMgr.create(symbolOptions).also { stations.add(it) }
+                    }
+                }
+            }
         }
-        return drawable
+    }
+
+    override suspend fun clearNearbyStations() {
+        symbolManager?.let { symMgr ->
+            stations.forEach { symMgr.delete(it) }
+            stations.clear()
+        }
+    }
+
+    private fun getMarkerIcon(
+        context: Context,
+        type: MarkerType,
+        backgroundColor: Color = Color.Unspecified,
+        foregroundColor: Color = Color.Unspecified
+    ): Drawable {
+        return ContextCompat.getDrawable(context, when(type) {
+            MarkerType.STOP -> R.drawable.ic_marker_trip_stop
+            MarkerType.GENERIC_STOP -> R.drawable.stop_generic
+            MarkerType.BEGIN -> R.drawable.ic_marker_trip_begin
+            MarkerType.CHANGE -> R.drawable.ic_marker_trip_change
+            MarkerType.END -> R.drawable.ic_marker_trip_end
+            MarkerType.WALK -> R.drawable.ic_marker_trip_walk
+        })?.also {
+            when(type) {
+                MarkerType.STOP -> it.setTint(backgroundColor.toArgb())
+
+                MarkerType.BEGIN,
+                MarkerType.CHANGE,
+                MarkerType.END,
+                MarkerType.WALK -> (it as LayerDrawable).let {
+                    it.getDrawable(0).setTint(backgroundColor.toArgb())
+                    it.getDrawable(1).setTint(foregroundColor.toArgb())
+                }
+
+                else -> {}
+            }
+        } ?: throw RuntimeException()
     }
 
     //private fun marLocation(map: MapLibreMap, location: Location, icon: Icon, text: String) {
@@ -663,6 +784,24 @@ class MapViewState : MapViewStateInterface {
         return null
     }
 }
+
+private fun String?.shorten(): String? {
+    if(this == null) return null
+    if(this.length < 15) return this
+    return this
+        .replace("straße", "str.")
+        .replace("Straße", "Str.")
+        .replace(Regex("\\s*und\\s*"), "&")
+        .replace("Platz", "Pl.")
+        .replace("platz", "pl.")
+        .replace("bibliothek", "bibl.")
+        .replace("Bibliothek", "Bibl.")
+        .replace("Krankenhaus", "Krhs.")
+        .replace("krankenhaus", "krhs.")
+        .take(25)
+        .replace(Regex("""\s*\([^)]*$"""), "")
+}
+
 
 private fun Long.formatTime(): String {
     return Instant.fromEpochMilliseconds(this).format(

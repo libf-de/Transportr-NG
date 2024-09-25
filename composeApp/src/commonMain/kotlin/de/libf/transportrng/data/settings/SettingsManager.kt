@@ -17,9 +17,8 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.grobox.transportr.settings
+package de.libf.transportrng.data.settings
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.ui.text.intl.Locale
 import com.russhwolf.settings.Settings
 import com.russhwolf.settings.get
@@ -27,8 +26,6 @@ import de.libf.ptek.NetworkId
 import de.libf.ptek.NetworkProvider.Optimize
 import de.libf.ptek.NetworkProvider.WalkSpeed
 import de.libf.ptek.dto.Product
-import org.jetbrains.compose.resources.getString
-import transportr_ng.composeapp.generated.resources.Res
 
 
 class SettingsManager constructor(private val settings: Settings) {
@@ -85,6 +82,14 @@ class SettingsManager constructor(private val settings: Settings) {
                 Optimize.LEAST_DURATION
             }
         }
+
+    var isFirstRun: Boolean
+        get() = settings.getBoolean(IS_FIRST_RUN, true)
+        set(value) = settings.putBoolean(IS_FIRST_RUN, value)
+
+    var autoSearchNearby: Boolean
+        get() = settings.getBoolean(AUTO_SEARCH_NEARBY, true)
+        set(value) = settings.putBoolean(AUTO_SEARCH_NEARBY, value)
 
     fun showLocationFragmentOnboarding(): Boolean = settings.getBoolean(LOCATION_ONBOARDING, true)
     fun locationFragmentOnboardingShown() {
@@ -162,9 +167,12 @@ class SettingsManager constructor(private val settings: Settings) {
         internal const val SHOW_WHEN_LOCKED = "pref_key_show_when_locked"
         internal const val WALK_SPEED = "pref_key_walk_speed"
         internal const val OPTIMIZE = "pref_key_optimize"
+        private const val IS_FIRST_RUN = "isFirstRun"
         private const val LOCATION_ONBOARDING = "locationOnboarding"
         private const val TRIP_DETAIL_ONBOARDING = "tripDetailOnboarding"
         private const val LAST_PRODUCT_PREFIX = "pref_key_last_product_prefix_"
+
+        private const val AUTO_SEARCH_NEARBY = "auto_search_nearby"
     }
 
 }

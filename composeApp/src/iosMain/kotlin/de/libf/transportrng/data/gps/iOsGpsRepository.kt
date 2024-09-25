@@ -8,6 +8,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
 import platform.CoreLocation.CLAuthorizationStatus
 import platform.CoreLocation.CLAuthorizationStatusVar
@@ -94,6 +95,7 @@ class iOsGpsRepository(private val minDeltaMeters: Float = 50f) : GpsRepository 
     }
         .filterByDistance(minDeltaMeters)
         .debounce(5000)
+        .distinctUntilChanged()
 
 
     override fun setEnabled(enabled: Boolean) {

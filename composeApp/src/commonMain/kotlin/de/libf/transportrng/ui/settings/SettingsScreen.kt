@@ -60,7 +60,7 @@ import com.alorma.compose.settings.ui.SettingsMenuLink
 import com.alorma.compose.settings.ui.SettingsRadioButton
 import com.alorma.compose.settings.ui.SettingsSlider
 import com.alorma.compose.settings.ui.SettingsSwitch
-import de.grobox.transportr.settings.SettingsManager
+import de.libf.transportrng.data.settings.SettingsManager
 import de.libf.ptek.NetworkProvider
 import de.libf.transportrng.data.utils.name
 import org.jetbrains.compose.resources.StringResource
@@ -181,8 +181,10 @@ fun SettingsScreen(
     val viewModel: SettingsViewModel = koinViewModel()
 
     val networkName by viewModel.transportNetwork.collectAsStateWithLifecycle()
-    val optimize by viewModel.optimize.collectAsStateWithLifecycle(NetworkProvider.Optimize.valueOf(SettingsManager.Values.OPTIMIZE_DEFAULT))
-    val walkSpeed by viewModel.walkSpeed.collectAsStateWithLifecycle(NetworkProvider.WalkSpeed.valueOf(SettingsManager.Values.WALKSPEED_DEFAULT))
+    val optimize by viewModel.optimize.collectAsStateWithLifecycle(NetworkProvider.Optimize.valueOf(
+        SettingsManager.Values.OPTIMIZE_DEFAULT))
+    val walkSpeed by viewModel.walkSpeed.collectAsStateWithLifecycle(NetworkProvider.WalkSpeed.valueOf(
+        SettingsManager.Values.WALKSPEED_DEFAULT))
     val theme by viewModel.theme.collectAsStateWithLifecycle(null)
     val locale by viewModel.locale.collectAsStateWithLifecycle(SettingsManager.Values.LOCALE_DEFAULT)
     val showWhenLocked by viewModel.showWhenLocked.collectAsStateWithLifecycle(viewModel.defaultShowWhenLocked)

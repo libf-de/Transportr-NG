@@ -21,7 +21,7 @@ package de.libf.transportrng.ui.directions
 import androidx.lifecycle.viewModelScope
 import de.grobox.transportr.favorites.trips.SavedSearchesViewModel
 import de.grobox.transportr.networks.TransportNetworkManager
-import de.grobox.transportr.settings.SettingsManager
+import de.libf.transportrng.data.settings.SettingsManager
 import de.grobox.transportr.ui.trips.TripQuery
 import de.libf.ptek.dto.Product
 import de.libf.ptek.dto.Trip
@@ -33,13 +33,11 @@ import de.libf.transportrng.data.searches.SearchesRepository
 import de.libf.transportrng.data.trips.TripsRepository
 
 import de.libf.ptek.NetworkProvider
-import de.libf.ptek.dto.Departure
 import de.libf.ptek.dto.QueryDeparturesResult
 import de.libf.ptek.dto.StationDepartures
 import de.libf.transportrng.data.gps.GpsState
 import de.libf.transportrngocations.CombinedSuggestionRepository
 import de.libf.transportrng.data.locations.WrapLocation
-import de.libf.transportrng.ui.departures.DeparturesState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
@@ -53,10 +51,8 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapLatest
-import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.timeout
 import kotlinx.coroutines.launch

@@ -21,8 +21,10 @@ package de.libf.transportrng.data.gps
 
 import de.libf.ptek.dto.Point
 import de.libf.ptek.util.LocationUtils
+import de.libf.transportrng.data.maplibrecompat.LatLng
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
 
 interface GpsRepository {
     val isEnabled: Boolean
@@ -59,18 +61,20 @@ fun Flow<GpsState>.filterByDistance(minDistanceMeters: Float = 50f): Flow<GpsSta
     }
 }
 
-fun Flow<Point>.filterByDistance(minDistanceMeters: Double = 50.0): Flow<Point> {
-    var lastPoint: Point? = null
-    return filter { newPoint ->
+fun Flow<LatLng?>.filterByDistance(minDistanceMeters: Double = 50.0): Flow<LatLng?> {
+    var lastPoint: LatLng? = null
+    return filterNotNull().filter { newPoint ->
         val shouldInclude = lastPoint?.let { last ->
-            LocationUtils.computeDistance(last, newPoint) >= minDistanceMeters
+            LocationUtils.computeDistance(
+                last.latitude, last.longitude,
+                newPoint.latitude, newPoint.longitude
+            ) >= minDistanceMeters
         } ?: true
         shouldInclude.also {
             if(it) lastPoint = newPoint
         }
     }
 }
-
 //
 //enum class GpsState {
 //    DISABLED,

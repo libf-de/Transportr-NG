@@ -20,7 +20,7 @@
 package de.libf.transportrng.data.trips
 
 import de.grobox.transportr.networks.TransportNetworkManager
-import de.grobox.transportr.settings.SettingsManager
+import de.libf.transportrng.data.settings.SettingsManager
 import de.grobox.transportr.ui.trips.TripQuery
 import de.libf.ptek.QueryTripsContext
 import de.libf.ptek.dto.PublicLeg

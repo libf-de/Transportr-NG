@@ -28,7 +28,7 @@ import de.libf.transportrng.data.networks.TransportNetwork
 import de.grobox.transportr.networks.TransportNetworkManager
 import de.grobox.transportr.networks.TransportNetworkViewModel
 import de.grobox.transportr.networks.TransportNetworks
-import de.grobox.transportr.settings.SettingsManager
+import de.libf.transportrng.data.settings.SettingsManager
 import de.libf.ptek.NetworkProvider
 import de.libf.ptek.NetworkProvider.WalkSpeed
 import kotlinx.coroutines.flow.Flow
@@ -92,9 +92,9 @@ class SettingsViewModel(
         NetworkProvider.Optimize.LEAST_WALKING to Res.string.pref_optimize_least_walking
     )
 
-//    val defaultWalkSpeed = getString(Res.string.pref_walk_speed_value_default)
+    val defaultWalkSpeed = SettingsManager.Values.WALKSPEED_DEFAULT
     val walkSpeed: Flow<WalkSpeed> = settings
-        .getStringStateFlow(viewModelScope,SettingsManager.WALK_SPEED, SettingsManager.WALK_SPEED)
+        .getStringStateFlow(viewModelScope, SettingsManager.WALK_SPEED, defaultWalkSpeed)
         .map(WalkSpeed::valueOf)
     val walkSpeedNames = mapOf(
         WalkSpeed.SLOW to Res.string.pref_walk_speed_slow,
@@ -107,7 +107,7 @@ class SettingsViewModel(
     private val themeAuto = SettingsManager.Values.THEME_AUTO
     val defaultTheme = null
     val theme: Flow<Boolean?> = settings
-        .getStringStateFlow(viewModelScope,SettingsManager.THEME, themeAuto)
+        .getStringStateFlow(viewModelScope, SettingsManager.THEME, themeAuto)
         .map {
             when (it) {
                 themeDark -> true
@@ -124,7 +124,7 @@ class SettingsViewModel(
 
     val defaultLocale = SettingsManager.Values.LOCALE_DEFAULT
     val locale: Flow<String> = settings
-        .getStringStateFlow(viewModelScope,SettingsManager.LANGUAGE, defaultLocale)
+        .getStringStateFlow(viewModelScope, SettingsManager.LANGUAGE, defaultLocale)
     val localeNames = mapOf(
         defaultLocale to Res.string.system_default,
         "en" to Res.string.english,

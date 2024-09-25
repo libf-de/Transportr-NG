@@ -20,7 +20,7 @@
 package de.grobox.transportr.networks
 
 import androidx.annotation.VisibleForTesting
-import de.grobox.transportr.settings.SettingsManager
+import de.libf.transportrng.data.settings.SettingsManager
 import de.libf.ptek.NetworkId
 import de.libf.transportrng.data.networks.TransportNetwork
 import kotlinx.coroutines.flow.MutableStateFlow

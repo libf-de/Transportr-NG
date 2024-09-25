@@ -25,7 +25,6 @@ class AndroidPlatformTool(
     private val context: Context
 ) : PlatformTool {
     override fun showLocationOnMap(loc: WrapLocation) {
-
         CoroutineScope(Dispatchers.IO).launch {
             val uri1 = "geo:0,0?q=${loc.latLng.latitude},${loc.latLng.longitude}"
             val uri2 = try {

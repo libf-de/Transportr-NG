@@ -8,6 +8,11 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.GppMaybe
+import androidx.compose.material.icons.rounded.GpsFixed
+import androidx.compose.material.icons.rounded.GpsNotFixed
+import androidx.compose.material.icons.rounded.LocationOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SmallFloatingActionButton
@@ -33,8 +38,10 @@ import de.libf.transportrng.data.maplibrecompat.LatLng
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import transportr_ng.composeapp.generated.resources.Res
 import transportr_ng.composeapp.generated.resources.ic_gps
+import transportr_ng.composeapp.generated.resources.location_gps
 
 private val GpsState.containerColor: Color
     @Composable get() = if(this.enabled) {
@@ -54,7 +61,7 @@ private val GpsState.contentColor: Color
 fun GpsFabComposable(
     gpsState: GpsState,
     modifier: Modifier = Modifier,
-    onClick: (LatLng?) -> Unit,
+    onClick: () -> Unit,
     onLongClick: () -> Unit,
 ) {
     val haptics = LocalHapticFeedback.current
@@ -73,14 +80,9 @@ fun GpsFabComposable(
                     onLongClick()
                 }
                 is PressInteraction.Release -> {
-                    if (isLongClick.not() /*&& gpsState is GpsState.Enabled*/){
-                        val latLng = if(gpsState is GpsState.Enabled)LatLng(
-                            latitude = gpsState.location.lat,
-                            longitude = gpsState.location.lon
-                        ) else null
-
+                    if (isLongClick.not()){
                         haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                        onClick(latLng)
+                        onClick()
                     }
                 }
                 is PressInteraction.Cancel -> {
@@ -101,8 +103,12 @@ fun GpsFabComposable(
             modifier = modifier.saturation(saturation)
         ) {
             Icon(
-                painter = painterResource(Res.drawable.ic_gps),
-                contentDescription = null
+                imageVector = when(gpsState) {
+                    is GpsState.Enabled -> Icons.Rounded.GpsFixed
+                    is GpsState.EnabledSearching -> Icons.Rounded.GpsNotFixed
+                    else -> Icons.Rounded.LocationOff
+                },
+                contentDescription = stringResource(Res.string.location_gps)
             )
         }
     }
