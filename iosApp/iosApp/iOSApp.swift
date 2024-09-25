@@ -14,7 +14,5 @@ struct iOSApp: App {
         WindowGroup {
             ContentView()
         }
-        
-        CLAuthorizationStatus.authorizedAlways
     }
 }

@@ -101,7 +101,7 @@ class iOsMapViewState : MapViewStateInterface {
         }
 
         override fun mapViewDidChangeVisibleRegion(mapView: MKMapView) {
-            super.mapViewDidChangeVisibleRegion(mapView)
+//            super.mapViewDidChangeVisibleRegion(mapView)
             this@iOsMapViewState._currentMapCenter.value = mapView.centerCoordinate.useContents {
                 this
             }
