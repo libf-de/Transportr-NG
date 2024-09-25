@@ -27,6 +27,9 @@ import kotlinx.cinterop.allocArray
 import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.useContents
 import kotlinx.cinterop.usePinned
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,6 +38,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.getDrawableResourceBytes
@@ -43,6 +47,8 @@ import platform.CoreLocation.CLLocationCoordinate2D
 import platform.CoreLocation.CLLocationCoordinate2DMake
 import platform.Foundation.NSData
 import platform.Foundation.dataWithBytes
+import platform.MapKit.MKAnnotationProtocol
+import platform.MapKit.MKAnnotationView
 import platform.MapKit.MKCoordinateRegionMake
 import platform.MapKit.MKCoordinateSpanMake
 import platform.MapKit.MKMapRectMake
@@ -75,6 +81,8 @@ class iOsMapViewState : MapViewStateInterface {
 
     internal var mapInset: MapPadding = MapPadding()
 
+    internal val iconMap: MutableMap<MarkerType, UIImage> = mutableMapOf()
+
     private val _currentMapCenter: MutableStateFlow<LatLng?> = MutableStateFlow(null)
     override val currentMapCenter: Flow<LatLng?>
         get() = _currentMapCenter.asStateFlow()
@@ -99,6 +107,29 @@ class iOsMapViewState : MapViewStateInterface {
             return MKOverlayRenderer(rendererForOverlay)
         }
 
+        @Suppress("RETURN_TYPE_MISMATCH_ON_OVERRIDE")
+        override fun mapView(
+            mapView: MKMapView,
+            viewForAnnotation: MKAnnotationProtocol
+        ): MKAnnotationView? {
+            if (viewForAnnotation !is MKPointAnnotation) return null
+
+            val reuseIdentifier = "CustomAnnotation"
+            var annotationView = mapView.dequeueReusableAnnotationViewWithIdentifier(reuseIdentifier)
+
+            if (annotationView == null) {
+                annotationView = MKAnnotationView(viewForAnnotation, reuseIdentifier)
+                annotationView.canShowCallout = true
+            } else {
+                annotationView.annotation = viewForAnnotation
+            }
+
+            // Load custom image from Compose Multiplatform resource
+            annotationView.image = iconMap[MarkerType.CHANGE]
+
+            return annotationView
+        }
+
         override fun mapViewDidChangeVisibleRegion(mapView: MKMapView) {
 //            super.mapViewDidChangeVisibleRegion(mapView)
             this@iOsMapViewState._currentMapCenter.value = mapView.centerCoordinate.useContents {
@@ -113,6 +144,15 @@ class iOsMapViewState : MapViewStateInterface {
 
     fun setMapView(mapView: MKMapView) {
         println("Map view set")
+
+        CoroutineScope(Dispatchers.IO).launch {
+            MarkerType.entries.forEach {
+                iconMap[it] = getMarkerIcon(it)
+            }
+        }
+
+
+
         this.mapView = mapView
         mapView.delegate = mapViewDelegate
     }
