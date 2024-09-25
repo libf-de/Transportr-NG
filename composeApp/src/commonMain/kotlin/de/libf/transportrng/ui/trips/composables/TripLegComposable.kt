@@ -89,7 +89,7 @@ import de.libf.transportrng.data.utils.formatDuration
 import de.libf.transportrng.data.utils.getDrawable
 import de.libf.transportrng.data.utils.getName
 import de.libf.transportrng.ui.favorites.composables.PopupMenuItem
-import de.libf.transportrng.ui.trips.search.timeFmt
+import de.libf.transportrng.ui.trips.search.formatAsLocal
 import kotlinx.datetime.Instant
 import kotlinx.datetime.format
 import org.jetbrains.compose.resources.painterResource
@@ -1084,14 +1084,14 @@ fun Leg.getDepartureTimes(): Pair<String, String> {
     return if(this is PublicLeg)
         this.departureStop.getDepartureTimes()
     else
-        Pair(Instant.fromEpochMilliseconds(departureTime).format(timeFmt), "")
+        Pair(Instant.fromEpochMilliseconds(departureTime).formatAsLocal(), "")
 }
 
 fun Leg.getArrivalTimes(): Pair<String, String> {
     return if(this is PublicLeg)
         this.arrivalStop.getArrivalTimes()
     else
-        Pair(Instant.fromEpochMilliseconds(arrivalTime).format(timeFmt), "")
+        Pair(Instant.fromEpochMilliseconds(arrivalTime).formatAsLocal(), "")
 }
 
 

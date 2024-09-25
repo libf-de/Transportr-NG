@@ -63,8 +63,11 @@ import de.libf.transportrng.ui.transport.composables.WalkComposable
 import kotlinx.coroutines.delay
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalTime
+import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.format.DateTimeComponents
+import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import transportr_ng.composeapp.generated.resources.Res
@@ -75,10 +78,18 @@ import transportr_ng.composeapp.generated.resources.trip_not_travelable
 import transportr_ng.composeapp.generated.resources.x_minutes_ago
 import kotlin.time.Duration.Companion.milliseconds
 
-val timeFmt = DateTimeComponents.Format {
-    hour()
-    chars(":")
-    minute()
+//val timeFmt = DateTimeComponents.Format {
+//    hour()
+//    chars(":")
+//    minute()
+//}
+
+fun Instant.formatAsLocal(): String {
+    return this.toLocalDateTime(TimeZone.currentSystemDefault()).time.format(LocalTime.Format {
+        hour()
+        chars(":")
+        minute()
+    })
 }
 
 @Composable
@@ -129,9 +140,12 @@ fun Stop.getDepartureTimes(): Pair<String, String> {
                 delayMinutes < 0 -> "$delayMinutes"
                 else -> ""
             }
-            Pair(time.format(timeFmt), delayStr)
+
+
+
+            Pair(time.formatAsLocal(), delayStr)
         } else {
-            Pair(time.format(timeFmt), "")
+            Pair(time.formatAsLocal(), "")
         }
     } ?: Pair("", "")
 }
@@ -150,9 +164,9 @@ fun Stop.getArrivalTimes(): Pair<String, String> {
                 delayMinutes < 0 -> "$delayMinutes"
                 else -> ""
             }
-            Pair(time.format(timeFmt), delayStr)
+            Pair(time.formatAsLocal(), delayStr)
         } else {
-            Pair(time.format(timeFmt), "")
+            Pair(time.formatAsLocal(), "")
         }
     } ?: Pair("", "")
 }
@@ -162,7 +176,7 @@ fun getDepartureTimes(trip: Trip): Pair<String, String> {
     return if (firstLeg is PublicLeg) {
         firstLeg.departureStop.getDepartureTimes()
     } else {
-        Pair(Instant.fromEpochMilliseconds(firstLeg.departureTime).format(timeFmt), trip.firstPublicLeg.let {
+        Pair(Instant.fromEpochMilliseconds(firstLeg.departureTime).formatAsLocal(), trip.firstPublicLeg.let {
             if (it?.departureDelay != null && it.departureDelay != 0L)
                 it.departureStop.getDepartureTimes().second ?: ""
             else ""
@@ -175,7 +189,7 @@ fun getArrivalTimes(trip: Trip): Pair<String, String> {
     return if (lastLeg is PublicLeg) {
         lastLeg.arrivalStop.getArrivalTimes()
     } else {
-        Pair(Instant.fromEpochMilliseconds(lastLeg.arrivalTime).format(timeFmt), trip.lastPublicLeg.let {
+        Pair(Instant.fromEpochMilliseconds(lastLeg.arrivalTime).formatAsLocal(), trip.lastPublicLeg.let {
             if (it?.arrivalDelay != null && it.arrivalDelay != 0L)
                 it.arrivalStop.getArrivalTimes().second
             else ""

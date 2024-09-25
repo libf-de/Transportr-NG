@@ -97,7 +97,7 @@ fun DepartureTimeComposable(
                     departureTimeStr = dvNow
                 }
                 it.isToday() -> {
-                    val difference = Clock.System.now().minus(it).inWholeMinutes
+                    val difference = it.minus(Clock.System.now()).inWholeMinutes
                     departureTimeStr = when {
                         difference !in -maxMins..maxMins -> formatTime(it, false)
                         difference == 0L -> dvNow

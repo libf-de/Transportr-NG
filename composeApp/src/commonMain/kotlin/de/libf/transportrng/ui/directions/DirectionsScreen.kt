@@ -112,9 +112,12 @@ fun DirectionsScreen(
         if(specialLocation == FavoriteTripType.WORK || specialLocation == FavoriteTripType.HOME) {
             //TODO: Home/Work location
         } else {
-            viewModel.setFromLocation(from)
-            viewModel.setViaLocation(via)
-            viewModel.setToLocation(to)
+            if(viewModel.fromLocation.value == null)
+                viewModel.setFromLocation(from)
+            if(viewModel.viaLocation.value == null)
+                viewModel.setViaLocation(via)
+            if(viewModel.toLocation.value == null)
+                viewModel.setToLocation(to)
         }
     }
 
