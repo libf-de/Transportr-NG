@@ -306,11 +306,21 @@ class iOsMapViewState : MapViewStateInterface {
     }
 
     override suspend fun drawNearbyStations(nearbyStations: List<Location>) {
-        TODO("Not yet implemented")
+        nearbyStations.forEach {
+            mapView?.addAnnotation(
+                MKPointAnnotation(
+                    CLLocationCoordinate2DMake(it.latAsDouble, it.lonAsDouble),
+                    it.uniqueShortName ?: "",
+                    ""
+                )
+            )
+        }
     }
 
     override suspend fun clearNearbyStations() {
-        TODO("Not yet implemented")
+        mapView?.annotations?.let {
+            mapView?.removeAnnotations(it)
+        }
     }
 
     @OptIn(ExperimentalResourceApi::class)
