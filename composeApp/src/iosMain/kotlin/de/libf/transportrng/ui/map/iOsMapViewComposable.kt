@@ -107,28 +107,28 @@ class iOsMapViewState : MapViewStateInterface {
             return MKOverlayRenderer(rendererForOverlay)
         }
 
-        @Suppress("RETURN_TYPE_MISMATCH_ON_OVERRIDE")
-        override fun mapView(
-            mapView: MKMapView,
-            viewForAnnotation: MKAnnotationProtocol
-        ): MKAnnotationView? {
-            if (viewForAnnotation !is MKPointAnnotation) return null
-
-            val reuseIdentifier = "CustomAnnotation"
-            var annotationView = mapView.dequeueReusableAnnotationViewWithIdentifier(reuseIdentifier)
-
-            if (annotationView == null) {
-                annotationView = MKAnnotationView(viewForAnnotation, reuseIdentifier)
-                annotationView.canShowCallout = true
-            } else {
-                annotationView.annotation = viewForAnnotation
-            }
-
-            // Load custom image from Compose Multiplatform resource
-            annotationView.image = iconMap[MarkerType.CHANGE]
-
-            return annotationView
-        }
+//        @Suppress("RETURN_TYPE_MISMATCH_ON_OVERRIDE")
+//        override fun mapView(
+//            mapView: MKMapView,
+//            viewForAnnotation: MKAnnotationProtocol
+//        ): MKAnnotationView? {
+//            if (viewForAnnotation !is MKPointAnnotation) return null
+//
+//            val reuseIdentifier = "CustomAnnotation"
+//            var annotationView = mapView.dequeueReusableAnnotationViewWithIdentifier(reuseIdentifier)
+//
+//            if (annotationView == null) {
+//                annotationView = MKAnnotationView(viewForAnnotation, reuseIdentifier)
+//                annotationView.canShowCallout = true
+//            } else {
+//                annotationView.annotation = viewForAnnotation
+//            }
+//
+//            // Load custom image from Compose Multiplatform resource
+//            annotationView.image = iconMap[MarkerType.CHANGE]
+//
+//            return annotationView
+//        }
 
         override fun mapViewDidChangeVisibleRegion(mapView: MKMapView) {
 //            super.mapViewDidChangeVisibleRegion(mapView)
@@ -145,11 +145,11 @@ class iOsMapViewState : MapViewStateInterface {
     fun setMapView(mapView: MKMapView) {
         println("Map view set")
 
-        CoroutineScope(Dispatchers.IO).launch {
-            MarkerType.entries.forEach {
-                iconMap[it] = getMarkerIcon(it)
-            }
-        }
+//        CoroutineScope(Dispatchers.IO).launch {
+//            MarkerType.entries.forEach {
+//                iconMap[it] = getMarkerIcon(it)
+//            }
+//        }
 
 
 
