@@ -1,0 +1,29 @@
+PODS:
+  - CocoaLumberjack (3.8.5):
+    - CocoaLumberjack/Core (= 3.8.5)
+  - CocoaLumberjack/Core (3.8.5)
+  - SVGKit (3.0.0):
+    - CocoaLumberjack (~> 3.0)
+  - TransportrNG (1.0):
+    - SVGKit
+
+DEPENDENCIES:
+  - TransportrNG (from `../composeApp`)
+
+SPEC REPOS:
+  trunk:
+    - CocoaLumberjack
+    - SVGKit
+
+EXTERNAL SOURCES:
+  TransportrNG:
+    :path: "../composeApp"
+
+SPEC CHECKSUMS:
+  CocoaLumberjack: 6a459bc897d6d80bd1b8c78482ec7ad05dffc3f0
+  SVGKit: 1ad7513f8c74d9652f94ed64ddecda1a23864dea
+  TransportrNG: 3e1d0a8169afa03d88bed09844823ce4f2a65d44
+
+PODFILE CHECKSUM: 0c0a20f964ca8fe339bf9c1b872e47c5eaf11e25
+
+COCOAPODS: 1.15.2
