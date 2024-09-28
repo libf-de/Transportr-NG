@@ -233,20 +233,6 @@ fun MapScreen(
                 drawerState = drawerState,
                 gesturesEnabled = drawerState.isOpen,
                 drawerContent = {
-                    SpecialLocationItem(
-                        location = FavoriteTripItem(
-                            uid = 11L,
-                            from = WrapLocation(
-                                LatLng(11.0, 12.0)
-                            ),
-                            to = WrapLocation(
-                                LatLng(13.0, 14.0)
-                            )
-                        ),
-                        actions = SpecialLocationItemActions()
-                    )
-
-
                     MapNavDrawerContent(
                         transportNetworks = transportNetworks,
                         onNetworkClick = {

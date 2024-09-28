@@ -12,10 +12,10 @@ androidx-lifecycle = "2.8.2"
 androidx-material = "1.12.0"
 androidx-test-junit = "1.2.1"
 androidx-navigation = "2.8.0-alpha09"
-compose-plugin = "1.6.11"
+#compose-plugin = "1.6.11"
 androidx-splashscreen = "1.1.0-rc01"
 #compose-plugin = "1.7.0-beta02"
-#compose-plugin = "1.7.0-dev1840"
+compose-plugin = "1.7.0-dev1840"
 junit = "4.13.2"
 kotlin = "2.0.20"
 ksp = "2.0.20-1.0.25"
@@ -86,3 +86,4 @@ kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref =
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 room = { id = "androidx.room", version.ref = "room"}
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+kotlinCocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = "kotlin" }

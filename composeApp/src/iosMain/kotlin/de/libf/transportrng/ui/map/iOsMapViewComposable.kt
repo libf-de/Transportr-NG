@@ -20,11 +20,15 @@ import de.libf.transportrng.data.gps.filterByDistance
 import de.libf.transportrng.data.locations.WrapLocation
 import de.libf.transportrng.data.maplibrecompat.LatLng
 import de.libf.transportrng.data.maplibrecompat.LatLngBounds
+import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.ObjCClass
+import kotlinx.cinterop.ObjCClassOf
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.allocArray
 import kotlinx.cinterop.memScoped
+import kotlinx.cinterop.typeOf
 import kotlinx.cinterop.useContents
 import kotlinx.cinterop.usePinned
 import kotlinx.coroutines.CoroutineScope
@@ -45,8 +49,15 @@ import org.jetbrains.compose.resources.getDrawableResourceBytes
 import org.jetbrains.compose.resources.getSystemResourceEnvironment
 import platform.CoreLocation.CLLocationCoordinate2D
 import platform.CoreLocation.CLLocationCoordinate2DMake
+import platform.Foundation.NSBundle
 import platform.Foundation.NSData
+import platform.Foundation.NSString
+import platform.Foundation.NSUTF8StringEncoding
+import platform.Foundation.classForCoder
+import platform.Foundation.dataUsingEncoding
 import platform.Foundation.dataWithBytes
+import platform.Foundation.stringByReplacingOccurrencesOfString
+import platform.Foundation.stringWithContentsOfFile
 import platform.MapKit.MKAnnotationProtocol
 import platform.MapKit.MKAnnotationView
 import platform.MapKit.MKCoordinateRegionMake
@@ -67,6 +78,9 @@ import platform.UIKit.UIEdgeInsets
 import platform.UIKit.UIEdgeInsetsMake
 import platform.UIKit.UIImage
 import platform.darwin.NSObject
+import platform.objc.objc_getClass
+import platform.objc.objc_getRequiredClass
+import platform.objc.objc_lookUpClass
 import transportr_ng.composeapp.generated.resources.Res
 import transportr_ng.composeapp.generated.resources.ic_marker_trip_begin
 import transportr_ng.composeapp.generated.resources.ic_marker_trip_change
@@ -107,28 +121,35 @@ class iOsMapViewState : MapViewStateInterface {
             return MKOverlayRenderer(rendererForOverlay)
         }
 
-//        @Suppress("RETURN_TYPE_MISMATCH_ON_OVERRIDE")
-//        override fun mapView(
-//            mapView: MKMapView,
-//            viewForAnnotation: MKAnnotationProtocol
-//        ): MKAnnotationView? {
+
+        @Suppress("RETURN_TYPE_MISMATCH_ON_OVERRIDE")
+        override fun mapView(
+            mapView: MKMapView,
+            viewForAnnotation: MKAnnotationProtocol
+        ): MKAnnotationView? {
+            println(viewForAnnotation::class.qualifiedName)
 //            if (viewForAnnotation !is MKPointAnnotation) return null
-//
-//            val reuseIdentifier = "CustomAnnotation"
-//            var annotationView = mapView.dequeueReusableAnnotationViewWithIdentifier(reuseIdentifier)
-//
-//            if (annotationView == null) {
-//                annotationView = MKAnnotationView(viewForAnnotation, reuseIdentifier)
-//                annotationView.canShowCallout = true
-//            } else {
-//                annotationView.annotation = viewForAnnotation
-//            }
-//
-//            // Load custom image from Compose Multiplatform resource
+
+            if(viewForAnnotation is TripBeginAnnotation) {
+                println("TripBeginAnnotation!!")
+            }
+
+            val reuseIdentifier = "CustomAnnotation"
+            var annotationView = mapView.dequeueReusableAnnotationViewWithIdentifier(reuseIdentifier)
+
+            if (annotationView == null) {
+                annotationView = MKAnnotationView(viewForAnnotation, reuseIdentifier)
+                annotationView.canShowCallout = true
+            } else {
+                annotationView.annotation = viewForAnnotation
+            }
+
+            // Load custom image from Compose Multiplatform resource
 //            annotationView.image = iconMap[MarkerType.CHANGE]
-//
-//            return annotationView
-//        }
+            annotationView.image = getMarkerIcon(MarkerType.STOP, Color.Green, Color.Magenta)
+
+            return annotationView
+        }
 
         override fun mapViewDidChangeVisibleRegion(mapView: MKMapView) {
 //            super.mapViewDidChangeVisibleRegion(mapView)
@@ -265,9 +286,10 @@ class iOsMapViewState : MapViewStateInterface {
         var i = 1
         trip.legs.forEachIndexed { j, leg ->
             // get colors
-            val backgroundColor = leg.takeIf { it is PublicLeg }
+            val backgroundColor = leg
+                .takeIf { it is PublicLeg }
                 ?.let { it as PublicLeg }
-                ?.line?.style?.backgroundColor ?: Color(0xFFFED21B)
+                ?.line?.style?.backgroundColor?.let(::Color) ?: Color(0xFFFED21B)
             val foregroundColor = Color.White
 
             memScoped {
@@ -312,6 +334,13 @@ class iOsMapViewState : MapViewStateInterface {
                     boundingCoords.add(Pair(it.location.latAsDouble, it.location.lonAsDouble))
 
                     mapView?.addAnnotation(
+//                        TripBeginAnnotation(
+//                            it.location,
+//                            backgroundColor,
+//                            foregroundColor,
+//                            it.location.uniqueShortName
+//                        )
+
                         MKPointAnnotation(
                             CLLocationCoordinate2DMake(it.location.latAsDouble, it.location.lonAsDouble),
                             it.location.uniqueShortName ?: "",
@@ -363,8 +392,40 @@ class iOsMapViewState : MapViewStateInterface {
         }
     }
 
+    @OptIn(ExperimentalStdlibApi::class)
+    private fun getMarkerIcon(
+        type: MarkerType,
+        backgroundColor: Color = Color.Unspecified,
+        foregroundColor: Color = Color.Unspecified
+    ): UIImage {
+        return TripBeginIcon.replace(
+            "id=\"background\" fill=\"#ff0000\"",
+            "id=\"background\" fill=\"#${backgroundColor.toArgb().toHexString()}\""
+        ).replace(
+            "id=\"foreground\" fill=\"#000000FF\"",
+            "id=\"foreground\" fill=\"#${foregroundColor.toArgb().toHexString()}\""
+        ).let {
+            val data = (it as NSString).dataUsingEncoding(NSUTF8StringEncoding)
+            data!!.let { UIImage.imageWithData(it)!! }
+        }
+//        return NSBundle.mainBundle.pathForResource(name = "trip_begin", ofType = "svg")!!.let {
+//            NSString.stringWithContentsOfFile(it)?.let {
+//                (it as NSString).toString().replace(
+//                    "id=\"background\" fill=\"#ff0000\"",
+//                    "id=\"background\" fill=\"#${backgroundColor.toArgb().toHexString()}\""
+//                ).replace(
+//                    "id=\"foreground\" fill=\"#000000FF\"",
+//                    "id=\"foreground\" fill=\"#${foregroundColor.toArgb().toHexString()}\""
+//                )
+//            }?.let {
+//                val data = (it as NSString).dataUsingEncoding(NSUTF8StringEncoding)
+//                data?.let { UIImage.imageWithData(it) }
+//            }
+//        }
+    }
+
     @OptIn(ExperimentalResourceApi::class)
-    private suspend fun getMarkerIcon(
+    private suspend fun getMarkerIcon2(
         type: MarkerType,
         backgroundColor: Color = Color.Unspecified,
         foregroundColor: Color = Color.Unspecified
@@ -438,7 +499,7 @@ actual fun <T : MapViewStateInterface> MapViewComposable(
 }
 
 
-@OptIn(ExperimentalForeignApi::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalForeignApi::class, ExperimentalComposeUiApi::class, BetaInteropApi::class)
 @Composable
 fun UIKitMapView(
     mapViewState: iOsMapViewState,
@@ -458,6 +519,8 @@ fun UIKitMapView(
         factory = {
             mapView.apply {
                 mapViewState.setMapView(this)
+
+//                this.registerClass(TripBeginAnnotation::, TripBeginAnnotation::class.qualifiedName!!)
             }
         },
         update = {

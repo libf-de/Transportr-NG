@@ -11,9 +11,33 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 
     alias(libs.plugins.androidApplication)
+
+    alias(libs.plugins.kotlinCocoapods)
 }
 
 kotlin {
+    cocoapods {
+        // Required properties
+        // Specify the required Pod version here. Otherwise, the Gradle project version is used.
+        name = "TransportrNG"
+        version = "1.0"
+        summary = "Kotlin/Native module"
+        homepage = "http://localhost"
+        ios.deploymentTarget = "14.1"
+
+        podfile = project.file("../iosApp/Podfile")
+////
+        framework {
+            // Required properties
+            // Framework name configuration. Use this property instead of deprecated 'frameworkName'
+            baseName = "TransportrNG"
+            export(project(":composeApp"))
+            transitiveExport = false // This is default.
+        }
+
+        pod("SVGKit")
+    }
+
     androidTarget {
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
         compilerOptions {
