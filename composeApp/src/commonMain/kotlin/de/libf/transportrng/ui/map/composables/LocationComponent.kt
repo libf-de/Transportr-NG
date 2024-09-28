@@ -22,9 +22,11 @@ package de.libf.transportrng.ui.map.composables
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -64,21 +66,17 @@ import transportr_ng.composeapp.generated.resources.ic_more_horiz
 import transportr_ng.composeapp.generated.resources.ic_nearby_stations
 import transportr_ng.composeapp.generated.resources.more
 
+
+
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun LocationComponent(
     location: WrapLocation?,
-    lines: List<Line>?,
     modifier: Modifier = Modifier,
-    fromHereClicked: () -> Unit = {},
-    copyClicked: () -> Unit = {},
-    departuresClicked: () -> Unit = {},
-    nearbyStationsClicked: () -> Unit = {},
-    shareClicked: () -> Unit = {}
-
+    menuContent: @Composable RowScope.() -> Unit = {},
+    furtherContent: @Composable ColumnScope.() -> Unit = {},
 ) {
     var locationInfo by remember { mutableStateOf("") }
-    var showMoreMenu by remember { mutableStateOf(false) }
 
     LaunchedEffect(location) {
         val locationInfoStr = StringBuilder()
@@ -108,18 +106,8 @@ fun LocationComponent(
 
             Text(
                 text = location?._getName() ?: "",
-                style = MaterialTheme.typography.displayMedium
+                style = MaterialTheme.typography.headlineSmall
             )
-        }
-
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-            modifier = Modifier
-        ) {
-            lines?.forEach {
-                ProductComposable(line = it)
-            }
         }
 
         Row(
@@ -129,10 +117,35 @@ fun LocationComponent(
         ) {
             Text(
                 text = locationInfo,
-                style = MaterialTheme.typography.displayMedium,
+                style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.weight(1f)
             )
 
+            menuContent()
+        }
+
+        furtherContent()
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun LocationComponent(
+    location: WrapLocation?,
+    lines: List<Line>?,
+    modifier: Modifier = Modifier,
+    fromHereClicked: () -> Unit = {},
+    copyClicked: () -> Unit = {},
+    departuresClicked: () -> Unit = {},
+    nearbyStationsClicked: () -> Unit = {},
+    shareClicked: () -> Unit = {}
+) {
+    var showMoreMenu by remember { mutableStateOf(false) }
+
+    LocationComponent(
+        location = location,
+        modifier = modifier,
+        menuContent = {
             Box {
                 IconButton(
                     onClick = { showMoreMenu = true }
@@ -176,7 +189,16 @@ fun LocationComponent(
 
                 }
             }
-
+        }
+    ) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            modifier = Modifier
+        ) {
+            lines?.forEach {
+                ProductComposable(line = it)
+            }
         }
 
         Row(
@@ -221,6 +243,73 @@ fun LocationComponent(
                     text = stringResource(Res.string.action_share)
                 )
             }
+        }
+    }
+}
+
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun LocationComponent2(
+    location: WrapLocation?,
+    lines: List<Line>?,
+    modifier: Modifier = Modifier,
+    fromHereClicked: () -> Unit = {},
+    copyClicked: () -> Unit = {},
+    departuresClicked: () -> Unit = {},
+    nearbyStationsClicked: () -> Unit = {},
+    shareClicked: () -> Unit = {}
+) {
+    var locationInfo by remember { mutableStateOf("") }
+
+
+    LaunchedEffect(location) {
+        val locationInfoStr = StringBuilder()
+        location?.location?.place.takeIf { !it.isNullOrEmpty() }.let {
+            locationInfoStr.append(it)
+        }
+        location?.location.takeIf { it?.hasCoords == true }?.let {
+            if (locationInfoStr.isNotEmpty()) locationInfoStr.append(", ")
+            locationInfoStr.append(it.getCoordName())
+        }
+        locationInfo = locationInfoStr.toString()
+    }
+
+    Column(
+        modifier = modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Row(
+            modifier = Modifier,
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Icon(
+                painter = painterResource(location?.drawableInt ?: Res.drawable.ic_location),
+                contentDescription = null
+            )
+
+            Text(
+                text = location?._getName() ?: "",
+                style = MaterialTheme.typography.headlineSmall
+            )
+        }
+
+
+
+        Row(
+            modifier = Modifier,
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = locationInfo,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.weight(1f)
+            )
+
+
+
         }
     }
 }

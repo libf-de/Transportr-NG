@@ -19,6 +19,16 @@
 
 package de.libf.transportrng.ui.map
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -43,12 +53,13 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberDrawerState
-import androidx.compose.material3.rememberStandardBottomSheetState
+//import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -62,25 +73,45 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import androidx.navigation.NavHost
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
+import de.libf.transportrng.MapRoutes
 import de.libf.transportrng.Routes
+import de.libf.transportrng.data.favorites.FavoriteTripItem
 import de.libf.transportrng.data.gps.GpsState
 import de.libf.transportrng.data.gps.enabled
 import de.libf.transportrng.data.locations.WrapLocation
 import de.libf.transportrng.data.maplibrecompat.LatLng
+import de.libf.transportrng.protobufNavType
+import de.libf.transportrng.ui.composables.AnchoredDraggableDefaults
+import de.libf.transportrng.ui.composables.AnchoredDraggableState
 import de.libf.transportrng.ui.composables.BaseLocationGpsInput
+import de.libf.transportrng.ui.composables.CustomBottomSheetScaffold
+import de.libf.transportrng.ui.composables.rememberCustomBottomSheetScaffoldState
+import de.libf.transportrng.ui.composables.rememberStandardBottomSheetState
 import de.libf.transportrng.ui.favorites.SavedSearchesActions
 import de.libf.transportrng.ui.favorites.SavedSearchesComponent
+import de.libf.transportrng.ui.favorites.composables.SpecialLocationItem
+import de.libf.transportrng.ui.favorites.composables.SpecialLocationItemActions
 import de.libf.transportrng.ui.map.composables.GpsFabComposable
 import de.libf.transportrng.ui.map.composables.LocationComponent
 import de.libf.transportrng.ui.map.composables.MapNavDrawerContent
+import de.libf.transportrng.ui.map.sheets.LocationDetailSheetContent
+import de.libf.transportrng.ui.map.sheets.SavedSearchesSheetComponent
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 import transportr_ng.composeapp.generated.resources.Res
 import transportr_ng.composeapp.generated.resources.directions
 import transportr_ng.composeapp.generated.resources.ic_menu_black
@@ -88,15 +119,19 @@ import transportr_ng.composeapp.generated.resources.ic_menu_directions
 import transportr_ng.composeapp.generated.resources.material_drawer_open
 import transportr_ng.composeapp.generated.resources.search_hint
 import kotlin.math.roundToInt
+import kotlin.reflect.typeOf
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun MapScreen(
     viewModel: MapViewModel,
-    navController: NavController,
+    navController: NavHostController,
     geoUri: String? = null,
     location: WrapLocation? = null
 ) {
+    val mapNavController = rememberNavController()
+
+
     val searchSuggestions by viewModel.locationSuggestions.collectAsStateWithLifecycle(emptySet())
     val focusManager = LocalFocusManager.current
     val mapState = remember { provideMapState() }
@@ -106,11 +141,19 @@ fun MapScreen(
     val drawerState = rememberDrawerState(
         initialValue = DrawerValue.Closed
     )
-    val scafState = rememberBottomSheetScaffoldState(
+
+    val scafState = rememberCustomBottomSheetScaffoldState(
         bottomSheetState = rememberStandardBottomSheetState(
             initialValue = SheetValue.Expanded,
         )
     )
+
+//    val scafState = rememberBottomSheetScaffoldState(
+//        bottomSheetState = androidx.compose.material3.rememberStandardBottomSheetState(
+//            initialValue = SheetValue.Expanded,
+//        )
+//    )
+
     var bottomSheetVisible by remember { mutableStateOf(true) }
 
     val barPadding = WindowInsets.systemBars.asPaddingValues()
@@ -136,6 +179,14 @@ fun MapScreen(
                         it.longitude
                     )
                 )
+            )
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        mapState.onLocationClicked = { loc ->
+            mapNavController.navigate(
+                route = MapRoutes.LocationDetail(loc)
             )
         }
     }
@@ -182,6 +233,20 @@ fun MapScreen(
                 drawerState = drawerState,
                 gesturesEnabled = drawerState.isOpen,
                 drawerContent = {
+                    SpecialLocationItem(
+                        location = FavoriteTripItem(
+                            uid = 11L,
+                            from = WrapLocation(
+                                LatLng(11.0, 12.0)
+                            ),
+                            to = WrapLocation(
+                                LatLng(13.0, 14.0)
+                            )
+                        ),
+                        actions = SpecialLocationItemActions()
+                    )
+
+
                     MapNavDrawerContent(
                         transportNetworks = transportNetworks,
                         onNetworkClick = {
@@ -224,55 +289,52 @@ fun MapScreen(
                 modifier = Modifier.fillMaxSize()
             ) {
                 Box(Modifier.fillMaxSize()) {
-                    BottomSheetScaffold(
+                    CustomBottomSheetScaffold(
+//                    BottomSheetScaffold(
+                        scaffoldState = scafState,
                         sheetContent = {
-                            when(val state = sheetContentState) {
-                                is BottomSheetContentState.Location -> {
-                                    LocationComponent(
-                                        location = state.loc,
-                                        lines = state.lines,
-                                        modifier = Modifier
+                            NavHost(
+                                navController = mapNavController,
+                                startDestination = if(location == null) MapRoutes.SavedSearches else MapRoutes.LocationDetail(location),
+                                modifier = Modifier.animateContentSize()
+                                /*route = Routes.Map::class,
+                                typeMap = mapOf(typeOf<WrapLocation?>() to protobufNavType<WrapLocation?>())*/
+                            ) {
+                                composable<MapRoutes.SavedSearches> {
+                                    SavedSearchesSheetComponent(
+                                        viewModel = koinViewModel(),
+                                        rootNavController = navController,
+                                        mapNavController = mapNavController,
+                                        modifier = Modifier.navigationBarsPadding()
                                             .heightIn(max = screenHeight.value / 2)
                                     )
                                 }
 
-                                is BottomSheetContentState.SavedSearches -> {
-                                    SavedSearchesComponent(
-                                        items = favoriteTrips,
-                                        specialLocations = specialTrips,
-                                        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 8.dp),
-                                        modifier = Modifier
-                                            .navigationBarsPadding()
-                                            .heightIn(max = (screenHeight.value / 2)),
-                                        actions = SavedSearchesActions(
-                                            requestDirectionsFromViaTo = { from, via, to, search ->
-                                                navController.navigate(
-                                                    route = Routes.Directions(
-                                                        from = from,
-                                                        via = via,
-                                                        to = to,
-                                                        search = search
-                                                    )
-                                                )
-                                            },
-                                            requestDeparturesFrom = {
-                                                navController.navigate(
-                                                    route = Routes.Departures(
-                                                        location = it
-                                                    )
-                                                )
-                                            },
-                                            requestSetTripFavorite = viewModel::setFavoriteTrip,
-                                            onChangeSpecialLocationRequested = {},
-                                            onCreateShortcutRequested = {},
-                                            requestDelete = viewModel::removeFavoriteTrip
-                                        )
+                                composable<MapRoutes.LocationDetail>(
+                                    typeMap = mapOf(typeOf<WrapLocation>() to protobufNavType<WrapLocation>())
+                                ) {
+                                    val params = it.toRoute<MapRoutes.LocationDetail>()
+
+                                    LocationDetailSheetContent(
+                                        viewModel = koinViewModel(),
+                                        rootNavController = navController,
+                                        mapNavController = mapNavController,
+                                        location = params.location,
+                                        modifier = Modifier.navigationBarsPadding()
+                                            .heightIn(max = screenHeight.value / 2)
                                     )
                                 }
-                                else -> { }
                             }
+
+
+                            MapScreenSheetContent(
+                                sheetContentState = sheetContentState,
+                                maxContentHeight = screenHeight.value / 2,
+                                navController = navController,
+                                viewModel = viewModel
+                            )
                         },
-                        scaffoldState = scafState,
+                        modifier = Modifier.animateContentSize()
                     ) { contentPadding ->
                         MapViewComposable(
                             mapViewState = mapState,
@@ -315,7 +377,12 @@ fun MapScreen(
                             BaseLocationGpsInput(
                                 location = null,
                                 onAcceptSuggestion = {
-                                    /* TODO */
+                                    navController.navigate(
+                                        Routes.Directions(
+                                            from = WrapLocation(WrapLocation.WrapType.GPS),
+                                            to = it
+                                        )
+                                    )
                                 },
                                 onValueChange = {
                                     viewModel.suggestLocations(it)
@@ -347,6 +414,7 @@ fun MapScreen(
                             }
                     ) {
                         val haptics = LocalHapticFeedback.current
+
                         GpsFabComposable(
                             gpsState = locationState,
                             onLongClick = {
@@ -423,4 +491,43 @@ fun MapScreen(
             }
         }
     )
+}
+
+@Composable
+fun MapScreenSheetContent(
+    sheetContentState: BottomSheetContentState,
+    maxContentHeight: Dp,
+    navController: NavController,
+    viewModel: MapViewModel
+) {
+    AnimatedContent(
+        targetState = sheetContentState,
+        transitionSpec = {
+            if (initialState is BottomSheetContentState.Loading) {
+                fadeIn() togetherWith fadeOut()
+            } else if (targetState is BottomSheetContentState.Location) {
+                slideInHorizontally { height -> height } + fadeIn() togetherWith
+                        slideOutHorizontally { height -> height } + fadeOut()
+            } else if(targetState is BottomSheetContentState.SavedSearches) {
+                slideInHorizontally { height -> -height } + fadeIn() togetherWith
+                        slideOutHorizontally { height -> -height } + fadeOut()
+            } else {
+                fadeIn(tween(durationMillis = 0)) togetherWith
+                        fadeOut(tween(durationMillis = 0))
+            }.using(
+                SizeTransform(clip = false)
+            )
+        }, label = "animated content"
+    ) { targetCount ->
+        when(val state = sheetContentState) {
+            is BottomSheetContentState.Location -> {
+
+            }
+
+            is BottomSheetContentState.SavedSearches -> {
+
+            }
+            else -> { }
+        }
+    }
 }

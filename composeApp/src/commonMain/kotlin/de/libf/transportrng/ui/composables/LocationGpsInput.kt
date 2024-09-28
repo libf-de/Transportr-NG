@@ -51,6 +51,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,12 +61,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.fromHtml
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.PopupProperties
 import de.libf.transportrng.data.locations.WrapLocation
@@ -134,69 +137,76 @@ fun BaseLocationGpsInput(
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
-        Box(modifier = Modifier.fillMaxWidth()) {
-            Row() {
-                BasicTextField(
-                    modifier = modifier.onFocusChanged {
-                        isFocused = it.isFocused
-                        onFocusChange(it.isFocused)
-                    }
-                        .weight(1f)
-                        .then(Modifier.wrapContentHeight(Alignment.CenterVertically)),
-                    value = text,
-                    onValueChange = {
-                        onValueChange(it)
-                        text = it
-                        showSuggestions = true
-                    },
-                    maxLines = 1,
-                    textStyle = MaterialTheme.typography.bodyLarge.copy(
-                        color = MaterialTheme.colorScheme.onSurface
-                    ),
-                    singleLine = true,
-                    cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                )
-
-                if(isLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(16.dp),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-
-                if(text.isNotBlank()) {
-                    IconButton(
-                        onClick = {
-                            onValueChange("")
-                            text = ""
-                            showSuggestions = false
+        ExposedDropdownMenuBox(
+            expanded = isFocused && showSuggestions && suggestions != null,
+            onExpandedChange = {
+                showSuggestions = !it
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Box(modifier = Modifier.fillMaxWidth()) {
+                Row() {
+                    BasicTextField(
+                        modifier = modifier.onFocusChanged {
+                            isFocused = it.isFocused
+                            onFocusChange(it.isFocused)
                         }
-                    ) {
-                        Icon(
-                            painter = painterResource(Res.drawable.ic_action_content_remove), //TODO?
-                            contentDescription = stringResource(Res.string.clear_location),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            .weight(1f)
+                            .menuAnchor()
+                            .then(Modifier.wrapContentHeight(Alignment.CenterVertically)),
+                        value = text,
+                        onValueChange = {
+                            text = it
+                            onValueChange(it)
+                            showSuggestions = true
+                        },
+                        maxLines = 1,
+                        textStyle = MaterialTheme.typography.bodyLarge.copy(
+                            color = MaterialTheme.colorScheme.onSurface
+                        ),
+                        singleLine = true,
+                        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                    )
+
+                    if(isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(16.dp),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
+
+                    if(text.isNotBlank()) {
+                        IconButton(
+                            onClick = {
+                                onValueChange("")
+                                text = ""
+                                showSuggestions = false
+                            }
+                        ) {
+                            Icon(
+                                painter = painterResource(Res.drawable.ic_action_content_remove), //TODO?
+                                contentDescription = stringResource(Res.string.clear_location),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
+
+
+                if (text.isBlank()) {
+                    Text(
+                        text = placeholder,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.align(Alignment.CenterStart)
+                    )
                 }
             }
 
-
-            if (text.isBlank()) {
-                Text(
-                    text = placeholder,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.align(Alignment.CenterStart)
-                )
-            }
-        }
-
-
-        if(isFocused && showSuggestions && suggestions != null) {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize()
+            ExposedDropdownMenu(
+                expanded = isFocused && showSuggestions && suggestions != null,
+                onDismissRequest = { showSuggestions = false },
             ) {
-                items(suggestions.toList()) { sug ->
+                suggestions?.forEach { sug ->
                     DropdownMenuItem(
                         onClick = {
                             onAcceptSuggestion(sug)
@@ -217,6 +227,14 @@ fun BaseLocationGpsInput(
                                 contentDescription = null
                             )
                         },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
+                if(suggestions?.isEmpty() != false) {
+                    Text(
+                        text = "Keine Haltestellen gefunden?",
+                        textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth()
                     )
                 }

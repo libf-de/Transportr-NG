@@ -21,14 +21,21 @@ package de.libf.transportrng
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.core.bundle.Bundle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import de.grobox.transportr.networks.TransportNetworkManager
 import de.libf.ptek.dto.Trip
 import de.libf.transportrng.data.favorites.FavoriteTripType
 import de.libf.transportrng.ui.directions.DirectionsScreen
@@ -50,6 +57,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.protobuf.ProtoBuf
 import kotlinx.serialization.serializer
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.reflect.typeOf
 
@@ -79,6 +87,15 @@ class ProtobufNavType<T>(
 
 inline fun <reified T> protobufNavType(): NavType<T> {
     return ProtobufNavType(serializer())
+}
+
+@Serializable
+sealed class MapRoutes {
+    @Serializable
+    data object SavedSearches : MapRoutes()
+
+    @Serializable
+    data class LocationDetail(val location: WrapLocation) : MapRoutes()
 }
 
 @Serializable
@@ -116,12 +133,17 @@ sealed class Routes {
 }
 
 @Composable
-fun TransportrNavigationController() {
-    val navController = rememberNavController()
+fun TransportrNavigationController(
+    navController: NavHostController
+) {
+    val netMgr = koinInject<TransportNetworkManager>()
+    val hasTransportNetwork = remember {
+        netMgr.transportNetwork.value != null
+    }
 
     NavHost(
         navController = navController,
-        startDestination = Routes.Map(),
+        startDestination = if(hasTransportNetwork) Routes.Map() else Routes.TransportNetworkSelector,
         modifier = Modifier.fillMaxSize()
     ) {
         composable<Routes.Map>(
@@ -133,9 +155,10 @@ fun TransportrNavigationController() {
                 viewModel = koinViewModel(),
                 navController = navController,
                 geoUri = params.geoUri,
-                location = params.location
+                location = params.location,
             )
         }
+
 
         composable<Routes.Directions>(
             typeMap = mapOf(
@@ -167,7 +190,8 @@ fun TransportrNavigationController() {
             SettingsScreen(
                 onSelectNetworkClicked = {
                     navController.navigate(route = Routes.TransportNetworkSelector)
-                }
+                },
+                navController = navController
             )
         }
 
@@ -204,4 +228,10 @@ fun TransportrNavigationController() {
             )
         }
     }
+}
+
+fun String?.isRouteToShowWhenLocked(): Boolean {
+    if(this == null) return false
+    if(Routes.TripDetail::class.qualifiedName?.let { this.startsWith(it) } == true) return true
+    return false
 }

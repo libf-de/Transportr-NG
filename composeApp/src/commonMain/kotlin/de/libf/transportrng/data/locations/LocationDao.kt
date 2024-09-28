@@ -33,6 +33,29 @@ interface LocationDao {
     @Query("SELECT * FROM locations WHERE networkId = :networkId")
     fun getAllLocationsAsFlow(networkId: NetworkId?): Flow<List<GenericLocation>>
 
+//    @Query("""
+//        SELECT * FROM (
+//            SELECT *, (
+//                6371 * acos(
+//                    cos(radians(:lat / 1000000.0)) * cos(radians(lat / 1000000.0)) *
+//                    cos(radians(lon / 1000000.0) - radians(:lon / 1000000.0)) +
+//                    sin(radians(:lat / 1000000.0)) * sin(radians(lat / 1000000.0))
+//                )
+//            ) AS distance
+//            FROM locations
+//        )
+//        WHERE distance <= :radius AND networkId = :networkId
+//        ORDER BY distance
+//        LIMIT :maxItems
+//    """)
+//    suspend fun getLocationsWithinRadius(
+//        networkId: NetworkId?,
+//        lat: Int,
+//        lon: Int,
+//        radius: Double,
+//        maxItems: Int = 25
+//    ): List<GenericLocation>
+
     // FavoriteLocation
     //	@Query("SELECT * FROM locations WHERE networkId = :networkId")
     //	LiveData<List<FavoriteLocation>> getFavoriteLocations(NetworkId networkId);

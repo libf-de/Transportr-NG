@@ -112,6 +112,8 @@ and always knows where you are to not miss where to get off the bus.
 	<string name="show_location_in">Show Location In&#8230;</string>
 	<string name="more">More</string>
 
+	<string name="query_failed_generic">Querying %1$s failed: %2$s</string>
+
 	<!-- Shows a short(!) representation of how long you need to walk, e.g. "for 5 min" -->
 	<string name="for_x_min">for %1$d min</string>
 

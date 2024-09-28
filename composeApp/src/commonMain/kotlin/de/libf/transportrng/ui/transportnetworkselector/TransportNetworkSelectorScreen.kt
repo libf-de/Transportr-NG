@@ -31,16 +31,12 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -53,6 +49,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import androidx.navigation.NavOptions
+import de.libf.transportrng.Routes
+import de.libf.transportrng.ui.composables.SmallBackFab
 import de.libf.transportrng.ui.settings.SettingsViewModel
 import de.libf.transportrng.ui.transportnetworkselector.composables.ContinentComposable
 import de.libf.transportrng.ui.transportnetworkselector.composables.CountryComposable
@@ -64,7 +63,6 @@ import transportr_ng.composeapp.generated.resources.ic_globe
 import transportr_ng.composeapp.generated.resources.pick_network_activity
 import transportr_ng.composeapp.generated.resources.pick_network_first_run
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TransportNetworkSelectorScreen(
     viewModel: SettingsViewModel,
@@ -73,20 +71,23 @@ fun TransportNetworkSelectorScreen(
     val expandedIds = remember { mutableStateListOf<Int>() }
     val networks by viewModel.allNetworks.collectAsStateWithLifecycle(emptyArray())
 
+    fun confirm() {
+        if(navController.previousBackStackEntry == null)
+            navController.navigate(Routes.Map()) {
+                popUpTo(Routes.TransportNetworkSelector) { inclusive = true }
+            }
+        else
+            navController.popBackStack()
+    }
+
     Scaffold(
         topBar = {
-            SmallFloatingActionButton(
-                onClick = { navController.popBackStack() },
-                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            SmallBackFab(
+                navController = navController,
                 modifier = Modifier
                     .windowInsetsPadding(WindowInsets.systemBars)
                     .padding(start = 12.dp)
-            ) {
-                Icon(
-                    Icons.AutoMirrored.Rounded.ArrowBack,
-                    null
-                )
-            }
+            )
         }
     ) { contentPadding ->
         Column(
@@ -164,7 +165,7 @@ fun TransportNetworkSelectorScreen(
                                     network = it,
                                 ) {
                                     viewModel.setTransportNetwork(it)
-                                    navController.popBackStack()
+                                    confirm()
                                 }
                             }
                         }

@@ -27,6 +27,7 @@ import de.libf.ptek.dto.Line
 import de.libf.ptek.dto.Location
 import de.libf.ptek.dto.NearbyLocationsResult
 import de.libf.ptek.dto.QueryDeparturesResult
+import de.libf.transportrng.data.favorites.FavoriteTripItem
 import de.libf.transportrng.data.gps.GpsRepository
 import de.libf.transportrng.data.gps.GpsState
 import de.libf.transportrng.data.locations.LocationRepository
@@ -51,6 +52,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
+import kotlin.reflect.KClass
 
 class MapViewModel internal constructor(
     private val transportNetworkManager: TransportNetworkManager,
@@ -58,7 +60,7 @@ class MapViewModel internal constructor(
     searchesRepository: SearchesRepository,
     override val gpsRepository: GpsRepository,
     private val combinedSuggestionRepository: CombinedSuggestionRepository,
-    ) : SavedSearchesViewModel(transportNetworkManager, locationRepository, searchesRepository), GpsMapViewModel by GpsMapViewModelImpl(gpsRepository) {
+) : SavedSearchesViewModel(transportNetworkManager, locationRepository, searchesRepository), GpsMapViewModel by GpsMapViewModelImpl(gpsRepository) {
 
 //    private val peekHeight = MutableStateFlow<Int>()
     private val selectedLocationClicked = MutableStateFlow<LatLng?>(null)
@@ -103,7 +105,8 @@ class MapViewModel internal constructor(
     val locationSuggestions = combinedSuggestionRepository.suggestions
     val suggestionsLoading = combinedSuggestionRepository.isLoading
 
-    private val _sheetContentState = MutableStateFlow<BottomSheetContentState>(BottomSheetContentState.SavedSearches)
+    private val _sheetContentTarget = MutableStateFlow<KClass<*>>(BottomSheetContentState.SavedSearches::class)
+    private val _sheetContentState = MutableStateFlow<BottomSheetContentState>(BottomSheetContentState.Initial)
     val sheetContentState: StateFlow<BottomSheetContentState> = _sheetContentState.asStateFlow()
 
     fun suggestLocations(query: String) {
@@ -232,5 +235,8 @@ sealed class BottomSheetContentState {
     object Empty : BottomSheetContentState()
     object Loading : BottomSheetContentState()
     data class Location(val loc: WrapLocation?, val lines: List<Line>?) : BottomSheetContentState()
-    object SavedSearches : BottomSheetContentState()
+    data class SavedSearches(
+        val favorites: List<FavoriteTripItem>,
+        val specials: List<FavoriteTripItem>
+    ) : BottomSheetContentState()
 }

@@ -36,6 +36,8 @@ import de.libf.transportrng.data.trips.TripsRepository
 import de.libf.transportrng.ui.departures.DeparturesViewModel
 import de.libf.transportrng.ui.directions.DirectionsViewModel
 import de.libf.transportrng.ui.map.MapViewModel
+import de.libf.transportrng.ui.map.sheets.LocationDetailSheetViewModel
+import de.libf.transportrng.ui.map.sheets.SavedSearchesSheetViewModel
 import de.libf.transportrng.ui.settings.SettingsViewModel
 import de.libf.transportrng.ui.trips.TripDetailViewModel
 import de.libf.transportrngocations.CombinedSuggestionRepository
@@ -186,6 +188,22 @@ val ViewModelModule = module {
     viewModel {
         DeparturesViewModel(
             transportManager = get()
+        )
+    }
+
+    viewModel {
+        LocationDetailSheetViewModel(
+            transportNetworkManager = get(),
+            locationRepository = get(),
+            searchesRepository = get()
+        )
+    }
+
+    viewModel {
+        SavedSearchesSheetViewModel(
+            transportNetworkManager = get(),
+            locationRepository = get(),
+            searchesRepository = get()
         )
     }
 }
