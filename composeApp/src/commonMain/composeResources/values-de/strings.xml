@@ -367,4 +367,31 @@ und weiß immer, wo man aussteigen muss.
   <string name="danish">Dänisch</string>
 
   <string name="continue_journey_later">Reise dort später fortsetzen</string>
+
+  <string name="till">bis</string>
+  <string name="trip_from">Ab</string>
+  <string name="trip_via">Via</string>
+  <string name="and">und</string>
+  <string name="add">Hinzufügen</string>
+  <string name="trip_added_to_calendar">Die Verbindung wurde erfolgreich zum Kalender hinzugefügt</string>
+  <string name="trip_added_to_calendar_failed">Die Verbindung konnte nicht zum Kalender hinzugefügt werden: %1$s</string>
+  <string name="cool">Super!</string>
+
+  <!-- Long form weekday names in German -->
+  <string name="monday_long">Montag</string>
+  <string name="tuesday_long">Dienstag</string>
+  <string name="wednesday_long">Mittwoch</string>
+  <string name="thursday_long">Donnerstag</string>
+  <string name="friday_long">Freitag</string>
+  <string name="saturday_long">Samstag</string>
+  <string name="sunday_long">Sonntag</string>
+
+  <!-- Short form weekday names in German -->
+  <string name="monday_short">Mo</string>
+  <string name="tuesday_short">Di</string>
+  <string name="wednesday_short">Mi</string>
+  <string name="thursday_short">Do</string>
+  <string name="friday_short">Fr</string>
+  <string name="saturday_short">Sa</string>
+  <string name="sunday_short">So</string>
 </resources>

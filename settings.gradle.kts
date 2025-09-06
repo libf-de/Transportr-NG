@@ -12,6 +12,7 @@ pluginManagement {
         }
         mavenCentral()
         gradlePluginPortal()
+        maven(url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev/"))
     }
 }
 
@@ -26,6 +27,7 @@ dependencyResolutionManagement {
         }
         mavenCentral()
         maven(url = uri("../public-transport-enabler-ktx/build/repo"))
+        maven(url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev/"))
     }
 }
 

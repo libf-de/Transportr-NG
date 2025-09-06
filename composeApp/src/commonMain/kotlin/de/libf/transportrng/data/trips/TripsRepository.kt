@@ -322,7 +322,7 @@ class TripsRepository(
 
     suspend fun toggleFavState() {
         val oldFavState = isFavTrip.value
-        if (uid == 0L || oldFavState == null) throw IllegalStateException()
+        if (uid == 0L) return
         searchesRepository.updateFavoriteState(uid, !oldFavState)
         _isFavTrip.value = !oldFavState
     }

@@ -7,7 +7,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 //import androidx.compose.ui.viewinterop.UIKitInteropInteractionMode
 //import androidx.compose.ui.viewinterop.UIKitInteropProperties
 import androidx.compose.ui.interop.UIKitView
@@ -17,18 +16,19 @@ import de.libf.ptek.dto.Point
 import de.libf.ptek.dto.PublicLeg
 import de.libf.ptek.dto.Trip
 import de.libf.transportrng.data.gps.filterByDistance
+import de.libf.transportrng.data.gps.filterByDistanceIgnoreZoom
 import de.libf.transportrng.data.locations.WrapLocation
 import de.libf.transportrng.data.maplibrecompat.LatLng
 import de.libf.transportrng.data.maplibrecompat.LatLngBounds
+import de.libf.transportrng.data.utils.formatTime
 import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExperimentalForeignApi
-import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.allocArray
 import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.useContents
-import kotlinx.cinterop.usePinned
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -36,17 +36,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
-import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.getDrawableResourceBytes
-import org.jetbrains.compose.resources.getSystemResourceEnvironment
+import org.jetbrains.compose.resources.getString
+import platform.CoreGraphics.CGBlendMode
+import platform.CoreGraphics.CGContextClipToMask
+import platform.CoreGraphics.CGContextFillRect
+import platform.CoreGraphics.CGContextSetBlendMode
+import platform.CoreGraphics.CGRectMake
 import platform.CoreLocation.CLLocationCoordinate2D
 import platform.CoreLocation.CLLocationCoordinate2DMake
-import platform.Foundation.NSData
-import platform.Foundation.dataWithBytes
 import platform.MapKit.MKAnnotationProtocol
 import platform.MapKit.MKAnnotationView
 import platform.MapKit.MKCoordinateRegionMake
@@ -56,7 +55,6 @@ import platform.MapKit.MKMapView
 import platform.MapKit.MKMapViewDelegateProtocol
 import platform.MapKit.MKOverlayProtocol
 import platform.MapKit.MKOverlayRenderer
-import platform.MapKit.MKPointAnnotation
 import platform.MapKit.MKPolyline
 import platform.MapKit.MKPolylineRenderer
 import platform.MapKit.addOverlay
@@ -65,14 +63,16 @@ import platform.MapKit.removeOverlays
 import platform.UIKit.UIColor
 import platform.UIKit.UIEdgeInsets
 import platform.UIKit.UIEdgeInsetsMake
+import platform.UIKit.UIGraphicsBeginImageContextWithOptions
+import platform.UIKit.UIGraphicsEndImageContext
+import platform.UIKit.UIGraphicsGetCurrentContext
+import platform.UIKit.UIGraphicsGetImageFromCurrentImageContext
 import platform.UIKit.UIImage
 import platform.darwin.NSObject
 import transportr_ng.composeapp.generated.resources.Res
-import transportr_ng.composeapp.generated.resources.ic_marker_trip_begin
-import transportr_ng.composeapp.generated.resources.ic_marker_trip_change
-import transportr_ng.composeapp.generated.resources.ic_marker_trip_end
-import transportr_ng.composeapp.generated.resources.ic_marker_trip_stop
-import transportr_ng.composeapp.generated.resources.ic_marker_trip_walk
+import transportr_ng.composeapp.generated.resources.trip_arr
+import transportr_ng.composeapp.generated.resources.trip_dep
+import kotlin.math.log2
 import kotlin.math.pow
 
 @OptIn(ExperimentalForeignApi::class)
@@ -81,15 +81,72 @@ class iOsMapViewState : MapViewStateInterface {
 
     internal var mapInset: MapPadding = MapPadding()
 
-    internal val iconMap: MutableMap<MarkerType, UIImage> = mutableMapOf()
+//    internal val iconMap: MutableMap<MarkerType, UIImage> = mutableMapOf()
+    internal val polylineColorMap: MutableMap<MKPolyline, Color> = mutableMapOf()
 
-    private val _currentMapCenter: MutableStateFlow<LatLng?> = MutableStateFlow(null)
-    override val currentMapCenter: Flow<LatLng?>
+    private val _currentMapCenter: MutableStateFlow<Pair<LatLng, Double>?> = MutableStateFlow(null)
+    @OptIn(FlowPreview::class)
+    override val currentMapCenter: Flow<Pair<LatLng, Double>?>
         get() = _currentMapCenter.asStateFlow()
             .debounce(2000)
-            .onEach { println("flow: ${it?.latitude}, ${it?.longitude}") }
-            .filterByDistance(2000.0)
+            .filterByDistanceIgnoreZoom(2000.0)
             .distinctUntilChanged()
+
+    private var departureText: String = ""
+    private var arrivalText: String = ""
+
+    private fun tintedImage(
+        imageName: String,
+        tint: Color,
+        mode: CGBlendMode = CGBlendMode.kCGBlendModeSourceAtop,
+        clip: Boolean = false
+    ): UIImage? {
+        val image = UIImage.imageNamed(imageName) ?: return null
+        val rect = image.size.useContents {
+            CGRectMake(0.0, 0.0, this.width, this.height)
+        }
+
+        UIGraphicsBeginImageContextWithOptions(image.size, false, image.scale)
+        val context = UIGraphicsGetCurrentContext() ?: return null
+
+        image.drawInRect(rect)
+
+        if(clip) CGContextClipToMask(context, rect, image.CGImage)
+
+        // Correct way to set blend mode in Core Graphics
+        CGContextSetBlendMode(context, mode)
+
+        tint.toUIColor().setFill()
+
+        CGContextFillRect(context, rect)
+
+//        CGContextClipToMask(context, rect, image.CGImage)
+
+        val newImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+
+        return newImage
+    }
+
+    private fun tintedFgBgImage(fgName: String, fgTint: Color, bgName: String, bgTint: Color): UIImage? {
+        val fgImage = tintedImage(fgName, fgTint) ?: return null
+        val bgImage = tintedImage(bgName, bgTint, CGBlendMode.kCGBlendModeMultiply, true) ?: return null
+
+        val rect = bgImage.size.useContents {
+            CGRectMake(0.0, 0.0, this.width, this.height)
+        }
+
+        UIGraphicsBeginImageContextWithOptions(bgImage.size, false, bgImage.scale)
+        val context = UIGraphicsGetCurrentContext() ?: return null
+
+        bgImage.drawInRect(rect)
+        fgImage.drawInRect(rect)
+
+        val newImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+
+        return newImage
+    }
 
     private val mapViewDelegate = object : NSObject(), MKMapViewDelegateProtocol {
         @Suppress("RETURN_TYPE_MISMATCH_ON_OVERRIDE")
@@ -98,7 +155,8 @@ class iOsMapViewState : MapViewStateInterface {
             println("overlays: ${mapView.overlays}")
             if(rendererForOverlay is MKPolyline) {
                 val renderer = MKPolylineRenderer(rendererForOverlay)
-                renderer.strokeColor = Color.Red.toUIColor()
+                val color = polylineColorMap[rendererForOverlay] ?: Color.Red
+                renderer.strokeColor = color.toUIColor()
                 renderer.lineWidth = 3.0
                 return renderer
             }
@@ -107,51 +165,74 @@ class iOsMapViewState : MapViewStateInterface {
             return MKOverlayRenderer(rendererForOverlay)
         }
 
-//        @Suppress("RETURN_TYPE_MISMATCH_ON_OVERRIDE")
-//        override fun mapView(
-//            mapView: MKMapView,
-//            viewForAnnotation: MKAnnotationProtocol
-//        ): MKAnnotationView? {
-//            if (viewForAnnotation !is MKPointAnnotation) return null
-//
-//            val reuseIdentifier = "CustomAnnotation"
-//            var annotationView = mapView.dequeueReusableAnnotationViewWithIdentifier(reuseIdentifier)
-//
-//            if (annotationView == null) {
-//                annotationView = MKAnnotationView(viewForAnnotation, reuseIdentifier)
-//                annotationView.canShowCallout = true
-//            } else {
-//                annotationView.annotation = viewForAnnotation
-//            }
-//
-//            // Load custom image from Compose Multiplatform resource
-//            annotationView.image = iconMap[MarkerType.CHANGE]
-//
-//            return annotationView
-//        }
+        @Suppress("RETURN_TYPE_MISMATCH_ON_OVERRIDE")
+        override fun mapView(
+            mapView: MKMapView,
+            viewForAnnotation: MKAnnotationProtocol
+        ): MKAnnotationView? {
+            return when(viewForAnnotation) {
+                is GenericStopAnnotation -> {
+                    (mapView.dequeueReusableAnnotationViewWithIdentifier("GenericStop")?.also {
+                        it.annotation = viewForAnnotation
+                    } ?: MKAnnotationView(viewForAnnotation, "GenericStop").also {
+                        it.canShowCallout = true
+                    }).also {
+                        it.image = UIImage.imageNamed("haltestelle")
+                            ?.imageWithTintColor(Color.Magenta.toUIColor())
+                    }
+                }
+
+                is TintableAnnotation -> {
+                    MKAnnotationView(viewForAnnotation, viewForAnnotation.hashCode().toString()).also {
+                        it.canShowCallout = true
+                    }.also {
+                        if(viewForAnnotation.fgColor == null) {
+                            it.image = tintedImage(
+                                viewForAnnotation.iconName,
+                                viewForAnnotation.bgColor ?: Color.Gray
+                            )
+                        } else {
+                            it.image = tintedFgBgImage(
+                                viewForAnnotation.iconName,
+                                viewForAnnotation.fgColor,
+                                TintableAnotationIcons.TRIP_BACKGROUND,
+                                viewForAnnotation.bgColor ?: Color.Gray
+                            )
+                        }
+
+//                        it.image = UIImage.imageNamed(viewForAnnotation.iconName).let {
+//                            if(viewForAnnotation.bgColor != null) it?.imageWithTintColor(viewForAnnotation.bgColor.toUIColor())
+//                            else it
+//                        }
+                    }
+                }
+
+                else -> null
+            }
+        }
 
         override fun mapViewDidChangeVisibleRegion(mapView: MKMapView) {
-//            super.mapViewDidChangeVisibleRegion(mapView)
-            this@iOsMapViewState._currentMapCenter.value = mapView.centerCoordinate.useContents {
-                LatLng(
-                    this.latitude,
-                    this.longitude
+            if(mapView.getOSMZoomLevel() >= 12) {
+                this@iOsMapViewState._currentMapCenter.value = Pair(
+                    mapView.centerCoordinate.useContents {
+                        LatLng(
+                            this.latitude,
+                            this.longitude
+                        )
+                    },
+                    mapView.getOSMZoomLevel()
                 )
             }
-            println(mapView.centerCoordinate.useContents { "${this.latitude}, ${this.longitude}" })
         }
     }
 
     fun setMapView(mapView: MKMapView) {
         println("Map view set")
 
-//        CoroutineScope(Dispatchers.IO).launch {
-//            MarkerType.entries.forEach {
-//                iconMap[it] = getMarkerIcon(it)
-//            }
-//        }
-
-
+        CoroutineScope(Dispatchers.IO).launch {
+            departureText = getString(Res.string.trip_dep)
+            arrivalText = getString(Res.string.trip_arr)
+        }
 
         this.mapView = mapView
         mapView.delegate = mapViewDelegate
@@ -163,7 +244,7 @@ class iOsMapViewState : MapViewStateInterface {
 
 
 
-    override suspend fun animateTo(latLng: LatLng?, zoom: Int) {
+    override suspend fun animateTo(latLng: LatLng?, zoom: Int, animate: Boolean) {
         if(latLng == null || mapView == null) return
         val coordinate = CLLocationCoordinate2DMake(latLng.latitude, latLng.longitude)
 
@@ -177,7 +258,7 @@ class iOsMapViewState : MapViewStateInterface {
         val span =  MKCoordinateSpanMake(latitudeDelta, latitudeDelta) // Assuming an equirectangular projection
 
         val region = MKCoordinateRegionMake(coordinate, span)
-        mapView?.setRegion(region, animated = true)
+        mapView?.setRegion(region, animated = animate)
     }
 
     override suspend fun zoomToBounds(latLngBounds: LatLngBounds?, animate: Boolean) {
@@ -267,7 +348,7 @@ class iOsMapViewState : MapViewStateInterface {
             // get colors
             val backgroundColor = leg.takeIf { it is PublicLeg }
                 ?.let { it as PublicLeg }
-                ?.line?.style?.backgroundColor ?: Color(0xFFFED21B)
+                ?.line?.style?.backgroundColor?.let(::Color) ?: Color(0xFFFED21B)
             val foregroundColor = Color.White
 
             memScoped {
@@ -284,6 +365,8 @@ class iOsMapViewState : MapViewStateInterface {
                         coordinatesPointer,
                         leg.size.toULong()
                     )
+
+                    polylineColorMap[polyline] = backgroundColor
 
                     mapView?.addOverlay(polyline)
                 } ?: leg.let { leg ->
@@ -303,6 +386,8 @@ class iOsMapViewState : MapViewStateInterface {
                         2.toULong()
                     )
 
+                    polylineColorMap[polyline] = backgroundColor
+
                     mapView?.addOverlay(polyline)
                 }
             }
@@ -311,14 +396,67 @@ class iOsMapViewState : MapViewStateInterface {
                 leg.intermediateStops?.forEach {
                     boundingCoords.add(Pair(it.location.latAsDouble, it.location.lonAsDouble))
 
+                    val text = "${arrivalText}: ${it.getArrivalTime()?.formatTime() ?: "unbekannt"}\n" +
+                            "${departureText}: ${it.getDepartureTime()?.formatTime() ?: "unbekannt"}"
+
                     mapView?.addAnnotation(
-                        MKPointAnnotation(
-                            CLLocationCoordinate2DMake(it.location.latAsDouble, it.location.lonAsDouble),
-                            it.location.uniqueShortName ?: "",
-                            ""
+                        TintableAnnotation(
+                            pLocation = it.location,
+                            pTitle = it.location.uniqueShortName,
+                            pSubtitle = text,
+                            fgColor = null,
+                            bgColor = backgroundColor,
+                            iconName = TintableAnotationIcons.TRIP_STOP
                         )
                     )
                 }
+
+                val icon: String
+                val text: String
+                if (i == 1 || i == 2 && trip.legs[0] !is PublicLeg) {
+                    icon = TintableAnotationIcons.TRIP_START
+                    text = "${departureText}: ${leg.departureTime.formatTime()}"
+                } else {
+                    icon = TintableAnotationIcons.TRIP_CHANGE
+                    text ="${arrivalText}: ${trip.legs.getOrNull(i-2)?.arrivalTime?.formatTime() ?: "unbekannt"}\n" +
+                        "${departureText}: ${leg.departureTime.formatTime()}"
+                }
+
+                mapView?.addAnnotation(
+                    TintableAnnotation(
+                        pLocation = leg.departure,
+                        pTitle = leg.departure.uniqueShortName,
+                        pSubtitle = text,
+                        iconName = icon,
+                        fgColor = foregroundColor,
+                        bgColor = backgroundColor
+                    )
+                )
+
+                if (i == trip.legs.size || i == trip.legs.size - 1 && trip.legs[i] !is PublicLeg) {
+                    mapView?.addAnnotation(
+                        TintableAnnotation(
+                            pLocation = leg.arrival,
+                            pTitle = leg.arrival.uniqueShortName,
+                            pSubtitle = "${arrivalText}: ${leg.arrivalTime.formatTime()}",
+                            iconName = TintableAnotationIcons.TRIP_END,
+                            fgColor = foregroundColor,
+                            bgColor = backgroundColor
+                        )
+                    )
+                }
+            } else if (i > 1 && i < trip.legs.size) {
+                // only draw an icon if walk is required in the middle of a trip?
+                mapView?.addAnnotation(
+                    TintableAnnotation(
+                        pLocation = leg.departure,
+                        pTitle = leg.departure.uniqueShortName,
+                        pSubtitle = "${arrivalText}: ${leg.arrivalTime.formatTime()}",
+                        iconName = TintableAnotationIcons.WALK,
+                        fgColor = foregroundColor,
+                        bgColor = backgroundColor
+                    )
+                )
             }
             i += 1
         }
@@ -343,16 +481,22 @@ class iOsMapViewState : MapViewStateInterface {
 
     override suspend fun showUserLocation(enabled: Boolean, userLocation: Point?) {
         mapView?.showsUserLocation = enabled
+
+        animateTo(userLocation?.let { LatLng(it.lat, it.lon) }, 14)
     }
 
     override suspend fun drawNearbyStations(nearbyStations: List<Location>) {
         nearbyStations.forEach {
             mapView?.addAnnotation(
-                MKPointAnnotation(
-                    CLLocationCoordinate2DMake(it.latAsDouble, it.lonAsDouble),
-                    it.uniqueShortName ?: "",
-                    ""
+                GenericStopAnnotation(
+                    it,
+                    it.uniqueShortName
                 )
+//                MKPointAnnotation(
+//                    CLLocationCoordinate2DMake(it.latAsDouble, it.lonAsDouble),
+//                    it.uniqueShortName ?: "",
+//                    ""
+//                )
             )
         }
     }
@@ -363,32 +507,33 @@ class iOsMapViewState : MapViewStateInterface {
         }
     }
 
-    @OptIn(ExperimentalResourceApi::class)
-    private suspend fun getMarkerIcon(
-        type: MarkerType,
-        backgroundColor: Color = Color.Unspecified,
-        foregroundColor: Color = Color.Unspecified
-    ): UIImage {
-        return when(type) {
-            MarkerType.STOP -> Res.drawable.ic_marker_trip_stop
-            MarkerType.GENERIC_STOP -> Res.drawable.ic_marker_trip_stop // TODO
-            MarkerType.BEGIN -> Res.drawable.ic_marker_trip_begin
-            MarkerType.CHANGE -> Res.drawable.ic_marker_trip_change
-            MarkerType.END -> Res.drawable.ic_marker_trip_end
-            MarkerType.WALK -> Res.drawable.ic_marker_trip_walk
-        }.let {
-            val bytes: ByteArray = getDrawableResourceBytes(
-                getSystemResourceEnvironment(),
-                it
-            )
-
-            val nsData = bytes.usePinned { pinnedBytes ->
-                NSData.dataWithBytes(pinnedBytes.addressOf(0), bytes.size.toULong())
-            }
-
-            UIImage.imageWithData(nsData)
-        } ?: throw RuntimeException()
-    }
+//    @OptIn(ExperimentalResourceApi::class)
+//    private suspend fun getMarkerIcon(
+//        type: MarkerType,
+//        backgroundColor: Color = Color.Unspecified,
+//        foregroundColor: Color = Color.Unspecified
+//    ): UIImage {
+//        return when(type) {
+////            MarkerType.STOP -> Res.drawable.ic_marker_trip_stop
+////            MarkerType.GENERIC_STOP -> Res.drawable.ic_marker_trip_stop // TODO
+////            MarkerType.BEGIN -> Res.drawable.ic_marker_trip_begin
+////            MarkerType.CHANGE -> Res.drawable.ic_marker_trip_change
+////            MarkerType.END -> Res.drawable.ic_marker_trip_end
+////            MarkerType.WALK -> Res.drawable.ic_marker_trip_walk
+//            else -> Res.drawable.haltestelle
+//        }.let {
+//            val bytes: ByteArray = getDrawableResourceBytes(
+//                getSystemResourceEnvironment(),
+//                it
+//            )
+//
+//            val nsData = bytes.usePinned { pinnedBytes ->
+//                NSData.dataWithBytes(pinnedBytes.addressOf(0), bytes.size.toULong())
+//            }
+//
+//            UIImage.imageWithData(nsData)
+//        } ?: throw RuntimeException()
+//    }
 
 }
 
@@ -505,3 +650,31 @@ fun UIKitMapView(
 fun Color.toUIColor(): UIColor {
     return UIColor(red = this.red.toDouble(), green = this.green.toDouble(), blue = this.blue.toDouble(), alpha = this.alpha.toDouble())
 }
+
+@OptIn(ExperimentalForeignApi::class)
+fun MKMapView.getOSMZoomLevel(): Double {
+    val longitudeDelta = region.useContents { this.span.longitudeDelta }
+
+    // Calculate the OSM zoom level
+    val zoomLevel = log2(360.0 / longitudeDelta)
+
+    // Clamp the zoom level between 0 and 18.79543
+    return zoomLevel
+        .coerceIn(0.0, 18.79543)
+}
+
+//fun MKMapView.getOSMZoomLevel(): Float {
+//    val camera = camera
+//    val altitude = camera.altitude
+//
+//    // Constants for Earth's radius and OSM zoom level at the equator
+//    val earthRadius = 6371000.0 // in meters
+//    val osmZoom0Altitude = 2.0 * PI * earthRadius
+//
+//    // Calculate the OSM zoom level
+//    val zoomLevel = log2(osmZoom0Altitude / altitude)
+//
+//    return zoomLevel.let {
+//        zoomLevel * (19.24/20.0)
+//    }.coerceIn(0.0, 20.0).toFloat()
+//}

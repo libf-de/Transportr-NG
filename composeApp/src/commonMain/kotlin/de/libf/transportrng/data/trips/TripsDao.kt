@@ -145,6 +145,12 @@ interface TripsDao {
         val from: GenericLocation?,
 
         @Relation(
+            parentColumn = "viaId",
+            entityColumn = "id"
+        )
+        val via: GenericLocation?,
+
+        @Relation(
             parentColumn = "toId",
             entityColumn = "id"
         )
@@ -154,6 +160,7 @@ interface TripsDao {
             return Trip(
                 id = trip.id,
                 from = from!!.toLocation(),
+                via = via?.toLocation(),
                 to = to!!.toLocation(),
                 legs = legs.map {
                     if(it.tripLeg.isPublicLeg) {

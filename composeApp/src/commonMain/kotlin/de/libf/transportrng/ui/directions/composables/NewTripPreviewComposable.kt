@@ -76,7 +76,7 @@ import transportr_ng.composeapp.generated.resources.Res
 import transportr_ng.composeapp.generated.resources.ic_walk
 import kotlin.math.max
 
-private val Leg.line: Line?
+val Leg.line: Line?
     get() = if(this is PublicLeg) this.line else null
 
 data class LegPosition(
@@ -163,13 +163,6 @@ private fun computeLegPositions(textMeasurer: TextMeasurer, lblStyle: TextStyle,
             index += 1
         }
     }
-//    return legWidths.entries.mapIndexed { index, mutableEntry ->
-//        val curWidth = mutableEntry.value.second
-//        LegPosition(currentPos, curWidth, mutableEntry.value.first, mutableEntry.key.hashCode()).also {
-//            currentPos += curWidth
-//            if(index < spacers.size) currentPos += spacers[index]
-//        }
-//    }
 }
 
 @Composable
@@ -193,7 +186,7 @@ fun NewTripPreviewComposable(
         departureDelay = departureData.second
         departureName = trip.from.getName() ?: "???"
 
-        duration = formatDuration(trip.duration) ?: ""
+        duration = trip.duration.formatDuration() ?: ""
         price = trip.getStandardFare() ?: ""
         warning = trip.hasProblem()
 
@@ -300,7 +293,7 @@ fun NewTripPreviewComposable(
     }
 }
 
-private fun Leg?.colorOr(alt: Color): Color {
+fun Leg?.colorOr(alt: Color): Color {
     if(this == null) return alt
     return this.line?.style?.backgroundColor?.let(::Color) ?: alt
 }
@@ -327,7 +320,7 @@ fun NewTripPreviewComposableLegacy(
         departureDelay = departureData.second
         departureName = trip.from.getName() ?: "???"
 
-        duration = formatDuration(trip.duration) ?: ""
+        duration = trip.duration.formatDuration() ?: ""
         price = trip.getStandardFare() ?: ""
         warning = trip.hasProblem()
 
@@ -568,7 +561,7 @@ enum class SegmentPos {
     LAST
 }
 
-fun DrawScope.aSegment(
+private fun DrawScope.aSegment(
     width: Float,
     color: Color,
     whichSegment: SegmentPos,

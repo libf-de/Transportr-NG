@@ -33,6 +33,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
@@ -432,7 +433,7 @@ fun LocationInputField(
         DropdownMenu(
             expanded = !suggestions.isNullOrEmpty(),
             onDismissRequest = { showSuggestions = false },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().heightIn(max = 300.dp),
             // This line here will accomplish what you want
             properties = PopupProperties(focusable = false)
         ) {

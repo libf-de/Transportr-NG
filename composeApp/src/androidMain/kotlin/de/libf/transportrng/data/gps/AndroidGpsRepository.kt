@@ -11,15 +11,14 @@ import de.libf.ptek.dto.Point
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.launch
 
 
 class AndroidGpsRepository(private val context: Context) : GpsRepository {
 
-    @Volatile
-    private var isEnabledInternal = true // Enabled by default
+    private val isEnabledInternal = MutableStateFlow(true)
 
-    override val isEnabled: Boolean
-        get() = isEnabledInternal
+    override val isEnabled: StateFlow<Boolean> = isEnabledInternal.asStateFlow()
 
     private val locationManager =
         context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -63,38 +62,60 @@ class AndroidGpsRepository(private val context: Context) : GpsRepository {
             }
         }
 
-        try {
-            // Start requesting location updates
-            locationManager.requestLocationUpdates(
-                LocationManager.GPS_PROVIDER,
-                MIN_TIME_BW_UPDATES,
-                MIN_DISTANCE_CHANGE_FOR_UPDATES,
-                locationListener
-            )
+        fun start() {
+            try {
+                // Start requesting location updates
+                locationManager.requestLocationUpdates(
+                    LocationManager.GPS_PROVIDER,
+                    MIN_TIME_BW_UPDATES,
+                    MIN_DISTANCE_CHANGE_FOR_UPDATES,
+                    locationListener
+                )
 
-            // Emit the last known location if available
-            val lastKnownLocation =
-                locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-            if (lastKnownLocation != null) {
-                val point = Point.fromDouble(
-                    lastKnownLocation.latitude,
-                    lastKnownLocation.longitude
-                )
-                val gpsState = GpsState.Enabled(
-                    location = point,
-                    isAccurate = isLocationAccurate(lastKnownLocation)
-                )
-                trySend(gpsState)
-            } else {
-                // If no last known location, indicate that we're searching
-                trySend(GpsState.EnabledSearching)
+                // Emit the last known location if available
+                val lastKnownLocation =
+                    locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+                if (lastKnownLocation != null) {
+                    val point = Point.fromDouble(
+                        lastKnownLocation.latitude,
+                        lastKnownLocation.longitude
+                    )
+                    val gpsState = GpsState.Enabled(
+                        location = point,
+                        isAccurate = isLocationAccurate(lastKnownLocation)
+                    )
+                    trySend(gpsState)
+                } else {
+                    // If no last known location, indicate that we're searching
+                    trySend(GpsState.EnabledSearching)
+                }
+            } catch (e: SecurityException) {
+                trySend(GpsState.Denied)
+                close() // Terminate the flow since we cannot proceed without permissions
+                return
+            } catch (e: Exception) {
+                trySend(GpsState.Error(e.message ?: "Error obtaining location"))
             }
-        } catch (e: SecurityException) {
-            trySend(GpsState.Denied)
-            close() // Terminate the flow since we cannot proceed without permissions
-            return@callbackFlow
-        } catch (e: Exception) {
-            trySend(GpsState.Error(e.message ?: "Error obtaining location"))
+        }
+
+        fun stop() {
+            locationManager.removeUpdates(locationListener)
+            trySend(GpsState.Disabled)
+        }
+
+        // Initial start of location updates if isEnabled is true
+        if (isEnabled.value) {
+            start()
+        } else {
+            trySend(GpsState.Disabled)
+        }
+
+        launch {
+            isEnabled
+                .collect { enabled ->
+                    if(enabled) start()
+                    else stop()
+                }
         }
 
         // Await until the flow is closed (i.e., when the consumer cancels the flow)
@@ -111,7 +132,7 @@ class AndroidGpsRepository(private val context: Context) : GpsRepository {
         // Since the repository is enabled by default and starts/stops based on flow collection,
         // this function can control an internal flag if needed.
         // We'll update the internal state but actual start/stop is managed by flow collection.
-        isEnabledInternal = enabled
+        isEnabledInternal.value = enabled
     }
 
     private fun hasLocationPermission(): Boolean {

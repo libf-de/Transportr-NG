@@ -31,6 +31,7 @@ import de.libf.ptek.NetworkId
     tableName = "trips",
     foreignKeys = [
         ForeignKey(entity = GenericLocation::class, parentColumns = ["uid"], childColumns = ["fromId"], onDelete = ForeignKey.CASCADE),
+        ForeignKey(entity = GenericLocation::class, parentColumns = ["uid"], childColumns = ["viaId"], onDelete = ForeignKey.CASCADE),
         ForeignKey(entity = GenericLocation::class, parentColumns = ["uid"], childColumns = ["toId"], onDelete = ForeignKey.CASCADE)
     ],
     indices = [
@@ -44,6 +45,7 @@ data class TripEntity(
     @PrimaryKey val uid: Long,
     val id: String,
     @ColumnInfo(name = "fromId") val fromId: Long,
+    @ColumnInfo(name = "viaId") val viaId: Long? = null,
     @ColumnInfo(name = "toId") val toId: Long,
     val capacity: List<Int>,
     val changes: Int,

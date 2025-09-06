@@ -21,14 +21,12 @@ package de.grobox.transportr.ui.trips
 
 import de.libf.ptek.dto.Product
 import de.libf.transportrng.data.locations.WrapLocation
+import kotlinx.serialization.Serializable
 
-class TripQuery internal constructor(
+@Serializable
+data class TripQuery internal constructor(
     val from: WrapLocation, val via: WrapLocation?, val to: WrapLocation,
     val date: Long,
-    departure: Boolean?,
-    products: Set<Product>?) {
-
-    val departure = departure != false
-    val products: Set<Product> = products ?: Product.ALL
-
-}
+    val departure: Boolean,
+    val products: Set<Product> = Product.ALL
+)

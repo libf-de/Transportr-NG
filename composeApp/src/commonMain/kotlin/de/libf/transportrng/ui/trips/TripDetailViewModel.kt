@@ -21,12 +21,15 @@ package de.libf.transportrng.ui.trips
 
 
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import de.grobox.transportr.networks.TransportNetworkManager
 import de.grobox.transportr.networks.TransportNetworkViewModel
 import de.libf.transportrng.data.settings.SettingsManager
 import de.grobox.transportr.ui.trips.TripQuery
 import de.grobox.transportr.ui.trips.detail.reload
+import de.grobox.transportr.ui.trips.detail.reloadTrip
 import de.libf.ptek.dto.Leg
+import de.libf.ptek.dto.Product
 import de.libf.ptek.dto.Trip
 import de.libf.transportrng.data.PlatformTool
 import de.libf.transportrng.data.gps.GpsRepository
@@ -41,6 +44,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import de.libf.transportrng.data.locations.WrapLocation
+import de.libf.transportrng.data.utils.toShareString
+import nl.adaptivity.xmlutil.core.impl.multiplatform.assert
 import org.jetbrains.compose.resources.getString
 import transportr_ng.composeapp.generated.resources.Res
 import transportr_ng.composeapp.generated.resources.error_trip_refresh_failed
@@ -57,32 +62,50 @@ class TripDetailViewModel internal constructor(
         BOTTOM, MIDDLE, EXPANDED
     }
 
-    private val _trip = MutableStateFlow<Trip?>(null)
-    val trip = _trip.asStateFlow()
+    private val _uiState = MutableStateFlow<TripDetailState>(TripDetailState.Loading)
+    val uiState = _uiState.asStateFlow()
 
-    private val _zoomLeg = MutableSharedFlow<LatLngBounds>(extraBufferCapacity = 1)
-    val zoomLeg = _zoomLeg.asSharedFlow()
-    private val _zoomLocation = MutableSharedFlow<LatLng>(extraBufferCapacity = 1)
-    val zoomLocation = _zoomLocation.asSharedFlow()
+//    private val _trip = MutableStateFlow<Trip?>(null)
+//    val trip = _trip.asStateFlow()
+//
+//    private val _zoomLeg = MutableSharedFlow<LatLngBounds>(extraBufferCapacity = 1)
+//    val zoomLeg = _zoomLeg.asSharedFlow()
+//    private val _zoomLocation = MutableSharedFlow<LatLng>(extraBufferCapacity = 1)
+//    val zoomLocation = _zoomLocation.asSharedFlow()
 
-
-    private val _tripReloadError = MutableSharedFlow<String?>(extraBufferCapacity = 1)
-    val tripReloadError = _tripReloadError.asSharedFlow()
-//    val tripReloadError = SingleLiveEvent<String>()
-    val sheetState = MutableStateFlow<SheetState>(SheetState.MIDDLE)
+//    private val _tripReloadError = MutableSharedFlow<String?>(extraBufferCapacity = 1)
+//    val tripReloadError = _tripReloadError.asSharedFlow()
     val isFreshStart = MutableStateFlow<Boolean>(true)
     var from: WrapLocation? = null
     var via: WrapLocation? = null
     var to: WrapLocation? = null
+
+    fun shareTrip(trip: Trip) {
+        viewModelScope.launch {
+            platformTool.shareText(
+                trip.toShareString()
+            )
+        }
+    }
+
+    fun addTripToCalendar(trip: Trip, callback: (String?) -> Unit) {
+        viewModelScope.launch {
+            callback(platformTool.addToCalendar(trip))
+        }
+    }
 
     fun setZoomLeg(leg: Leg) {
         if(leg.path.size < 2) return
 
         viewModelScope.launch {
             val latLngs = leg.path.map { LatLng(it.lat, it.lon) }
-            _zoomLeg.emit(
-                LatLngBounds.Builder().includes(latLngs).build()
-            )
+
+            _uiState.value.getTripOrNull()?.let { trip ->
+                _uiState.value = TripDetailState.DisplayingLeg(
+                    trip,
+                    LatLngBounds.Builder().includes(latLngs).build()
+                )
+            }
         }
 
     }
@@ -98,37 +121,39 @@ class TripDetailViewModel internal constructor(
         return settingsManager.showWhenLocked()
     }
 
-    fun getTripById(id: String) {
+    fun getTripById(id: String, tripQuery: TripQuery) {
         viewModelScope.launch {
-            _trip.value = tripsRepository.findTripById(id)
+            tripsRepository.findTripById(id)?.also {
+                from = WrapLocation(it.from)
+                it.via?.let { via = WrapLocation(it) }
+                to = WrapLocation(it.to)
+            }?.let { _uiState.value = TripDetailState.DisplayingWholeTrip(it) }
+            ?: run { reloadTrip(tripQuery) }
         }
     }
 
-    fun setTrip(trip: Trip) {
-        this._trip.value = trip
-    }
-
-
-
-    fun reloadTrip() {
+    fun reloadTrip(tripQuery: TripQuery) {
         viewModelScope.launch {
-            val network = transportNetwork.value ?: throw IllegalStateException()
+            transportNetwork.value?.let { network ->
+                val errorString = getString(Res.string.error_trip_refresh_failed)
 
-            val oldTrip = _trip.value ?: throw IllegalStateException()
-
-            if (from == null || to == null) throw IllegalStateException()
-
-            val errorString = getString(Res.string.error_trip_refresh_failed)
-            val query = TripQuery(from!!, via, to!!, oldTrip.firstDepartureTime!!, true, oldTrip.products)
-
-            val reloadError = _trip.reload(
-                networkProvider = network.networkProvider,
-                settingsManager = settingsManager,
-                query = query,
-                errorString = errorString
-            )
-
-            _tripReloadError.emit(reloadError)
+                _uiState.value
+                    .getTripOrNull()
+                    .reloadTrip(
+                        networkProvider = network.networkProvider,
+                        settingsManager = settingsManager,
+                        query = tripQuery,
+                        errorString = errorString
+                    ).onFailure { error ->
+                        _uiState.value = _uiState.value.getReloadFailedState(error)
+                    }.onSuccess {
+                        _uiState.value = _uiState.value.updateTrip(it)
+                    }
+            } ?: run {
+                _uiState.value = _uiState.value.getReloadFailedState(
+                    Exception("Transport network is null")
+                )
+            }
         }
     }
 

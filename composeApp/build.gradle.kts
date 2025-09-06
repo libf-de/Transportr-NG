@@ -31,8 +31,15 @@ kotlin {
             isStatic = true
         }
     }
+
+    jvm("desktop"){
+        compilations.all {
+            kotlinOptions.jvmTarget = "11"
+        }
+    }
     
     sourceSets {
+        val desktopMain by getting
         
         androidMain.dependencies {
             implementation(compose.preview)
@@ -42,6 +49,11 @@ kotlin {
             implementation(libs.maplibre.android.annotation)
             implementation(libs.material)
             implementation(libs.androidx.splashscreen)
+        }
+
+        desktopMain.dependencies {
+            implementation(compose.desktop.currentOs)
+            implementation(libs.ktor.client.java)
         }
 
         commonMain.dependencies {
@@ -80,6 +92,9 @@ kotlin {
             implementation(libs.ktor.client.cio)
             implementation(libs.ktor.client.json)
 
+//            implementation(libs.datetime.picker)
+//            implementation("io.github.epicarchitect:calendar-compose-datepicker:1.0.5") // includes pager + ranges
+
             implementation(libs.xmlutil)
         }
 
@@ -110,7 +125,7 @@ android {
         }
     }
     buildTypes {
-        getByName("release") {
+        release {
             isMinifyEnabled = false
         }
     }
@@ -123,6 +138,18 @@ android {
     }
     dependencies {
         debugImplementation(compose.uiTooling)
+    }
+}
+
+compose.desktop {
+    application {
+        mainClass = "MainKt"
+
+        nativeDistributions {
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            packageName = "de.libf.transportrng"
+            packageVersion = "1.0.0"
+        }
     }
 }
 

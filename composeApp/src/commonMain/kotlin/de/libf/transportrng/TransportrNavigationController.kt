@@ -20,6 +20,7 @@
 package de.libf.transportrng
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -36,6 +37,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import de.grobox.transportr.networks.TransportNetworkManager
+import de.grobox.transportr.ui.trips.TripQuery
+import de.libf.ptek.dto.Location
 import de.libf.ptek.dto.Trip
 import de.libf.transportrng.data.favorites.FavoriteTripType
 import de.libf.transportrng.ui.directions.DirectionsScreen
@@ -129,7 +132,10 @@ sealed class Routes {
     object TransportNetworkSelector
 
     @Serializable
-    data class TripDetail(val tripId: String)
+    data class TripDetail(
+        val tripId: String,
+        val query: TripQuery
+    )
 }
 
 @Composable
@@ -144,7 +150,7 @@ fun TransportrNavigationController(
     NavHost(
         navController = navController,
         startDestination = if(hasTransportNetwork) Routes.Map() else Routes.TransportNetworkSelector,
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize().imePadding()
     ) {
         composable<Routes.Map>(
             typeMap = mapOf(typeOf<WrapLocation?>() to protobufNavType<WrapLocation?>())
@@ -179,7 +185,15 @@ fun TransportrNavigationController(
                 tripClicked = { trip ->
                     navController.navigate(
                         Routes.TripDetail(
-                            tripId = trip.id
+                            tripId = trip.id,
+                            query = TripQuery(
+                                trip.from.let(::WrapLocation),
+                                trip.via?.let(::WrapLocation),
+                                trip.to.let(::WrapLocation),
+                                trip.firstDepartureTime,
+                                true,
+                                trip.products
+                            )
                         )
                     )
                 }
@@ -196,13 +210,14 @@ fun TransportrNavigationController(
         }
 
         composable<Routes.TripDetail>(
-            typeMap = mapOf(typeOf<Trip>() to protobufNavType<Trip>())
+            typeMap = mapOf(typeOf<TripQuery>() to protobufNavType<TripQuery>())
         ) {
             val params = it.toRoute<Routes.TripDetail>()
             TripDetailScreen(
                 viewModel = koinViewModel(),
                 navController = navController,
                 tripId = params.tripId,
+                tripQuery = params.query,
                 setBarColor = { _, _ -> }
             )
         }

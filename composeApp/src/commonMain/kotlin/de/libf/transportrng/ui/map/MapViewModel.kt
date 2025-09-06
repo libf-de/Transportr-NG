@@ -29,28 +29,21 @@ import de.libf.ptek.dto.NearbyLocationsResult
 import de.libf.ptek.dto.QueryDeparturesResult
 import de.libf.transportrng.data.favorites.FavoriteTripItem
 import de.libf.transportrng.data.gps.GpsRepository
-import de.libf.transportrng.data.gps.GpsState
 import de.libf.transportrng.data.locations.LocationRepository
 import de.libf.transportrng.data.maplibrecompat.LatLng
 import de.libf.transportrng.data.maplibrecompat.LatLngBounds
 import de.libf.transportrng.data.searches.SearchesRepository
-import de.libf.transportrng.ui.departures.MAX_DEPARTURES
 import de.libf.transportrngocations.CombinedSuggestionRepository
 import de.libf.transportrng.data.locations.WrapLocation
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
+import de.libf.transportrng.data.settings.SettingsManager
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.lastOrNull
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import kotlin.reflect.KClass
 
@@ -60,7 +53,15 @@ class MapViewModel internal constructor(
     searchesRepository: SearchesRepository,
     override val gpsRepository: GpsRepository,
     private val combinedSuggestionRepository: CombinedSuggestionRepository,
+    private val settingsMgr: SettingsManager
 ) : SavedSearchesViewModel(transportNetworkManager, locationRepository, searchesRepository), GpsMapViewModel by GpsMapViewModelImpl(gpsRepository) {
+
+    val lastMapCenter: Pair<LatLng, Double>?
+        get() = settingsMgr.lastMapLocation
+
+    fun storeMapCenter(latLng: LatLng, zoom: Double) {
+        settingsMgr.lastMapLocation = Pair(latLng, zoom)
+    }
 
 //    private val peekHeight = MutableStateFlow<Int>()
     private val selectedLocationClicked = MutableStateFlow<LatLng?>(null)
@@ -77,30 +78,6 @@ class MapViewModel internal constructor(
     private var nearbyStationsJob: Job? = null
     private val _nearbyStationsState = MutableStateFlow<NearbyLocationsState?>(null)
     val nearbyStations = _nearbyStationsState.asStateFlow()
-
-//    val mapClicked = SingleLiveEvent<Void>()
-//    val markerClicked = SingleLiveEvent<Void>()
-    val liveBounds: Flow<LatLngBounds?> = locations.map { input ->
-        val points = input
-            .filter { it.hasLocation() }
-            .map { it.latLng }
-            .toMutableSet()
-        home.lastOrNull()?.let { if (it.hasLocation()) points.add(it.latLng) }
-        work.lastOrNull()?.let { if (it.hasLocation()) points.add(it.latLng) }
-
-        gpsRepository.getGpsStateFlow()
-            .filter { it is GpsState.Enabled }
-            .map { (it as GpsState.Enabled).location }
-            .lastOrNull()
-            ?.let { points.add(LatLng(it.lat, it.lon)) }
-
-        if (points.size < 2) {
-            null
-        } else {
-            LatLngBounds.Builder().includes(ArrayList(points)).build()
-        }
-    }
-    var transportNetworkWasChanged = false
 
     val locationSuggestions = combinedSuggestionRepository.suggestions
     val suggestionsLoading = combinedSuggestionRepository.isLoading
@@ -144,12 +121,12 @@ class MapViewModel internal constructor(
                 ?.networkProvider
                 ?.queryDepartures(location.id!!,
                                     Clock.System.now().toEpochMilliseconds(),
-                                    MAX_DEPARTURES,
+                                    24,
                                     false)
                 ?.takeIf { it.status == QueryDeparturesResult.Status.OK }
                 ?.let { dep ->
                     dep.stationDepartures
-                        .flatMap { it.lines ?: emptyList() }
+                        .flatMap { it.lines }
                         .map { it.line }
                 }
 

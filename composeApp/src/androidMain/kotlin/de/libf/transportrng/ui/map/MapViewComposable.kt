@@ -46,7 +46,6 @@ import androidx.core.graphics.drawable.toBitmap
 import com.google.android.material.color.MaterialColors
 import com.google.gson.JsonParser
 import com.google.gson.JsonPrimitive
-import com.mapbox.android.gestures.StandardScaleGestureDetector
 import de.grobox.transportr.map.NearbyStationsDrawer
 import de.libf.ptek.dto.Leg
 import de.libf.ptek.dto.Location
@@ -54,10 +53,11 @@ import de.libf.ptek.dto.Point
 import de.libf.ptek.dto.PublicLeg
 import de.libf.ptek.dto.Stop
 import de.libf.ptek.dto.Trip
-import de.libf.ptek.util.LocationUtils
 import de.libf.transportrng.R
 import de.libf.transportrng.data.gps.filterByDistance
+import de.libf.transportrng.data.gps.filterByDistanceIgnoreZoom
 import de.libf.transportrng.data.locations.WrapLocation
+import de.libf.transportrng.data.utils.formatTime
 import de.libf.transportrng.ui.map.drawable.createSpeechBubbleDrawable
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
@@ -66,8 +66,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withTimeout
 import kotlinx.datetime.Instant
@@ -84,7 +82,6 @@ import org.maplibre.android.location.engine.LocationEngineRequest
 import org.maplibre.android.location.modes.CameraMode
 import org.maplibre.android.maps.MapLibreMap
 import org.maplibre.android.maps.MapLibreMap.OnCameraMoveListener
-import org.maplibre.android.maps.MapLibreMap.OnScaleListener
 import org.maplibre.android.maps.MapLibreMapOptions
 import org.maplibre.android.maps.MapView
 import org.maplibre.android.maps.Style
@@ -98,7 +95,6 @@ import org.maplibre.android.style.expressions.Expression
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlin.math.abs
-import kotlin.math.min
 
 
 // Returns the Jawg url depending on the style given (jawg-streets by default)
@@ -293,6 +289,7 @@ private fun Symbol.near(other: LatLng): Boolean {
 class MapViewState : MapViewStateInterface {
     protected var context: Context? = null
     protected var mapView: MapView? = null
+    private var drawnTrip: Trip? = null
     var mapPadding: Int = 0
     internal var mapInset: MapPadding = MapPadding()
     internal var onMapStyleLoaded: (style: Style, map: MapLibreMap) -> Unit = { _, _ -> }
@@ -308,17 +305,20 @@ class MapViewState : MapViewStateInterface {
     internal val genericStopIconName = "GenericStop"
     private val stops: MutableMap<Int, Location> = mutableMapOf()
 
-    private val _currentMapCenter: MutableStateFlow<LatLng?> = MutableStateFlow(null)
-    override val currentMapCenter = _currentMapCenter.asStateFlow()
+    private val _currentMapCenter: MutableStateFlow<Pair<LatLng, Double>?> = MutableStateFlow(null)
+    override val currentMapCenter: Flow<Pair<de.libf.transportrng.data.maplibrecompat.LatLng, Double>?> =
+        _currentMapCenter.asStateFlow()
         .debounce(2000)
         .map {
             it?.let {
-                de.libf.transportrng.data.maplibrecompat.LatLng(
-                    it.latitude, it.longitude, it.altitude
+                Pair(
+                    de.libf.transportrng.data.maplibrecompat.LatLng(
+                        it.first.latitude, it.first.longitude, it.first.altitude
+                    ), it.second
                 )
             }
         }
-        .filterByDistance(2000.0)
+        .filterByDistanceIgnoreZoom(2000.0)
         .distinctUntilChanged()
 
     internal val onCameraMove = OnCameraMoveListener {
@@ -326,7 +326,9 @@ class MapViewState : MapViewStateInterface {
             if(map.cameraPosition.zoom > 12) {
                 symbolManager?.setFilter(Expression.neq(Expression.literal(""), ""))
 
-                _currentMapCenter.value = map.cameraPosition.target
+                _currentMapCenter.value = map.cameraPosition.target?.let {
+                    Pair(it, map.cameraPosition.zoom)
+                }
             } else {
                 symbolManager?.setFilter(Expression.eq(Expression.literal(""), ""))
             }
@@ -431,12 +433,28 @@ class MapViewState : MapViewStateInterface {
         this.onMapStyleLoaded = onMapStyleLoaded
     }
 
-    override suspend fun animateTo(latLng: de.libf.transportrng.data.maplibrecompat.LatLng?, zoom: Int) {
-        return animateTo(latLng?.toLatLng(), zoom)
+    override suspend fun animateTo(
+        latLng: de.libf.transportrng.data.maplibrecompat.LatLng?,
+        zoom: Int,
+        animate: Boolean
+    ) {
+        return animateTo(latLng?.toLatLng(), zoom, animate)
     }
 
-    fun animateTo(latLng: LatLng?, zoom: Int) {
+    suspend fun animateTo(latLng: LatLng?, zoom: Int, animate: Boolean = true) {
         if (latLng == null) return
+
+        if(mapView == null) {
+            withTimeout(5000L) {
+                while (mapView == null) {
+                    delay(500L)
+                }
+                true
+            }
+
+            delay(500L)
+        }
+
         mapView?.getMapAsync { map ->
             val padding = mapInset + mapPadding
             map.moveCamera(
@@ -451,11 +469,19 @@ class MapViewState : MapViewStateInterface {
                 latLng,
                 zoom.toDouble()
             ) else CameraUpdateFactory.newLatLng(latLng)
-            map.easeCamera(update, 1500)
+            
+            map.easeCamera(update, if(animate) 1500 else 10)
         }
     }
 
     override suspend fun zoomToBounds(latLngBounds: de.libf.transportrng.data.maplibrecompat.LatLngBounds?, animate: Boolean) {
+        withTimeout(5000L) {
+            while (mapView == null) {
+                delay(500L)
+            }
+            true
+        }
+
         return _zoomToBounds(latLngBounds?.toLatLngBounds(), animate)
     }
 
@@ -512,6 +538,9 @@ class MapViewState : MapViewStateInterface {
     @OptIn(ExperimentalStdlibApi::class)
     override suspend fun drawTrip(trip: Trip?, shouldZoom: Boolean): Boolean {
         if (trip == null) return false
+        if (trip == drawnTrip) return true
+
+        drawnTrip = trip
 
         withTimeout(5000L) {
             while (symbolManager == null) {
@@ -657,13 +686,19 @@ class MapViewState : MapViewStateInterface {
                         }
 
                         map.locationComponent.isLocationComponentEnabled = true
-                        map.locationComponent.cameraMode = CameraMode.TRACKING_GPS_NORTH
+//                        map.locationComponent.cameraMode = CameraMode.TRACKING_GPS_NORTH
+                        map.locationComponent.cameraMode = CameraMode.NONE
                         map.locationComponent.forceLocationUpdate(null)
 
                         userLocation?.let {
                             CameraPosition.Builder()
                                 .target(LatLng(it.lat, it.lon))
                                 .zoom(13.0) // Adjust this value to set the desired zoom level
+                                .padding(
+                                    top = mapInset.top.toDouble(),
+                                    left = mapInset.left.toDouble(),
+                                    right = mapInset.right.toDouble(),
+                                    bottom = mapInset.bottom.toDouble())
                                 .build()
                                 .let { userCam ->
                                     map.animateCamera(CameraUpdateFactory.newCameraPosition(userCam), 1000)
@@ -802,16 +837,6 @@ private fun String?.shorten(): String? {
         .replace(Regex("""\s*\([^)]*$"""), "")
 }
 
-
-private fun Long.formatTime(): String {
-    return Instant.fromEpochMilliseconds(this).format(
-        DateTimeComponents.Format {
-            hour()
-            chars(":")
-            minute()
-        }
-    )
-}
 
 private fun de.libf.transportrng.data.maplibrecompat.LatLngBounds.toLatLngBounds(): LatLngBounds {
     return LatLngBounds.Companion.from(

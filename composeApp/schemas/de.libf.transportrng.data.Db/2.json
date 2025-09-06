@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "8c43d8fb847ecacfb82aa3f8b6c6ddc9",
+    "identityHash": "95450e9ad8134327ad9e54f9edb4d641",
     "entities": [
       {
         "tableName": "locations",
@@ -496,7 +496,7 @@
       },
       {
         "tableName": "trips",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uid` INTEGER NOT NULL, `id` TEXT NOT NULL, `fromId` INTEGER NOT NULL, `toId` INTEGER NOT NULL, `capacity` TEXT NOT NULL, `changes` INTEGER NOT NULL, `networkId` TEXT, PRIMARY KEY(`uid`), FOREIGN KEY(`fromId`) REFERENCES `genericLocations`(`uid`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`toId`) REFERENCES `genericLocations`(`uid`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uid` INTEGER NOT NULL, `id` TEXT NOT NULL, `fromId` INTEGER NOT NULL, `viaId` INTEGER, `toId` INTEGER NOT NULL, `capacity` TEXT NOT NULL, `changes` INTEGER NOT NULL, `networkId` TEXT, PRIMARY KEY(`uid`), FOREIGN KEY(`fromId`) REFERENCES `genericLocations`(`uid`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`viaId`) REFERENCES `genericLocations`(`uid`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`toId`) REFERENCES `genericLocations`(`uid`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "uid",
@@ -515,6 +515,11 @@
             "columnName": "fromId",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "viaId",
+            "columnName": "viaId",
+            "affinity": "INTEGER"
           },
           {
             "fieldPath": "toId",
@@ -592,6 +597,17 @@
             "onUpdate": "NO ACTION",
             "columns": [
               "fromId"
+            ],
+            "referencedColumns": [
+              "uid"
+            ]
+          },
+          {
+            "table": "genericLocations",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "viaId"
             ],
             "referencedColumns": [
               "uid"
@@ -1008,7 +1024,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8c43d8fb847ecacfb82aa3f8b6c6ddc9')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '95450e9ad8134327ad9e54f9edb4d641')"
     ]
   }
 }

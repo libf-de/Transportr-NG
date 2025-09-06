@@ -63,6 +63,7 @@ import de.libf.transportrng.ui.transport.composables.WalkComposable
 import kotlinx.coroutines.delay
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
@@ -85,10 +86,20 @@ import kotlin.time.Duration.Companion.milliseconds
 //}
 
 fun Instant.formatAsLocal(): String {
-    return this.toLocalDateTime(TimeZone.currentSystemDefault()).time.format(LocalTime.Format {
+    return this.toLocalDateTime(TimeZone.UTC).time.format(LocalTime.Format {
         hour()
         chars(":")
         minute()
+    })
+}
+
+fun Instant.formatAsLocalDate(): String {
+    return this.toLocalDateTime(TimeZone.UTC).date.format(LocalDate.Format {
+        dayOfMonth()
+        chars(".")
+        monthNumber()
+        chars(".")
+        year()
     })
 }
 
@@ -225,7 +236,7 @@ fun TripPreviewComposable(
         departureDelay = departureData.second
         departureName = trip.from.getName() ?: "???"
 
-        duration = formatDuration(trip.duration) ?: ""
+        duration = trip.duration.formatDuration() ?: ""
         price = trip.getStandardFare() ?: ""
         warning = trip.hasProblem()
 

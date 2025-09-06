@@ -6,10 +6,15 @@ import kotlinx.cinterop.useContents
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 import platform.CoreLocation.CLAuthorizationStatus
 import platform.CoreLocation.CLAuthorizationStatusVar
 import platform.CoreLocation.CLLocation
@@ -20,8 +25,10 @@ import platform.darwin.NSObject
 
 class iOsGpsRepository(private val minDeltaMeters: Float = 50f) : GpsRepository {
 
-    override var isEnabled = true
-        private set
+    private val isEnabledInternal = MutableStateFlow(true)
+    override val isEnabled: StateFlow<Boolean> = isEnabledInternal.asStateFlow()
+
+    private val granted = MutableStateFlow(false)
 
     private var locationManager: CLLocationManager? = null
 
@@ -55,20 +62,19 @@ class iOsGpsRepository(private val minDeltaMeters: Float = 50f) : GpsRepository 
                         platform.CoreLocation.kCLAuthorizationStatusAuthorizedAlways -> {
                             println("Location access granted")
 
-                            if(isEnabled) {
-                                trySend(GpsState.EnabledSearching)
-                                locationManager.startUpdatingLocation()
-                            } else {
-                                trySend(GpsState.Disabled)
-                            }
+                            granted.value = true
                         }
                         platform.CoreLocation.kCLAuthorizationStatusDenied-> {
                             println("Location access denied/disabled")
+
+                            granted.value = false
 
                             trySend(GpsState.Disabled)
                         }
                         platform.CoreLocation.kCLAuthorizationStatusRestricted -> {
                             println("Location access denied")
+
+                            granted.value = false
 
                             trySend(GpsState.Denied)
                         }
@@ -76,16 +82,28 @@ class iOsGpsRepository(private val minDeltaMeters: Float = 50f) : GpsRepository 
                         platform.CoreLocation.kCLAuthorizationStatusNotDetermined -> {
                             println("Location access not determined")
 
+                            granted.value = false
+
                             trySend(GpsState.Denied)
                         }
                         else -> {
                             println("Unknown authorization status")
+
+                            granted.value = false
 
                             trySend(GpsState.Error("unknown authorization status"))
                         }
                     }
                 }
             }
+        }
+
+        launch {
+            combine(isEnabled, granted) { enabled, granted -> enabled && granted }
+                .collect {
+                    if(it) locationManager?.startUpdatingLocation()
+                    else locationManager?.stopUpdatingLocation()
+                }
         }
 
         awaitClose {
@@ -99,7 +117,7 @@ class iOsGpsRepository(private val minDeltaMeters: Float = 50f) : GpsRepository 
 
 
     override fun setEnabled(enabled: Boolean) {
-        this.isEnabled = enabled
+        this.isEnabledInternal.value = enabled
         if(!enabled) {
             locationManager?.stopUpdatingLocation()
         } else {

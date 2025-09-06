@@ -65,6 +65,7 @@ import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.TextAlign
@@ -192,7 +193,7 @@ fun LegListComposable(
                     item {
                         IntermediateComponent(
                             leg = current,
-                            duration = formatDuration(next.departureTime - prev.arrivalTime)
+                            duration = (next.departureTime - prev.arrivalTime).formatDuration()
                         )
                     }
                 } else if(prev == null) {
@@ -362,7 +363,7 @@ fun FirstLegComponent(
                     color = MaterialTheme.colorScheme.outline
                 )
                 Text(
-                    text = formatDuration(leg.arrivalTime - leg.departureTime) ?: "",
+                    text = (leg.arrivalTime - leg.departureTime).formatDuration() ?: "",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.outline,
                     maxLines = 1
@@ -658,19 +659,24 @@ fun LastIndividualLegComponent(
 fun DelayTextComposable(
     delay: String?,
     smaller: Boolean = false,
+    fontSize: TextUnit? = null,
+    lineHeight: TextUnit? = null,
+    style: TextStyle? = null,
+    fontWeight: FontWeight? = null,
     modifier: Modifier = Modifier
 ) {
     if(!delay.isNullOrBlank()) {
         Text(
             text = delay,
-            lineHeight = if(smaller) MaterialTheme.typography.bodySmall.fontSize else TextUnit.Unspecified,
-            style = MaterialTheme.typography.bodySmall,
-            fontSize = if(smaller) MaterialTheme.typography.labelSmall.fontSize else TextUnit.Unspecified,
+            lineHeight = lineHeight ?: if(smaller) MaterialTheme.typography.bodySmall.fontSize else TextUnit.Unspecified,
+            style = style ?: MaterialTheme.typography.bodySmall,
+            fontSize = fontSize ?: if(smaller) MaterialTheme.typography.labelSmall.fontSize else TextUnit.Unspecified,
             color = when {
                 delay.startsWith("+") -> Color.Red
                 delay.startsWith("-") -> Color.Blue
                 else -> Color.Unspecified
             },
+            fontWeight = fontWeight,
             modifier = modifier
         )
     }

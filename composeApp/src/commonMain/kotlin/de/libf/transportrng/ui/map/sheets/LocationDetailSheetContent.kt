@@ -36,12 +36,14 @@ import androidx.navigation.NavController
 import de.libf.transportrng.MapRoutes
 import de.libf.transportrng.Routes
 import de.libf.transportrng.data.locations.WrapLocation
+import de.libf.transportrng.data.utils.toUTC
 import de.libf.transportrng.ui.departures.composables.DepartureComposable
 import de.libf.transportrng.ui.favorites.SavedSearchesActions
 import de.libf.transportrng.ui.favorites.SavedSearchesComponent
 import de.libf.transportrng.ui.map.composables.LocationComponent
 import de.libf.transportrng.ui.transport.composables.ProductComposable
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import transportr_ng.composeapp.generated.resources.Res
@@ -103,7 +105,6 @@ fun LocationDetailSheetContent(
                                 state = listState,
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .weight(1f)
                                     .pointerInput(Unit) {
                                         detectDragGestures { change, dragAmount ->
 //                                            change.consume()
@@ -115,6 +116,10 @@ fun LocationDetailSheetContent(
                             ) {
                                 items(state.departures
                                     .flatMap { it.departures }
+                                    .filter {
+                                        (it.predictedTime ?: it.plannedTime)?.let { time ->
+                                            time >= Clock.System.now().toUTC().toEpochMilliseconds()
+                                        } ?: false }
                                     .sortedBy { it.predictedTime }
                                 ) {
                                     DepartureComposable(

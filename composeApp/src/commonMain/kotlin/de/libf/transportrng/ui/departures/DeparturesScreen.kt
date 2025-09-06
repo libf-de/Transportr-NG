@@ -23,7 +23,6 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -63,7 +62,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.text.style.TextAlign
@@ -71,13 +69,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import de.libf.transportrng.data.locations.WrapLocation
-import de.libf.transportrng.data.utils.formatDuration
 import de.libf.transportrng.ui.composables.CustomSmallTopAppBar
 import de.libf.transportrng.ui.departures.composables.DepartureComposable
 import de.libf.transportrng.ui.map.CompassMargins
 import de.libf.transportrng.ui.map.MapViewComposable
 import de.libf.transportrng.ui.map.provideMapState
-import de.libf.transportrng.ui.trips.composables.LegListComposable
 import de.libf.transportrng.ui.trips.invert
 import de.libf.transportrng.ui.trips.mapRange
 import kotlinx.coroutines.launch
@@ -85,15 +81,10 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import transportr_ng.composeapp.generated.resources.Res
 import transportr_ng.composeapp.generated.resources.action_refresh
-import transportr_ng.composeapp.generated.resources.action_share
-import transportr_ng.composeapp.generated.resources.action_trip_calendar
 import transportr_ng.composeapp.generated.resources.change_time
 import transportr_ng.composeapp.generated.resources.drawer_departures
 import transportr_ng.composeapp.generated.resources.error
-import transportr_ng.composeapp.generated.resources.ic_action_calendar
 import transportr_ng.composeapp.generated.resources.ic_action_navigation_refresh
-import transportr_ng.composeapp.generated.resources.ic_action_social_share
-import transportr_ng.composeapp.generated.resources.total_time
 import transportr_ng.composeapp.generated.resources.try_again
 
 const val MAX_DEPARTURES = 12

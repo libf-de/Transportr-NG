@@ -15,8 +15,10 @@ import de.libf.transportrng.data.gps.OsmGeocoder
 import de.libf.transportrng.data.gps.ReverseGeocoderV2
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.HttpRequestRetry
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
+import kotlin.math.max
 
 
 actual val PlatformModule = module {
@@ -59,6 +61,12 @@ actual val PlatformModule = module {
     }
 
     factory {
-        HttpClient(CIO)
+        HttpClient(CIO) {
+            install(HttpRequestRetry) {
+                retryOnException(maxRetries = 5)
+                retryOnServerErrors(maxRetries = 5)
+                exponentialDelay()
+            }
+        }
     }
 }

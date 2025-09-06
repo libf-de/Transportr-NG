@@ -73,6 +73,12 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.roundToInt
 import androidx.compose.foundation.gestures.DraggableAnchors
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.unit.Velocity
+import kotlin.jvm.JvmName
 
 /**
  * I'm sorry, but at the time of writing there is no way to remove the nestedScrolling
@@ -88,6 +94,7 @@ import androidx.compose.foundation.gestures.DraggableAnchors
 fun CustomBottomSheetScaffold(
     sheetContent: @Composable ColumnScope.() -> Unit,
     modifier: Modifier = Modifier,
+    connectedScroll: Boolean = false,
     scaffoldState: BottomSheetScaffoldState = rememberCustomBottomSheetScaffoldState(),
     sheetPeekHeight: Dp = BottomSheetDefaults.SheetPeekHeight,
     sheetMaxWidth: Dp = BottomSheetDefaults.SheetMaxWidth,
@@ -145,7 +152,8 @@ fun CustomBottomSheetScaffold(
                 tonalElevation = sheetTonalElevation,
                 shadowElevation = sheetShadowElevation,
                 dragHandle = sheetDragHandle,
-                content = sheetContent
+                content = sheetContent,
+                connectedScroll = connectedScroll
             )
         }
     )
@@ -164,6 +172,7 @@ private fun StandardBottomSheet(
     contentColor: Color,
     tonalElevation: Dp,
     shadowElevation: Dp,
+    connectedScroll: Boolean,
     dragHandle: @Composable (() -> Unit)?,
     content: @Composable ColumnScope.() -> Unit
 ) {
@@ -176,15 +185,19 @@ private fun StandardBottomSheet(
             .widthIn(max = sheetMaxWidth)
             .fillMaxWidth()
             .requiredHeightIn(min = peekHeight)
-//            .nestedScroll(
-//                remember(state.anchoredDraggableState) {
-//                    ConsumeSwipeWithinBottomSheetBoundsNestedScrollConnection(
-//                        sheetState = state,
-//                        orientation = orientation,
-//                        onFling = { scope.launch { state.settle(it) } }
-//                    )
-//                }
-//            )
+            .then(
+                if (connectedScroll)
+                    Modifier.nestedScroll(
+                        remember(state.anchoredDraggableState) {
+                            ConsumeSwipeWithinBottomSheetBoundsNestedScrollConnection(
+                                sheetState = state,
+                                orientation = orientation,
+                                onFling = { scope.launch { state.settle(it) } }
+                            )
+                        }
+                    )
+                else Modifier
+            )
             .anchoredDraggable(
                 state = state.anchoredDraggableState,
                 orientation = orientation,
@@ -252,6 +265,65 @@ private fun StandardBottomSheet(
         }
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+internal fun ConsumeSwipeWithinBottomSheetBoundsNestedScrollConnection(
+    sheetState: SheetState,
+    orientation: Orientation,
+    onFling: (velocity: Float) -> Unit
+): NestedScrollConnection =
+    object : NestedScrollConnection {
+        override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+            val delta = available.toFloat()
+            return if (delta < 0 && source == NestedScrollSource.UserInput) {
+                sheetState.anchoredDraggableState.dispatchRawDelta(delta).toOffset()
+            } else {
+                Offset.Zero
+            }
+        }
+
+        override fun onPostScroll(
+            consumed: Offset,
+            available: Offset,
+            source: NestedScrollSource
+        ): Offset {
+            return if (source == NestedScrollSource.UserInput) {
+                sheetState.anchoredDraggableState.dispatchRawDelta(available.toFloat()).toOffset()
+            } else {
+                Offset.Zero
+            }
+        }
+
+        override suspend fun onPreFling(available: Velocity): Velocity {
+            val toFling = available.toFloat()
+            val currentOffset = sheetState.requireOffset()
+            val minAnchor = sheetState.anchoredDraggableState.anchors.minAnchor()
+            return if (toFling < 0 && currentOffset > minAnchor) {
+                onFling(toFling)
+                // since we go to the anchor with tween settling, consume all for the best UX
+                available
+            } else {
+                Velocity.Zero
+            }
+        }
+
+        override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
+            onFling(available.toFloat())
+            return available
+        }
+
+        private fun Float.toOffset(): Offset =
+            Offset(
+                x = if (orientation == Orientation.Horizontal) this else 0f,
+                y = if (orientation == Orientation.Vertical) this else 0f
+            )
+
+        @JvmName("velocityToFloat")
+        private fun Velocity.toFloat() = if (orientation == Orientation.Horizontal) x else y
+
+        @JvmName("offsetToFloat")
+        private fun Offset.toFloat(): Float = if (orientation == Orientation.Horizontal) x else y
+    }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

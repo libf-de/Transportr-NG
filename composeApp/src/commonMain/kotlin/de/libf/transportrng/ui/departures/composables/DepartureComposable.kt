@@ -1,5 +1,6 @@
 package de.libf.transportrng.ui.departures.composables
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,12 +14,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import de.libf.ptek.dto.Departure
 import de.libf.transportrng.data.utils.getName
 import de.libf.transportrng.ui.transport.composables.ProductComposable
 import de.libf.transportrng.ui.transport.composables.getDrawableRes
+import de.libf.transportrng.ui.trips.composables.DelayTextComposable
 import kotlinx.coroutines.delay
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -103,9 +106,16 @@ fun DepartureComposable(
         Column(
             modifier = Modifier.padding(8.dp)
         ) {
-            Row {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 Text(text = departureTime ?: "")
-                Text(text = delay.toString())
+
+                if(delay != 0L)
+                    DelayTextComposable(
+                        delay = if(delay > 0) "+$delay" else "$delay",
+                    )
 
                 Spacer(Modifier.weight(1f))
 
@@ -114,7 +124,10 @@ fun DepartureComposable(
                 }
             }
 
-            Row {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 ProductComposable(
                     line = departure.line
                 )

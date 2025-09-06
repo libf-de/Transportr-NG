@@ -51,6 +51,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
@@ -225,8 +226,8 @@ class DirectionsViewModel internal constructor(
                 _gpsLoading.value = false
                 println("Failed to get location")
             }
-            .first()
-            .let {
+            .firstOrNull()
+            ?.let {
                 geocoder.findLocation((it as GpsState.Enabled).location)
                     .onSuccess { location ->
                         when(gpsLocationFor.value) {
@@ -318,6 +319,12 @@ class DirectionsViewModel internal constructor(
         _now.value = true
         _calendar.value = Clock.System.now()
 //        search()
+    }
+
+    fun setCalendar(calendar: Instant, departure: Boolean) {
+        _calendar.value = calendar
+        _isDeparture.value = departure
+        _now.value = false
     }
 
 //    private fun setCalendar(calendar: Calendar) {

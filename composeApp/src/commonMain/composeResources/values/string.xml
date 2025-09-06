@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-	<string name="website" translatable="false">https://transportr.app/</string>
-	<string name="website_source_app" translatable="false">"?utm_source=app"</string>
-	<string name="website_source_shared" translatable="false">"?utm_source=shared_trip"</string>
-	<string name="bug_tracker" translatable="false">https://github.com/grote/Transportr/issues?q=is%3Aissue</string>
+	<string name="website" translatable="false">https://libf.de/transportrng</string>
+	<string name="bug_tracker" translatable="false">https://github.com/libf-de/Transportr-NG/issues?q=is%3Aissue</string>
 
-	<string name="google_play_title" tools:keep="@string/google_play_title">Transportr - Open Source Public Transit</string>
+	<string name="google_play_title" tools:keep="@string/google_play_title">Transportr-NG - Open Source Public Transit</string>
 	<string name="google_play_short_desc" tools:keep="@string/google_play_short_desc">Free Public Transport Assistant without Ads or Tracking</string>
 	<string name="google_play_full_desc" tools:keep="@string/google_play_full_desc" tools:ignore="StringFormatInvalid"><![CDATA[
-Transportr is a non-profit app developed by people around the world in their free time.
+Transportr-NG is a fork of Transportr and a non-profit app developed by people around the world in their free time.
 They want to make the use of public transport as easy as possible for everybody.
 
 This app uses the data of various local public transport agencies
@@ -73,8 +71,8 @@ and always knows where you are to not miss where to get off the bus.
 	<string name="tab_about">About</string>
 	<string name="tab_libraries">Libraries</string>
 
-	<string name="about_copyright">© 2013 &#8211; 2023 Torsten Grote\nFree Software License: GPLv3+</string>
-	<string name="about_description">Transportr is a public transport companion developed by people around the world to make using public transport as easy as possible wherever you are.</string>
+	<string name="about_copyright">© 2013 &#8211; 2024 Fabian Schillig, Torsten Grote\nFree Software License: GPLv3+</string>
+	<string name="about_description">Transportr-NG is a fork of Transportr, a public transport companion developed by people around the world to make using public transport as easy as possible wherever you are.</string>
 	<string name="about_warning_title">Warning</string>
 	<string name="about_warning_text">There is no guarantee for the correctness of the (externally provided) data. Please use this app only at your own risk.</string>
 	<string name="about_contributions">This app is Free Software, so you can freely use, study, share and improve it. Contributions are encouraged and appreciated. If you would like to contribute, please visit the homepage for more information.</string>
@@ -473,5 +471,35 @@ and always knows where you are to not miss where to get off the bus.
 	<string name="danish">Danish</string>
 
 	<string name="continue_journey_later">Continue journey here later</string>
+	<string name="till">till</string>
 
+	<string name="trip_from">From</string>
+	<string name="trip_via">Via</string>
+	<string name="and">and</string>
+	<string name="app_name">Transportr-NG</string>
+	<string name="add">Add</string>
+	<string name="trip_added_to_calendar">The trip was successfully added to your calendar</string>
+	<string name="trip_added_to_calendar_failed">Failed to add the trip to your calendar: %1$s</string>
+	<string name="cool">Cool!</string>
+
+	<!-- Long form weekday names -->
+	<string name="monday_long">Monday</string>
+	<string name="tuesday_long">Tuesday</string>
+	<string name="wednesday_long">Wednesday</string>
+	<string name="thursday_long">Thursday</string>
+	<string name="friday_long">Friday</string>
+	<string name="saturday_long">Saturday</string>
+	<string name="sunday_long">Sunday</string>
+
+	<!-- Short form weekday names -->
+	<string name="monday_short">Mo</string>
+	<string name="tuesday_short">Tu</string>
+	<string name="wednesday_short">We</string>
+	<string name="thursday_short">Th</string>
+	<string name="friday_short">Fr</string>
+	<string name="saturday_short">Sa</string>
+	<string name="sunday_short">Su</string>
+
+	<string name="later">Later</string>
+	<string name="earlier">Earlier</string>
 </resources>

@@ -23,11 +23,13 @@ import de.libf.ptek.dto.Point
 import de.libf.ptek.util.LocationUtils
 import de.libf.transportrng.data.maplibrecompat.LatLng
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 
 interface GpsRepository {
-    val isEnabled: Boolean
+//    val isEnabled: Boolean
+    val isEnabled: StateFlow<Boolean>
     fun getGpsStateFlow(): Flow<GpsState>
     fun setEnabled(enabled: Boolean)
 }
@@ -58,6 +60,21 @@ fun Flow<GpsState>.filterByDistance(minDistanceMeters: Float = 50f): Flow<GpsSta
                 lastAccurate = newState.isAccurate
             } }
         } else true
+    }
+}
+
+fun Flow<Pair<LatLng, Double>?>.filterByDistanceIgnoreZoom(minDistanceMeters: Double = 50.0): Flow<Pair<LatLng, Double>?> {
+    var lastPoint: LatLng? = null
+    return filterNotNull().filter { newPoint ->
+        val shouldInclude = lastPoint?.let { last ->
+            LocationUtils.computeDistance(
+                last.latitude, last.longitude,
+                newPoint.first.latitude, newPoint.first.longitude
+            ) >= minDistanceMeters
+        } ?: true
+        shouldInclude.also {
+            if(it) lastPoint = newPoint.first
+        }
     }
 }
 

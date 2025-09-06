@@ -27,6 +27,40 @@ import de.libf.ptek.dto.Trip
 import de.libf.ptek.dto.TripOptions
 import kotlinx.coroutines.flow.MutableStateFlow
 
+suspend fun Trip?.reloadTrip(
+    networkProvider: NetworkProvider,
+    settingsManager: SettingsManager,
+    query: TripQuery,
+    errorString: String
+): Result<Trip> {
+    try {
+        val queryTripsResult = networkProvider.queryTrips(
+            query.from.location, query.via?.location, query.to.location, query.date - 5000, true,
+            TripOptions(query.products.toSet(), settingsManager.optimize, settingsManager.walkSpeed, null, null)
+        )!!
+        if (queryTripsResult.status == OK && queryTripsResult.trips.isNotEmpty()) {
+            this?.let { oldTrip ->
+                for (newTrip in queryTripsResult.trips) {
+                    if (oldTrip.isTheSame(newTrip)) {
+                        return Result.success(newTrip)
+                    }
+                }
+            } ?: run {
+                val fallbackTrip = queryTripsResult.trips.firstOrNull {
+                    it.firstDepartureTime == query.date
+                } ?: queryTripsResult.trips.firstOrNull()
+
+                if(fallbackTrip != null) return Result.success(fallbackTrip)
+            }
+        } else {
+            return Result.failure(Exception("$errorString\n${queryTripsResult.status.name}"))
+        }
+        return Result.failure(Exception(errorString))
+    } catch (e: Exception) {
+        return Result.failure(Exception("$errorString\n$e"))
+    }
+}
+
 suspend fun MutableStateFlow<Trip?>.reload(
     networkProvider: NetworkProvider,
     settingsManager: SettingsManager,
@@ -38,14 +72,18 @@ suspend fun MutableStateFlow<Trip?>.reload(
             query.from.location, query.via?.location, query.to.location, query.date - 5000, true,
             TripOptions(query.products.toSet(), settingsManager.optimize, settingsManager.walkSpeed, null, null)
         )!!
-        if (queryTripsResult.status == OK && queryTripsResult.trips.size > 0) {
-            val oldTrip = this.value ?: throw IllegalStateException()
-
-            for (newTrip in queryTripsResult.trips) {
-                if (oldTrip.isTheSame(newTrip)) {
-                    this.emit(newTrip)
-                    return null
+        if (queryTripsResult.status == OK && queryTripsResult.trips.isNotEmpty()) {
+            this.value?.let { oldTrip ->
+                for (newTrip in queryTripsResult.trips) {
+                    if (oldTrip.isTheSame(newTrip)) {
+                        this.emit(newTrip)
+                        return null
+                    }
                 }
+            } ?: run {
+                this.emit(queryTripsResult.trips.firstOrNull {
+                    it.firstDepartureTime == query.date
+                } ?: queryTripsResult.trips.firstOrNull())
             }
 
             return errorString

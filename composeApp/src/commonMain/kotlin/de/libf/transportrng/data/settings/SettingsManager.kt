@@ -26,6 +26,7 @@ import de.libf.ptek.NetworkId
 import de.libf.ptek.NetworkProvider.Optimize
 import de.libf.ptek.NetworkProvider.WalkSpeed
 import de.libf.ptek.dto.Product
+import de.libf.transportrng.data.maplibrecompat.LatLng
 
 
 class SettingsManager constructor(private val settings: Settings) {
@@ -38,6 +39,20 @@ class SettingsManager constructor(private val settings: Settings) {
         const val WALKSPEED_DEFAULT = "NORMAL"
         const val OPTIMIZE_DEFAULT = "LEAST_DURATION"
     }
+
+    var lastMapLocation: Pair<LatLng, Double>?
+        get() = settings.getString(LAST_MAPLOC, "")
+            .takeIf { it.isNotBlank() }
+            ?.let {
+                val (lat, lon, zoom) = it.split(";")
+                LatLng(lat.toDouble(), lon.toDouble()) to zoom.toDouble()
+            }
+        set(value) {
+            value?.let {
+                settings.putString(LAST_MAPLOC, "${it.first.latitude};${it.first.longitude};${it.second}")
+            }
+        }
+
 
     val locale: Locale
         get() { //pref_language_value_default
@@ -163,6 +178,7 @@ class SettingsManager constructor(private val settings: Settings) {
         private const val NETWORK_ID_3 = "NetworkId3"
 
         internal const val LANGUAGE = "pref_key_language"
+        internal const val LAST_MAPLOC = "pref_key_last_map_location"
         internal const val THEME = "pref_key_theme"
         internal const val SHOW_WHEN_LOCKED = "pref_key_show_when_locked"
         internal const val WALK_SPEED = "pref_key_walk_speed"

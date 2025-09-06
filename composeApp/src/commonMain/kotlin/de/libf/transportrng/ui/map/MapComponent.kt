@@ -33,9 +33,9 @@ enum class MarkerType {
 interface MapViewStateInterface {
     var onLocationClicked: (WrapLocation) -> Unit
 
-    val currentMapCenter: Flow<LatLng?>
+    val currentMapCenter: Flow<Pair<LatLng, Double>?>
 
-    suspend fun animateTo(latLng: LatLng?, zoom: Int)
+    suspend fun animateTo(latLng: LatLng?, zoom: Int, animate: Boolean = true)
 
     suspend fun zoomToBounds(latLngBounds: LatLngBounds?, animate: Boolean)
 

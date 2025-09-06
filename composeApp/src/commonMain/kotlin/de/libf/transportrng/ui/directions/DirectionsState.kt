@@ -4,6 +4,7 @@ import de.libf.ptek.dto.Departure
 import de.libf.ptek.dto.LineDestination
 import de.libf.ptek.dto.Trip
 import de.libf.transportrng.data.favorites.FavoriteTripItem
+import de.libf.transportrng.data.trips.TripsRepository
 
 sealed class DirectionsState {
     object Loading : DirectionsState()

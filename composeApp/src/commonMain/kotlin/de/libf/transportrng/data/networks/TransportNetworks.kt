@@ -19,8 +19,10 @@
 
 package de.grobox.transportr.networks
 
+import de.libf.ptek.DbNextProvider
 import de.libf.ptek.DbProvider
 import de.libf.ptek.NetworkId
+import de.libf.ptek.VgnProvider
 import de.libf.ptek.VvoProvider
 import de.libf.transportrng.data.networks.TransportNetwork
 import io.ktor.client.HttpClient
@@ -30,11 +32,15 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import transportr_ng.composeapp.generated.resources.Res
 import transportr_ng.composeapp.generated.resources.continent_europe
+import transportr_ng.composeapp.generated.resources.network_bart_logo
 import transportr_ng.composeapp.generated.resources.network_db_logo
+import transportr_ng.composeapp.generated.resources.network_vgn_logo
 import transportr_ng.composeapp.generated.resources.network_vvo_logo
 import transportr_ng.composeapp.generated.resources.np_continent_europe
 import transportr_ng.composeapp.generated.resources.np_desc_db
 import transportr_ng.composeapp.generated.resources.np_desc_db2
+import transportr_ng.composeapp.generated.resources.np_desc_vgn
+import transportr_ng.composeapp.generated.resources.np_desc_vgn_networks
 import transportr_ng.composeapp.generated.resources.np_desc_vvo
 import transportr_ng.composeapp.generated.resources.np_name_db
 import transportr_ng.composeapp.generated.resources.np_region_germany
@@ -58,13 +64,24 @@ class TransportNetworks(
                             factory = { DbProvider(
                                 apiAuthorization = "{\"type\":\"AID\",\"aid\":\"n91dB8Z77MLdoR0K\"}",
                                 salt = "bdI8UVj40K5fvxwf".toByteArray(Charsets.UTF_8),
-                                httpClient = httpClient
+                                httpClient = httpClient,
+                                debug = true
                             ) }
                         )
                     )
                 ),
                 Country(
                     Res.string.np_region_germany, flag = "🇩🇪", networks = listOf(
+                        TransportNetwork(
+                            id = NetworkId.DB_NEXT,
+                            name = Res.string.np_name_db,
+                            description = Res.string.np_desc_db2,
+                            logo = Res.drawable.network_bart_logo,
+                            factory = { DbNextProvider(
+                                httpClient = httpClient,
+                                debug = true
+                            ) }
+                        ),
                         TransportNetwork(
                             id = NetworkId.DB,
                             name = Res.string.np_name_db,
@@ -74,14 +91,28 @@ class TransportNetworks(
                             factory = { DbProvider(
                                 apiAuthorization = "{\"type\":\"AID\",\"aid\":\"n91dB8Z77MLdoR0K\"}",
                                 salt = "bdI8UVj40K5fvxwf".toByteArray(Charsets.UTF_8),
-                                httpClient = httpClient) }
+                                httpClient = httpClient,
+                                debug = true
+                            ) }
+                        ),
+                        TransportNetwork(
+                            id = NetworkId.VGN,
+                            description = Res.string.np_desc_vgn,
+                            agencies = Res.string.np_desc_vgn_networks,
+                            logo = Res.drawable.network_vgn_logo,
+                            status = TransportNetwork.Status.BETA,
+                            factory = { VgnProvider(
+                                httpClient = httpClient,
+                                debug = true
+                            ) }
                         ),
                         TransportNetwork(
                             id = NetworkId.VVO,
                             description = Res.string.np_desc_vvo,
                             logo = Res.drawable.network_vvo_logo,
                             factory = { VvoProvider(
-                                httpClient = httpClient
+                                httpClient = httpClient,
+                                debug = true
                             ) }
                         ),
                     )

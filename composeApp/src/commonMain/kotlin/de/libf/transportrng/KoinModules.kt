@@ -149,7 +149,8 @@ val ViewModelModule = module {
             locationRepository = get(),
             searchesRepository = get(),
             gpsRepository = get(),
-            combinedSuggestionRepository = get()
+            combinedSuggestionRepository = get(),
+            settingsMgr = get()
         )
     }
 

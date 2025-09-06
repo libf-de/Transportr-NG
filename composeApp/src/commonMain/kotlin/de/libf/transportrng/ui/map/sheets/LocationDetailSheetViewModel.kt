@@ -9,6 +9,7 @@ import de.libf.ptek.dto.StationDepartures
 import de.libf.transportrng.data.locations.LocationRepository
 import de.libf.transportrng.data.locations.WrapLocation
 import de.libf.transportrng.data.searches.SearchesRepository
+import de.libf.transportrng.data.utils.toUTC
 import de.libf.transportrng.ui.departures.MAX_DEPARTURES
 import de.libf.transportrng.ui.map.BottomSheetContentState
 import kotlinx.coroutines.Job
@@ -17,6 +18,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.getString
 import transportr_ng.composeapp.generated.resources.Res
 import transportr_ng.composeapp.generated.resources.drawer_departures
@@ -51,8 +56,8 @@ class LocationDetailSheetViewModel internal constructor(
                     .value
                     ?.networkProvider
                     ?.queryDepartures(location.id!!,
-                        Clock.System.now().toEpochMilliseconds(),
-                        MAX_DEPARTURES,
+                        Clock.System.now().toUTC().toEpochMilliseconds(),
+                        24,
                         false)
                     ?.let {
                         _uiState.value = when(it.status) {

@@ -31,7 +31,6 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -45,7 +44,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.systemBars
-import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -53,11 +51,9 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.SheetValue
-import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberDrawerState
 //import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
@@ -71,6 +67,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.Dp
@@ -78,7 +75,6 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import androidx.navigation.NavHost
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -92,18 +88,13 @@ import de.libf.transportrng.data.gps.enabled
 import de.libf.transportrng.data.locations.WrapLocation
 import de.libf.transportrng.data.maplibrecompat.LatLng
 import de.libf.transportrng.protobufNavType
-import de.libf.transportrng.ui.composables.AnchoredDraggableDefaults
-import de.libf.transportrng.ui.composables.AnchoredDraggableState
 import de.libf.transportrng.ui.composables.BaseLocationGpsInput
 import de.libf.transportrng.ui.composables.CustomBottomSheetScaffold
 import de.libf.transportrng.ui.composables.rememberCustomBottomSheetScaffoldState
 import de.libf.transportrng.ui.composables.rememberStandardBottomSheetState
-import de.libf.transportrng.ui.favorites.SavedSearchesActions
-import de.libf.transportrng.ui.favorites.SavedSearchesComponent
 import de.libf.transportrng.ui.favorites.composables.SpecialLocationItem
 import de.libf.transportrng.ui.favorites.composables.SpecialLocationItemActions
 import de.libf.transportrng.ui.map.composables.GpsFabComposable
-import de.libf.transportrng.ui.map.composables.LocationComponent
 import de.libf.transportrng.ui.map.composables.MapNavDrawerContent
 import de.libf.transportrng.ui.map.sheets.LocationDetailSheetContent
 import de.libf.transportrng.ui.map.sheets.SavedSearchesSheetComponent
@@ -119,6 +110,7 @@ import transportr_ng.composeapp.generated.resources.ic_menu_directions
 import transportr_ng.composeapp.generated.resources.material_drawer_open
 import transportr_ng.composeapp.generated.resources.search_hint
 import kotlin.math.roundToInt
+import kotlin.reflect.KClass
 import kotlin.reflect.typeOf
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -130,7 +122,6 @@ fun MapScreen(
     location: WrapLocation? = null
 ) {
     val mapNavController = rememberNavController()
-
 
     val searchSuggestions by viewModel.locationSuggestions.collectAsStateWithLifecycle(emptySet())
     val focusManager = LocalFocusManager.current
@@ -144,7 +135,7 @@ fun MapScreen(
 
     val scafState = rememberCustomBottomSheetScaffoldState(
         bottomSheetState = rememberStandardBottomSheetState(
-            initialValue = SheetValue.Expanded,
+            initialValue = SheetValue.PartiallyExpanded,
         )
     )
 
@@ -158,11 +149,9 @@ fun MapScreen(
 
     val barPadding = WindowInsets.systemBars.asPaddingValues()
 
-    val favoriteTrips by viewModel.favoriteTrips.collectAsStateWithLifecycle(emptyList())
-    val specialTrips by viewModel.specialLocations.collectAsStateWithLifecycle(emptyList())
-
     val transportNetworks by viewModel.transportNetworks.collectAsStateWithLifecycle(emptyList())
 
+//    val transportNetwork by viewModel.transportNetwork.collectAsStateWithLifecycle(null)
     val locationState by viewModel.gpsRepository.getGpsStateFlow().collectAsStateWithLifecycle(
         GpsState.Disabled
     )
@@ -170,13 +159,25 @@ fun MapScreen(
     val nearbyStations by viewModel.nearbyStations.collectAsStateWithLifecycle(NearbyLocationsState.Initial)
     val mapCenter by mapState.currentMapCenter.collectAsStateWithLifecycle(null)
 
+    LaunchedEffect(Unit) {
+        viewModel.lastMapCenter?.let {
+            mapState.animateTo(it.first, it.second.roundToInt(), false)
+        }
+    }
+
+    LaunchedEffect(mapCenter) {
+        mapCenter?.let {
+            viewModel.storeMapCenter(it.first, it.second)
+        }
+    }
+
     fun updateNearbyStationsByMapPosition() {
         mapCenter?.let {
             viewModel.findNearbyStations(
                 WrapLocation(
                     LatLng(
-                        it.latitude,
-                        it.longitude
+                        it.first.latitude,
+                        it.first.longitude
                     )
                 )
             )
@@ -191,24 +192,18 @@ fun MapScreen(
         }
     }
 
+    var prevState: KClass<out GpsState>? by remember { mutableStateOf(null) }
     LaunchedEffect(locationState) {
+        if(locationState::class == prevState) return@LaunchedEffect
+
+        prevState = locationState::class
+
         val loc = when(val locationState = locationState) {
             is GpsState.Enabled -> locationState.location
             else -> null
         }
-        mapState.showUserLocation(locationState.enabled, loc)
 
-//        when(val locationState = locationState) {
-//            is GpsState.Enabled -> viewModel.findNearbyStations(
-//                WrapLocation(
-//                    LatLng(
-//                        locationState.location.lat,
-//                        locationState.location.lon
-//                    )
-//                )
-//            )
-//            else -> {}
-//        }
+        mapState.showUserLocation(locationState.enabled, loc)
     }
 
     LaunchedEffect(mapCenter) {
@@ -223,8 +218,28 @@ fun MapScreen(
         }
     }
 
-
     val screenHeight = remember { mutableStateOf(300.dp) }
+
+    val sheetPeekHeight = 128.dp
+//    var sheetPeekHeight by remember { mutableStateOf(64.dp) }
+//    LaunchedEffect(mapNavController.currentDestination) {
+//        if(mapNavController.currentDestination?.route?.contains("Location") == true) {
+//            sheetPeekHeight = 128.dp
+//        } else {
+//            sheetPeekHeight = 128.dp
+//        }
+//    }
+
+    val localDensity = LocalDensity.current
+    LaunchedEffect(scafState.bottomSheetState.targetValue, localDensity, screenHeight.value) {
+        mapState.setPadding(bottom = localDensity.run {
+            if(scafState.bottomSheetState.targetValue == SheetValue.Expanded) {
+                screenHeight.value.toPx().toInt() / 2
+            } else {
+                sheetPeekHeight.toPx().roundToInt()
+            }
+        })
+    }
 
     Layout(
         modifier = Modifier.fillMaxSize(),
@@ -290,15 +305,12 @@ fun MapScreen(
             ) {
                 Box(Modifier.fillMaxSize()) {
                     CustomBottomSheetScaffold(
-//                    BottomSheetScaffold(
                         scaffoldState = scafState,
                         sheetContent = {
                             NavHost(
                                 navController = mapNavController,
                                 startDestination = if(location == null) MapRoutes.SavedSearches else MapRoutes.LocationDetail(location),
                                 modifier = Modifier.animateContentSize()
-                                /*route = Routes.Map::class,
-                                typeMap = mapOf(typeOf<WrapLocation?>() to protobufNavType<WrapLocation?>())*/
                             ) {
                                 composable<MapRoutes.SavedSearches> {
                                     SavedSearchesSheetComponent(
@@ -334,7 +346,8 @@ fun MapScreen(
                                 viewModel = viewModel
                             )
                         },
-                        modifier = Modifier.animateContentSize()
+                        sheetPeekHeight = sheetPeekHeight,
+                        modifier = Modifier.navigationBarsPadding().animateContentSize()
                     ) { contentPadding ->
                         MapViewComposable(
                             mapViewState = mapState,
@@ -363,9 +376,6 @@ fun MapScreen(
                                     scope.launch {
                                         drawerState.open()
                                     }
-//                            navController.navigate(
-//                                route = Routes.Settings
-//                            )
                                 }
                             ) {
                                 Icon(
@@ -418,10 +428,10 @@ fun MapScreen(
                         GpsFabComposable(
                             gpsState = locationState,
                             onLongClick = {
-                                viewModel.gpsRepository.setEnabled(!viewModel.gpsRepository.isEnabled)
+                                viewModel.gpsRepository.setEnabled(!viewModel.gpsRepository.isEnabled.value)
                             },
                             onClick = {
-                                if(!viewModel.gpsRepository.isEnabled)
+                                if(!viewModel.gpsRepository.isEnabled.value)
                                     viewModel.gpsRepository.setEnabled(true)
 
                                 locationState.takeIf {

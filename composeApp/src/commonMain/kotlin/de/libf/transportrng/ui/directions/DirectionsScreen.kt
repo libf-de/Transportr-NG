@@ -52,12 +52,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import de.grobox.transportr.ui.trips.TripQuery
 import de.libf.transportrng.Routes
 import de.libf.transportrng.ui.directions.composables.DirectionsActions
 import de.libf.transportrng.ui.directions.composables.DirectionsSearchHeader
@@ -72,10 +75,17 @@ import de.libf.ptek.dto.Trip
 import de.libf.transportrng.data.favorites.FavoriteTripType
 import de.libf.transportrng.data.locations.WrapLocation
 import de.libf.transportrng.ui.departures.composables.DepartureComposable
+import de.libf.transportrng.ui.directions.composables.DateTimePickerDialog
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.format
+import kotlinx.datetime.format.DateTimeComponents
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import transportr_ng.composeapp.generated.resources.Res
@@ -106,7 +116,7 @@ fun DirectionsScreen(
     changeWork: () -> Unit = {}
 ) {
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
-
+    val showDTPicker = remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         if(specialLocation == FavoriteTripType.WORK || specialLocation == FavoriteTripType.HOME) {
@@ -160,6 +170,10 @@ fun DirectionsScreen(
     val queryPTEError by viewModel.queryPTEError.collectAsStateWithLifecycle(null)
     val queryMoreError by viewModel.queryMoreError.collectAsStateWithLifecycle(null)
 
+    val queryMoreState by viewModel.queryMoreState.collectAsStateWithLifecycle()
+
+    val hapticFeedback = LocalHapticFeedback.current
+
     ProductSelectorDialog(
         show = showProductSelector,
         onConfirmation = {
@@ -171,6 +185,28 @@ fun DirectionsScreen(
         },
         selectedProducts = products.toList()
     )
+
+    (departureCalendar ?: Clock.System.now()).toLocalDateTime(TimeZone.currentSystemDefault()).let {
+        DateTimePickerDialog(
+            showPicker = showDTPicker,
+            time = Pair(
+                it.hour,
+                it.minute
+            ),
+            date = Triple(
+                it.dayOfMonth,
+                it.monthNumber,
+                it.year
+            ),
+            isDeparture = isDeparture,
+            onDateTimeSelected = { localDateTime, isDeparture ->
+                viewModel.setCalendar(localDateTime.toInstant(TimeZone.UTC), isDeparture)
+            },
+            onDismiss = { showDTPicker.value = false }
+        )
+    }
+
+
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -223,8 +259,11 @@ fun DirectionsScreen(
                         DirectionsSearchHeaderBtmRow(
                             departureCalendar = departureCalendar,
                             isDeparture = isDeparture,
-                            onSelectDepartureClicked = onSelectDepartureClicked,
-                            onSelectDepartureLongClicked = onSelectDepartureLongClicked,
+                            onSelectDepartureClicked = { showDTPicker.value = true },
+                            onSelectDepartureLongClicked = {
+                                viewModel.resetCalender()
+                                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                            },
                             showProductSelector = { showProductSelector = true },
                             isProductsChanged = isProductsChanged
                         )
@@ -279,6 +318,7 @@ fun DirectionsScreen(
                 SearchResultComponent(
                     modifier = Modifier.padding(pv),
                     trips = trips?.toSet(),
+                    queryMoreState = queryMoreState,
                     tripClicked = tripClicked,
                     onLoadMoreRequested = viewModel::searchMore
                 )

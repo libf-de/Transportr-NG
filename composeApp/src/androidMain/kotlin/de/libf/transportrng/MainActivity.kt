@@ -1,5 +1,6 @@
 package de.libf.transportrng
 
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
@@ -58,7 +59,6 @@ class MainActivity : ComponentActivity() {
                 window.clearFlags(FLAG_SHOW_WHEN_LOCKED)
         }
     }
-
 
     fun askForLocationPermissions() {
         val locationPermissionRequest = registerForActivityResult(
